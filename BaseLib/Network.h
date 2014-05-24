@@ -37,8 +37,8 @@
 class Base
 {
 public:
-	Base() {};
-	virtual ~Base() {};
+	Base() { isActive = false; sock = INVALID_SOCKET; };
+	~Base() {};
 	SOCKET sock;
 	bool isActive;
 	int Opt = 1;
@@ -48,7 +48,7 @@ class Client : public Base
 {
 public:
 	Client() {};
-	virtual ~Client() {};
+	~Client() {};
 	bool ReceivingData();
 	class Server* pServer;
 	unsigned char pData[MAX_BUFFER_SIZE];
@@ -58,18 +58,21 @@ class Server : public Base
 {
 	public:
 		Server() {};
-		virtual ~Server() {};
+		~Server() {};
 		bool Start();
 		void Loop();
 		void AddClient(SOCKET sock, sockaddr_in* addr);
 		void CheckFDS(fd_set* fds);
 		void HandleClients(fd_set* fds);
 		void Disconnect(Client* cli);
-
-		void OnServerStep() {};
-		void OnConnect(Client* cli) {};
-		void OnDisconnect(Client* cli) {};
-		void OnDataReceived(Client* cli, unsigned char* pData) {};
+		
+		virtual Client* CreateClient()  { return new Client(); };
+		virtual void DeleteClient(Client * cli)  { delete cli; };
+		virtual void OnReady() {};
+		virtual void OnServerStep() {};
+		virtual void OnConnect(Client* cli) {};
+		virtual void OnDisconnect(Client* cli) {};
+		virtual void OnDataReceived(Client* cli, unsigned char* pData) {};
 
 		WSADATA wsData;
 		int sPort = SERVER_PORT;

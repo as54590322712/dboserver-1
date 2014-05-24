@@ -9,8 +9,10 @@ public:
 	AuthServer();
 	virtual ~AuthServer();
 
+	void OnReady();
 	void OnConnect(Client* cli);
 	void OnDisconnect(Client* cli);
+	void OnDataReceived(Client* cli, unsigned char* pData);
 };
 
 #endif

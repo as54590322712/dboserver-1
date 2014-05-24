@@ -13,7 +13,7 @@ bool Server::Start()
 
 	sock = socket(AF_INET, SOCK_STREAM, 0);
 
-	if (sock < 0)
+	if (sock == INVALID_SOCKET)
 	{
 		perror("socket() failed");
 		return false;
@@ -40,11 +40,11 @@ bool Server::Start()
 	addrServer.sin_addr.s_addr = htonl(INADDR_ANY);
 	addrServer.sin_port = htons(SERVER_PORT);
 
-	rc = bind(sock, (const sockaddr*)&addrServer, sizeof(addrServer));
-	if (rc < 0)
+	if (bind(sock, (const sockaddr*)&addrServer, sizeof(addrServer)))
 	{
 		perror("bind() failed");
 		close(sock);
+		sock = INVALID_SOCKET;
 		return false;
 	}
 
@@ -57,6 +57,7 @@ bool Server::Start()
 	}
 
 	isActive = true;
+	OnReady();
 	Loop();
 	return true;
 }
@@ -67,9 +68,7 @@ void Server::Loop()
 	int rc;
 	sockaddr_in cAddr;
 	SOCKET cSock;
-	timeval timeout;
-	timeout.tv_sec = 3 * 60;
-	timeout.tv_usec = 0;
+	timeval timeout = { 0, 2000 };
 
 	OnServerStep();
 
@@ -91,17 +90,18 @@ void Server::Loop()
 
 		if (FD_ISSET(sock, &fds))
 		{
-			cSock = accept(sock, (sockaddr*)&cAddr, (int *)sizeof(cAddr));
-
-			if (cSock != INVALID_SOCKET) AddClient(cSock, &cAddr);
+			int sSize = sizeof(sockaddr_in);
+			cSock = accept(sock, (sockaddr*)&cAddr, (int *)&sSize);
+			if (cSock != INVALID_SOCKET) { AddClient(cSock, &cAddr); }
 		}
+		HandleClients(&fds);
 	}
 	while (isActive);
 }
 
 void Server::AddClient(SOCKET sock, sockaddr_in* addr)
 {
-	Client* cli = new Client();
+	Client* cli = CreateClient();
 	cli->pServer = this;
 	cli->sock = sock;
 	cli->isActive = true;
@@ -123,7 +123,7 @@ void Server::HandleClients(fd_set* fds)
 	for each (Client* cli in Clients)
 	{
 		if (!cli->isActive) continue;
-		if (FD_ISSET(cli->sock, &fds))
+		if (FD_ISSET(cli->sock, fds))
 		{
 			if (!cli->ReceivingData()) Disconnect(cli);
 		}
@@ -136,11 +136,19 @@ void Server::Disconnect(Client* cli)
 	close(cli->sock);
 	cli->sock = INVALID_SOCKET;
 	cli->isActive = false;
-	int count = 0;
-	for each (Client* c in Clients)
+	std::vector<Client*>::iterator cIt = Clients.begin();
+	while (cIt != Clients.end())
 	{
-		if (c == cli) Clients.erase(Clients.begin() + count);
-		count++;
+		Client* c = (*cIt);
+
+		if (c == cli)
+		{
+			delete[] c;
+			cIt = Clients.erase(cIt);
+		}
+
+		if (cIt == Clients.end() || Clients.size() == 0) break;
+		++cIt;
 	}
-	delete cli;
+	DeleteClient(cli);
 }

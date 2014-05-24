@@ -3,19 +3,29 @@
 
 AuthServer::AuthServer()
 {
-	if (Start()) printf_s("Server is Listening\n");
+	if (!Start()) std::cout << "Server ERROR!" << std::endl;
 }
 
 AuthServer::~AuthServer()
 {
 }
 
+void AuthServer::OnReady()
+{
+	std::cout << "Server Listening ..." << std::endl;
+}
+
 void AuthServer::OnConnect(Client* cli)
 {
-	printf_s("Client Connected\n");
+	std::cout << "Client Connected" << std::endl;
 }
 
 void AuthServer::OnDisconnect(Client* cli)
 {
-	printf_s("Client Disconnected\n");
+	std::cout << "Client Disconnected" << std::endl;
+}
+
+void AuthServer::OnDataReceived(Client* cli, unsigned char* pData)
+{
+	std::cout << "Dado recebido" << std::endl;
 }

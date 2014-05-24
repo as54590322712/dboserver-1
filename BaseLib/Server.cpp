@@ -7,7 +7,7 @@ bool Server::Start()
 	rc = WSAStartup(MAKEWORD(2, 2), &wsData);
 	if (rc > 0)
 	{
-		perror("WSAStartup() error");
+		std::cout << "WSAStartup() error" << std::endl;
 		return false;
 	}
 
@@ -15,14 +15,14 @@ bool Server::Start()
 
 	if (sock == INVALID_SOCKET)
 	{
-		perror("socket() failed");
+		std::cout << "socket() failed" << std::endl;
 		return false;
 	}
 
 	rc = setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, (char *)&Opt, sizeof(Opt));
 	if (rc < 0)
 	{
-		perror("setsockopt() failed");
+		std::cout << "setsockopt() failed" << std::endl;
 		close(sock);
 		return false;
 	}
@@ -30,7 +30,7 @@ bool Server::Start()
 	rc = ioctlsocket(sock, FIONBIO, (u_long*)&Opt);
 	if (rc < 0)
 	{
-		perror("ioctl() failed");
+		std::cout << "ioctl() failed" << std::endl;
 		close(sock);
 		return false;
 	}
@@ -38,11 +38,11 @@ bool Server::Start()
 	memset(&addrServer, 0, sizeof(addrServer));
 	addrServer.sin_family = AF_INET;
 	addrServer.sin_addr.s_addr = htonl(INADDR_ANY);
-	addrServer.sin_port = htons(SERVER_PORT);
+	addrServer.sin_port = htons(sPort);
 
 	if (bind(sock, (const sockaddr*)&addrServer, sizeof(addrServer)))
 	{
-		perror("bind() failed");
+		std::cout << "bind() failed" << std::endl;
 		close(sock);
 		sock = INVALID_SOCKET;
 		return false;
@@ -51,7 +51,7 @@ bool Server::Start()
 	rc = listen(sock, 32);
 	if (rc < 0)
 	{
-		perror("listen() failed");
+		std::cout << "listen() failed" << std::endl;
 		close(sock);
 		return false;
 	}
@@ -64,91 +64,123 @@ bool Server::Start()
 
 void Server::Loop()
 {
-	fd_set fds;
-	int rc;
-	sockaddr_in cAddr;
-	SOCKET cSock;
-	timeval timeout = { 0, 2000 };
-
+	fd_set		fds;
+	int			activity;
+	sockaddr_in	ClientInfo;
+	SOCKET		NewSocket;
+	timeval		timeout = { 0, 2000 };
 	OnServerStep();
-
 	do
 	{
 		FD_ZERO(&fds);
 		CheckFDS(&fds);
 		FD_SET(sock, &fds);
 
-		rc = select(0, &fds, NULL, NULL, &timeout);
-
-		if (rc == 0) continue;
-
-		if (rc < 0 && errno == EINTR)
+		activity = select(0, &fds, NULL, NULL, &timeout);
+		if (activity == 0)
 		{
-			perror("select() failed");
+			continue;
+		}
+
+		if (activity < 0 && errno != EINTR) {
+			std::cout << "Select command failed: " << WSAGetLastError() << std::endl;
 			isActive = false;
 		}
-
 		if (FD_ISSET(sock, &fds))
 		{
-			int sSize = sizeof(sockaddr_in);
-			cSock = accept(sock, (sockaddr*)&cAddr, (int *)&sSize);
-			if (cSock != INVALID_SOCKET) { AddClient(cSock, &cAddr); }
+			int clientinfolen = sizeof(sockaddr_in);
+			NewSocket = accept(sock, (sockaddr*)&ClientInfo, (int*)&clientinfolen);
+			if (NewSocket != INVALID_SOCKET)
+				AddClient(NewSocket, &ClientInfo);
+			else
+				std::cout << "Error accepting socket: " << WSAGetLastError() << std::endl;
 		}
 		HandleClients(&fds);
-	}
-	while (isActive);
+	} while (isActive);
 }
 
 void Server::AddClient(SOCKET sock, sockaddr_in* addr)
 {
-	Client* cli = CreateClient();
-	cli->pServer = this;
-	cli->sock = sock;
-	cli->isActive = true;
-	Clients.push_back(cli);
-	OnConnect(cli);
+	Client* client = CreateClient();
+	if (client == NULL)
+	{
+		close(client->sock);
+		if (client != 0) delete client;
+		client = 0;
+		return;
+	}
+
+
+	client->pServer = this;
+	client->sock = sock;
+	client->isActive = true;
+
+	if (!OnConnect(client)) {
+		close(client->sock);
+		if (client != 0) delete client;
+		client = 0;
+		return;
+	}
+	Clients.push_back(client);
 }
 
 void Server::CheckFDS(fd_set* fds)
 {
-	for each (Client* cli in Clients)
+	for (unsigned int i = 0; i < Clients.size(); i++)
 	{
-		if (cli->isActive) FD_SET(cli->sock, fds);
-		else Disconnect(cli);
+		Client* client = Clients.at(i);
+		if (client->isActive)
+		{
+			FD_SET((unsigned)client->sock, fds);
+		}
+		else
+		{
+			Disconnect(client);
+		}
 	}
 }
 
 void Server::HandleClients(fd_set* fds)
 {
-	for each (Client* cli in Clients)
+	for (unsigned int i = 0; i < Clients.size(); i++)
 	{
-		if (!cli->isActive) continue;
-		if (FD_ISSET(cli->sock, fds))
+		Client* client = Clients.at(i);
+		if (!client->isActive)
+			continue;
+		if (FD_ISSET((unsigned)client->sock, fds))
 		{
-			if (!cli->ReceivingData()) Disconnect(cli);
+			if (!client->ReceivingData())
+			{
+				Disconnect(client);
+			}
 		}
 	}
 }
 
-void Server::Disconnect(Client* cli)
+void Server::Disconnect(Client* client)
 {
-	OnDisconnect(cli);
-	close(cli->sock);
-	cli->sock = INVALID_SOCKET;
-	cli->isActive = false;
-	std::vector<Client*>::iterator cIt = Clients.begin();
-	while (cIt != Clients.end())
+	OnDisconnect(client);
+	close(client->sock);
+	client->sock = INVALID_SOCKET;
+	client->isActive = false;
+	for (unsigned int i = 0; i < Clients.size(); i++)
 	{
-		Client* c = (*cIt);
-
-		if (c == cli)
+		Client* c = Clients.at(i);
+		if (c == client)
 		{
-			delete[] c;
-			cIt = Clients.erase(cIt);
+			Clients.erase(Clients.begin() + i);
+			break;
 		}
-
-		if (cIt == Clients.end() || Clients.size() == 0) break;
-		++cIt;
 	}
-	DeleteClient(cli);
+	DeleteClient(client);
+}
+
+Client* Server::CreateClient()
+{
+	return new Client();
+}
+
+void Server::DeleteClient(Client* client)
+{
+	delete client;
 }

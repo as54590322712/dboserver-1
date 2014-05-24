@@ -1,7 +1,6 @@
-#include "stdafx.h"
 #include "AuthServer.h"
 
-int _tmain(int argc, _TCHAR* argv[])
+int main(int argc, char* argv[])
 {
 	AuthServer* server = new AuthServer();
 	return 0;

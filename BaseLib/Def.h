@@ -1,6 +1,8 @@
 #ifndef _DEF_H
 #define _DEF_H
 
+#include <winnt.h>
+
 typedef char SBYTE;
 typedef unsigned char BYTE;
 typedef short SWORD;
@@ -17,5 +19,12 @@ typedef unsigned long long QWORD;
 #endif
 
 #define MAX_BUFFER_SIZE 7048
+
+#define MAX_USERNAME_SIZE 12
+#define MAX_PASSWORD_SIZE 12
+#define MAX_AUTHKEY_SIZE 16
+#define MAX_SRVADDR_SIZE 64
+#define MAX_CHARSRV_COUNT 10
+#define MAX_MAC_ADDR_SIZE 6
 
 #endif

@@ -64,11 +64,11 @@ bool Server::Start()
 
 void Server::Loop()
 {
-	fd_set		fds;
-	int			activity;
-	sockaddr_in	ClientInfo;
-	SOCKET		NewSocket;
-	timeval		timeout = { 0, 2000 };
+	fd_set fds;
+	int activity;
+	sockaddr_in ClientInfo;
+	SOCKET NewSocket;
+	timeval timeout = { 0, 2000 };
 	OnServerStep();
 	do
 	{

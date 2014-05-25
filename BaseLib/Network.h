@@ -1,5 +1,5 @@
-#ifndef _SERVER_H
-#define _SERVER_H
+#ifndef _NETWORK_H
+#define _NETWORK_H
 
 #include <winsock2.h>
 #include <thread>
@@ -37,11 +37,15 @@ public:
 class Client : public Base
 {
 public:
-	Client() { pServer = NULL; };
+	Client();
 	virtual ~Client() {};
 	bool ReceivingData();
+	void Send(unsigned char* pData, int size);
 	class Server* pServer;
 	unsigned char pData[MAX_BUFFER_SIZE];
+	int LastPacketSize;
+	int RecvCount;
+	int SendCount;
 };
 
 class Server : public Base

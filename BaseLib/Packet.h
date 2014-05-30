@@ -15,6 +15,7 @@ struct PACKETHEADER
 	WORD OpCode;
 };
 
+#pragma pack(push, 1)
 #define BEGIN_PACKET(opcode) \
 struct s##opcode :			 \
 	public PACKETHEADER		 \
@@ -24,7 +25,6 @@ struct s##opcode :			 \
 	{						 \
 	}
 #define END_PACKET() };
-
-#define DECLARE_PACKET_NAME(opcode) { #opcode }
+#pragma pack(pop)
 
 #endif

@@ -16,11 +16,12 @@ enum eOpcode
 
 struct SRVINFO
 {
-	char CharServerIP[MAX_SRVADDR_SIZE + 1];
+	char CharServerIP[MAX_SRVADDR_SIZE - 1];
 	WORD CharServerPort;
 	DWORD Load;
 };
 
+#pragma pack(push, 1)
 BEGIN_PACKET(UA_LOGIN_REQ)
 	WCHAR UserName[MAX_USERNAME_SIZE + 1];
 	WCHAR PassWord[MAX_PASSWORD_SIZE + 1];
@@ -40,5 +41,6 @@ BEGIN_PACKET(AU_LOGIN_RES)
 	BYTE ServerCount;
 	SRVINFO Servers[MAX_CHARSRV_COUNT];
 END_PACKET()
+#pragma pack(pop)
 
 #endif

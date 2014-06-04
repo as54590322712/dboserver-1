@@ -13,6 +13,7 @@
   <ItemGroup>
     <ClCompile Include="Client.cpp" />
     <ClCompile Include="Logger.cpp" />
+    <ClCompile Include="Packet.cpp" />
     <ClCompile Include="Server.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -20,6 +21,7 @@
     <ClInclude Include="Logger.h" />
     <ClInclude Include="Network.h" />
     <ClInclude Include="Packet.h" />
+    <ClInclude Include="Protocol.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{A0D9B4BD-FBB1-427D-AFD6-EF330F7E4915}</ProjectGuid>

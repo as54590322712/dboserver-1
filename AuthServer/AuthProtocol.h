@@ -1,7 +1,7 @@
 #ifndef _AUTHPROTOCOL_H
 #define _AUTHPROTOCOL_H
 
-#include "Packet.h"
+#include "Protocol.h"
 
 enum eOpcode
 {
@@ -16,7 +16,7 @@ enum eOpcode
 
 struct SRVINFO
 {
-	char CharServerIP[MAX_SRVADDR_SIZE - 1];
+	char CharServerIP[MAX_SRVADDR_SIZE + 1];
 	WORD CharServerPort;
 	DWORD Load;
 };

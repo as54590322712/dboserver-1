@@ -1,7 +1,8 @@
 #ifndef _DEF_H
 #define _DEF_H
 
-#include <winnt.h>
+#define SAFE_DELETE_ARRAY(p)	if(p) { delete[] p; p = 0; }
+#define SAFE_FREE(p)			if(p) { free(p); p = 0; }
 
 typedef char SBYTE;
 typedef unsigned char BYTE;
@@ -14,10 +15,7 @@ typedef unsigned long long QWORD;
 #define pi 3.1415926535897932384626433832795
 #define r2d pi/180
 
-#ifndef SERVER_PORT
 #define SERVER_PORT 50200
-#endif
-
 #define MAX_BUFFER_SIZE 7048
 
 #define MAX_USERNAME_SIZE 12

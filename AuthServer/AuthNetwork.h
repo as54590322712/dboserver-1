@@ -22,12 +22,12 @@ public:
 	void OnReady();
 	bool OnConnect(Client* client);
 	void OnDisconnect(Client* client);
-	bool OnDataReceived(Client* client, unsigned char* pData);
+	bool OnDataReceived(Client* client, Packet* pData);
 
 	AuthClient* CreateClient();
 	void DeleteClient(Client* client);
 
-	void PacketControl(AuthClient* client, unsigned char* pData);
+	void PacketControl(AuthClient* client, Packet* pData);
 };
 
 #endif

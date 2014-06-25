@@ -19,10 +19,10 @@ public:
 	void OnReady();
 	bool OnConnect(Client* client);
 	void OnDisconnect(Client* client);
-	bool OnDataReceived(Client* client, unsigned char* pData);
+	bool OnDataReceived(Client* client, Packet* pData);
 	CharClient* CreateClient();
 	void DeleteClient(Client* client);
-	void PacketControl(CharClient* client, unsigned char* pData);
+	void PacketControl(CharClient* client, Packet* pData);
 };
 
 #endif

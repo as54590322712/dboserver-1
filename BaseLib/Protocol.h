@@ -1,6 +1,8 @@
 #ifndef _PROTOCOL_H
 #define _PROTOCOL_H
 
+#pragma once
+
 #include "Def.h"
 
 struct sPACKETHEADER

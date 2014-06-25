@@ -1,4 +1,5 @@
 #include "CharNetwork.h"
+#include "CharProtocol.h"
 
 CharServer::CharServer()
 {
@@ -26,7 +27,7 @@ void CharServer::OnDisconnect(Client* client)
 	std::cout << "Client Disconnected" << std::endl;
 }
 
-bool CharServer::OnDataReceived(Client* client, unsigned char* pData)
+bool CharServer::OnDataReceived(Client* client, Packet* pData)
 {
 
 	PacketControl((CharClient*)client, pData);
@@ -43,15 +44,37 @@ void CharServer::DeleteClient(Client* client)
 	delete (CharClient*)client;
 }
 
-void CharServer::PacketControl(CharClient* client, unsigned char* pData)
+void CharServer::PacketControl(CharClient* client, Packet* pData)
 {
-	int opcode = *(unsigned short*)&pData[4];
-	std::cout << opcode << std::endl;
-	FILE* fp;
-	fopen_s(&fp, "log.dat", "a+");
-	if (fp != NULL)
+	LPPACKETHEADER header = pData->GetPacketHeader();
+	LPPACKETDATA data = (LPPACKETDATA)pData->GetPacketData();
+
+	switch (data->wOpCode)
 	{
-		fwrite(pData, sizeof(pData), 1, fp);
-		fclose(fp);
+	case UC_LOGIN_REQ:
+		{
+			sUC_LOGIN_REQ* lReq = (sUC_LOGIN_REQ*)data;
+			sCU_LOGIN_RES lRes;
+			memset(&lRes, 0, sizeof(sCU_LOGIN_RES));
+			lRes.OpCode = CU_LOGIN_RES;
+			lRes.ResultCode = 100;
+			client->Send((unsigned char*)&lRes, sizeof(lRes));
+		}
+		break;
+	case 1: break;
+	default:
+		{
+			printf("Received Opcode: %d\n", data->wOpCode);
+			char filename[60];
+			sprintf_s(filename, 60, "logs/packet_%x_%x.dat", data->wOpCode, header->wPacketLen);
+			FILE* fp;
+			fopen_s(&fp, filename, "w+");
+			if (fp != NULL)
+			{
+				fwrite(pData, client->LastPacketSize, 1, fp);
+				fclose(fp);
+			}
+		}
+		break;
 	}
 }

@@ -16,14 +16,14 @@ enum eOpcode
 	AU_LOGIN_DISCONNECT_RES,
 };
 
+#pragma pack(1)
+
 struct SRVINFO
 {
 	BYTE CharServerIP[MAX_SRVADDR_SIZE + 1];
 	WORD CharServerPort;
 	DWORD Load;
 };
-
-#pragma pack(1)
 
 BEGIN_PACKET(UA_LOGIN_REQ)
 	WCHAR UserName[MAX_USERNAME_SIZE + 1];
@@ -38,11 +38,20 @@ BEGIN_PACKET(AU_LOGIN_RES)
 	WORD ResultCode;
 	WCHAR UserName[MAX_USERNAME_SIZE + 1];
 	BYTE AuthKey[MAX_AUTHKEY_SIZE];
-	UINT32 AccountID;
+	int AccountID;
 	BYTE LastServerID;
 	DWORD AcLevel;
 	BYTE ServerCount;
 	SRVINFO Servers[MAX_CHARSRV_COUNT];
+END_PACKET()
+
+BEGIN_PACKET(UA_LOGIN_DISCONNECT_REQ)
+	WCHAR UserName[MAX_USERNAME_SIZE + 1];
+	DWORD CodePage;
+	bool IsEnteringCharacterServer;
+END_PACKET()
+
+BEGIN_PACKET(AU_LOGIN_DISCONNECT_RES)
 END_PACKET()
 
 #pragma pack()

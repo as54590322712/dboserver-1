@@ -34,4 +34,9 @@
       <Filter>Source Files\Network</Filter>
     </ClCompile>
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="CharProtocol.h">
+      <Filter>Header Files\Network</Filter>
+    </ClInclude>
+  </ItemGroup>
 </Project>

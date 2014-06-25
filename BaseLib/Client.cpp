@@ -15,16 +15,18 @@ bool Client::ReceivingData()
 	if (LastPacketSize <= 0) return false;
 
 	RecvCount++;
-	pServer->OnDataReceived(this, pData);
+	pkt->Attach(pData);
+	pServer->OnDataReceived(this, pkt);
 
 	return true;
 }
 
 void Client::Send(unsigned char* pData, int size)
 {
+	Packet* out = new Packet(pData, size);
 	u_long iMode = 1;
 	if (ioctlsocket(sock, FIONBIO, &iMode) != 0) std::cout << "error - ioctlsocket" << std::endl;
-	int retval = send(sock, (char*)pData, size, 0);
+	int retval = send(sock, (char*)out->GetPacketBuffer(), out->GetUsedSize(), 0);
 	iMode = 0;
 	if (ioctlsocket(sock, FIONBIO, &iMode) != 0) std::cout << "error - ioctlsocket" << std::endl;
 	SendCount++;

@@ -19,6 +19,7 @@
 #include <math.h>
 #include <csignal>
 #include "Def.h"
+#include "Packet.h"
 
 #define close closesocket
 
@@ -27,11 +28,12 @@
 class Base
 {
 public:
-	Base() { isActive = false; sock = INVALID_SOCKET; };
+	Base() { isActive = false; sock = INVALID_SOCKET; pkt = new Packet(); };
 	virtual ~Base() {};
 	SOCKET sock;
 	bool isActive;
 	int Opt = 1;
+	Packet* pkt;
 };
 
 class Client : public Base
@@ -66,7 +68,7 @@ class Server : public Base
 		virtual void OnServerStep() {};
 		virtual bool OnConnect(Client* client) { return true; };
 		virtual void OnDisconnect(Client* client) {};
-		virtual bool OnDataReceived(Client* client, unsigned char* pData) { return true; };
+		virtual bool OnDataReceived(Client* client, Packet* pData) { return true; };
 
 		WSADATA wsData;
 		int sPort = SERVER_PORT;

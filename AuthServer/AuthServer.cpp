@@ -51,16 +51,20 @@ void AuthServer::PacketControl(AuthClient* client, Packet* pData)
 	{
 	case UA_LOGIN_DISCONNECT_REQ:
 		{
-		sAU_LOGIN_DISCONNECT_RES dRes;
-		memset(&dRes, 0, sizeof(sAU_LOGIN_DISCONNECT_RES));
-		dRes.OpCode = AU_LOGIN_DISCONNECT_RES;
-		client->Send((unsigned char*)&dRes, sizeof(dRes));
+			sAU_LOGIN_DISCONNECT_RES dRes;
+			memset(&dRes, 0, sizeof(sAU_LOGIN_DISCONNECT_RES));
+			dRes.OpCode = AU_LOGIN_DISCONNECT_RES;
+			client->Send((unsigned char*)&dRes, sizeof(dRes));
 		}
 		break;
 	case UA_LOGIN_REQ:
 		{
 			sUA_LOGIN_REQ* lReq = (sUA_LOGIN_REQ*)data;
 			printf("USER: %S PASS: %S\n", lReq->UserName, lReq->PassWord);
+
+			memcpy(client->userName, lReq->UserName, MAX_USERNAME_SIZE);
+			memcpy(client->passWord, lReq->PassWord, MAX_PASSWORD_SIZE);
+
 			sAU_LOGIN_RES lRes;
 			memset(&lRes, 0, sizeof(sAU_LOGIN_RES));
 			lRes.OpCode = AU_LOGIN_RES;
@@ -69,7 +73,7 @@ void AuthServer::PacketControl(AuthClient* client, Packet* pData)
 			strcpy_s((char*)lRes.AuthKey, MAX_AUTHKEY_SIZE, "Dbo");
 			lRes.LastServerID = 0;
 			lRes.ResultCode = 100;
-			memcpy(lRes.UserName, lReq->UserName, MAX_USERNAME_SIZE);
+			memcpy(lRes.UserName, client->userName, MAX_USERNAME_SIZE);
 
 			// servers
 			lRes.ServerCount = 1;

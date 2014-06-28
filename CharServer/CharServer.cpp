@@ -55,9 +55,10 @@ void CharServer::PacketControl(CharClient* client, Packet* pData)
 		{
 			sUC_LOGIN_REQ* lReq = (sUC_LOGIN_REQ*)data;
 			sCU_LOGIN_RES lRes;
+			printf("ACCID: %d SRVID: %d AUTHKEY: %s\n", lReq->accountId, lReq->serverID, lReq->AuthKey);
 			memset(&lRes, 0, sizeof(sCU_LOGIN_RES));
 			lRes.OpCode = CU_LOGIN_RES;
-			lRes.ResultCode = 100;
+			lRes.ResultCode = 200;
 			client->Send((unsigned char*)&lRes, sizeof(lRes));
 		}
 		break;

@@ -48,6 +48,13 @@ public:
 	int LastPacketSize;
 	int RecvCount;
 	int SendCount;
+
+	WCHAR userName[MAX_USERNAME_SIZE + 1];
+	WCHAR passWord[MAX_PASSWORD_SIZE + 1];
+	BYTE AuthKey[MAX_AUTHKEY_SIZE];
+	int AccountID;
+	BYTE LastServerID;
+	DWORD AcLevel;
 };
 
 class Server : public Base

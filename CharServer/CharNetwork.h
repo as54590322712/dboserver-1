@@ -12,7 +12,8 @@ public:
 
 	// PROTOCOL FUNCTIONS
 	void SendLoginResult(sUC_LOGIN_REQ* data);
-	void SendServerlistOne(Packet* data);
+	void SendServerlistOne();
+	void SendCharLoadResult();
 };
 
 class CharServer : public Server

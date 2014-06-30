@@ -51,6 +51,8 @@ void CharServer::PacketControl(CharClient* client, Packet* pData)
 	switch (data->wOpCode)
 	{
 		case UC_LOGIN_REQ: client->SendLoginResult((sUC_LOGIN_REQ*)data); break;
+		case UC_CHARACTER_SERVERLIST_ONE_REQ: client->SendServerlistOne(); break;
+		case UC_CHARACTER_LOAD_REQ: client->SendCharLoadResult(); break;
 		case 1: break;
 		default:
 			{

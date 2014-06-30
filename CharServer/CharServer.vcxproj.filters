@@ -33,6 +33,9 @@
     <ClCompile Include="CharClient.cpp">
       <Filter>Source Files\Network</Filter>
     </ClCompile>
+    <ClCompile Include="CharProtocol.cpp">
+      <Filter>Source Files\Network</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CharProtocol.h">

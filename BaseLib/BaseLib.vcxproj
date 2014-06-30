@@ -22,6 +22,7 @@
     <ClInclude Include="Network.h" />
     <ClInclude Include="Packet.h" />
     <ClInclude Include="Protocol.h" />
+    <ClInclude Include="Structs.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{A0D9B4BD-FBB1-427D-AFD6-EF330F7E4915}</ProjectGuid>

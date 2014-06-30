@@ -11,6 +11,8 @@ class AuthClient : public Client
 public:
 	AuthClient();
 	~AuthClient();
+
+	char* GenAuthKey();
 };
 
 class AuthServer : public Server

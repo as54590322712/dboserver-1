@@ -4,7 +4,7 @@
 CharServer::CharServer()
 {
 	this->sPort = 50300;
-	if (!Start()) std::cout << "Server ERROR!" << std::endl;
+	if (!Start()) Logger::Log("Server ERROR!\n");
 }
 
 CharServer::~CharServer()
@@ -13,18 +13,18 @@ CharServer::~CharServer()
 
 void CharServer::OnReady()
 {
-	std::cout << "Server Listening ..." << std::endl;
+	Logger::Log("Server Listening ...\n");
 }
 
 bool CharServer::OnConnect(Client* client)
 {
-	std::cout << "Client Connected" << std::endl;
+	Logger::Log("Client Connected\n");
 	return true;
 }
 
 void CharServer::OnDisconnect(Client* client)
 {
-	std::cout << "Client Disconnected" << std::endl;
+	Logger::Log("Client Disconnected\n");
 }
 
 bool CharServer::OnDataReceived(Client* client, Packet* pData)
@@ -55,17 +55,17 @@ void CharServer::PacketControl(CharClient* client, Packet* pData)
 		{
 			sUC_LOGIN_REQ* lReq = (sUC_LOGIN_REQ*)data;
 			sCU_LOGIN_RES lRes;
-			printf("ACCID: %d SRVID: %d AUTHKEY: %s\n", lReq->accountId, lReq->serverID, lReq->AuthKey);
+			Logger::Log("ACCID: %d SRVID: %d AUTHKEY: %s\n", lReq->accountId, lReq->serverID, lReq->AuthKey);
 			memset(&lRes, 0, sizeof(sCU_LOGIN_RES));
 			lRes.OpCode = CU_LOGIN_RES;
-			lRes.ResultCode = 200;
+			lRes.ResultCode = CHARACTER_SUCCESS;
 			client->Send((unsigned char*)&lRes, sizeof(lRes));
 		}
 		break;
 	case 1: break;
 	default:
 		{
-			printf("Received Opcode: %d\n", data->wOpCode);
+			Logger::Log("Received Opcode: %d\n", data->wOpCode);
 			char filename[60];
 			sprintf_s(filename, 60, "logs/packet_%x_%x.dat", data->wOpCode, header->wPacketLen);
 			FILE* fp;

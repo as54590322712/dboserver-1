@@ -8,6 +8,9 @@ class CharClient : public Client
 public:
 	CharClient();
 	~CharClient();
+
+	// PROTOCOL FUNCTIONS
+	void SendServerlistOne(Packet* data);
 };
 
 class CharServer : public Server

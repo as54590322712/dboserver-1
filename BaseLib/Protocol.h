@@ -4,6 +4,7 @@
 #pragma once
 
 #include "Def.h"
+#include "Structs.h"
 
 struct sPACKETHEADER
 {

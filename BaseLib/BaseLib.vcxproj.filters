@@ -19,6 +19,18 @@
     <Filter Include="Header Files\Network">
       <UniqueIdentifier>{06baab74-5843-4792-bb6b-c52d3d56c76d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Database">
+      <UniqueIdentifier>{92a5b4f7-39a3-4f81-b4ad-f5e1a5aa9bb9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Database">
+      <UniqueIdentifier>{88472345-a0d1-4462-8154-bb68ea04aa79}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Config">
+      <UniqueIdentifier>{661f1d24-5db1-452a-b054-665fae0e0751}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Config">
+      <UniqueIdentifier>{e867cb52-6f5b-444b-b03b-d52a7b820fcc}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Server.cpp">
@@ -49,6 +61,9 @@
     </ClInclude>
     <ClInclude Include="Protocol.h">
       <Filter>Header Files\Network</Filter>
+    </ClInclude>
+    <ClInclude Include="Structs.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

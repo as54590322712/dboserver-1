@@ -80,6 +80,7 @@
   <ItemGroup>
     <ClCompile Include="CharClient.cpp" />
     <ClCompile Include="CharNetwork.h" />
+    <ClCompile Include="CharProtocol.cpp" />
     <ClCompile Include="CharServer.cpp" />
     <ClCompile Include="Main.cpp" />
   </ItemGroup>

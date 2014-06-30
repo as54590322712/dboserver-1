@@ -2,7 +2,7 @@
 
 AuthServer::AuthServer()
 {
-	if (!Start()) std::cout << "Server ERROR!" << std::endl;
+	if (!Start()) Logger::Log("Server ERROR!\n");
 }
 
 AuthServer::~AuthServer()
@@ -11,18 +11,18 @@ AuthServer::~AuthServer()
 
 void AuthServer::OnReady()
 {
-	std::cout << "Server Listening ..." << std::endl;
+	Logger::Log("Server Listening ...\n");
 }
 
 bool AuthServer::OnConnect(Client* client)
 {
-	std::cout << "Client Connected" << std::endl;
+	Logger::Log("Client Connected\n");
 	return true;
 }
 
 void AuthServer::OnDisconnect(Client* client)
 {
-	std::cout << "Client Disconnected" << std::endl;
+	Logger::Log("Client Disconnected\n");
 }
 
 bool AuthServer::OnDataReceived(Client* client, Packet* pData)
@@ -60,7 +60,7 @@ void AuthServer::PacketControl(AuthClient* client, Packet* pData)
 	case UA_LOGIN_REQ:
 		{
 			sUA_LOGIN_REQ* lReq = (sUA_LOGIN_REQ*)data;
-			printf("USER: %S PASS: %S\n", lReq->UserName, lReq->PassWord);
+			Logger::Log("USER: %S PASS: %S\n", lReq->UserName, lReq->PassWord);
 
 			memcpy(client->userName, lReq->UserName, MAX_USERNAME_SIZE);
 			memcpy(client->passWord, lReq->PassWord, MAX_PASSWORD_SIZE);
@@ -70,9 +70,9 @@ void AuthServer::PacketControl(AuthClient* client, Packet* pData)
 			lRes.OpCode = AU_LOGIN_RES;
 			lRes.AccountID = 1;
 			lRes.AcLevel = 0xFFFF;
-			strcpy_s((char*)lRes.AuthKey, MAX_AUTHKEY_SIZE, "Dbo");
+			strcpy_s((char*)lRes.AuthKey, MAX_AUTHKEY_SIZE, client->GenAuthKey());
 			lRes.LastServerID = 0;
-			lRes.ResultCode = 100;
+			lRes.ResultCode = AUTH_SUCCESS;
 			memcpy(lRes.UserName, client->userName, MAX_USERNAME_SIZE);
 
 			// servers
@@ -86,7 +86,7 @@ void AuthServer::PacketControl(AuthClient* client, Packet* pData)
 	case 1: break;
 	default:
 		{
-			printf("Received Opcode: %d\n", data->wOpCode);
+			Logger::Log("Received Opcode: %d\n", data->wOpCode);
 			char filename[60];
 			sprintf_s(filename, 60, "logs/packet_%x_%x.dat", data->wOpCode, header->wPacketLen);
 			FILE* fp;

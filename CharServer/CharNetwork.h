@@ -2,6 +2,7 @@
 #define _CHARNETWORK_H
 
 #include <Network.h>
+#include "CharProtocol.h"
 
 class CharClient : public Client
 {
@@ -10,6 +11,7 @@ public:
 	~CharClient();
 
 	// PROTOCOL FUNCTIONS
+	void SendLoginResult(sUC_LOGIN_REQ* data);
 	void SendServerlistOne(Packet* data);
 };
 

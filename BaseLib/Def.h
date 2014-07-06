@@ -28,6 +28,11 @@ typedef unsigned long long QWORD;
 #define INVALID_SLOTID (0xFF)
 #define MAX_SERVERNAME_SIZE (32)
 #define MAX_CHANNEL_COUNT (10)
+#define MAX_CHARNAME_SIZE (16)
+#define MAX_ITEM_OPTION (2)
+#define INVALID_MARKING_TYPE (0xffui8)
+#define INVALID_BYTE (0xffui8)
+#define MAX_CHARSLOT_COUNT (8)
 
 enum ResultCodes
 {

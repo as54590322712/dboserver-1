@@ -3,7 +3,7 @@
 
 void CharClient::SendLoginResult(sUC_LOGIN_REQ* data)
 {
-	Logger::Log("ACCID: %d SRVID: %d AUTHKEY: %s\n", data->accountId, data->serverID, data->AuthKey);
+	Logger::Log("-- LOGIN RESULT ACCID: %d SRVID: %d AUTHKEY: %s --\n", data->accountId, data->serverID, data->AuthKey);
 	LastServerID = data->serverID;
 	AccountID = data->accountId;
 	memcpy(AuthKey, data->AuthKey, MAX_AUTHKEY_SIZE);
@@ -17,6 +17,7 @@ void CharClient::SendLoginResult(sUC_LOGIN_REQ* data)
 
 void CharClient::SendServerlistOne()
 {
+	Logger::Log("-- SERVER LIST ONE --\n");
 	sCU_SERVER_FARM_INFO sinfo;
 	memset(&sinfo, 0, sizeof(sCU_SERVER_FARM_INFO));
 	sinfo.OpCode = CU_SERVER_FARM_INFO;
@@ -46,8 +47,27 @@ void CharClient::SendServerlistOne()
 	Send((unsigned char*)&cinfo, sizeof(cinfo));
 }
 
-void CharClient::SendCharLoadResult()
+void CharClient::SendCharLoadResult(sUC_CHARACTER_LOAD_REQ* data)
 {
+	Logger::Log("-- CHAR LOAD RESULT --\n");
+	sCU_CHARACTER_INFO cinfo;
+	memset(&cinfo, 0, sizeof(sCU_CHARACTER_INFO));
+	cinfo.Count = 1;
+	cinfo.OpCode = CU_CHARACTER_INFO;
+	cinfo.CharData[0].charId = 1000;
+	cinfo.CharData[0].Class = 0;
+	cinfo.CharData[0].Face = 3;
+	cinfo.CharData[0].Gender = 1;
+	cinfo.CharData[0].Hair = 4;
+	cinfo.CharData[0].HairColor = 2;
+	cinfo.CharData[0].IsAdult = true;
+	cinfo.CharData[0].Level = 1;
+	cinfo.CharData[0].NeedNameChange = false;
+	cinfo.CharData[0].Race = 0;
+	cinfo.CharData[0].SkinColor = 0;
+	wcscpy_s(cinfo.CharData[0].Name, L"Test");
+	Send((unsigned char*)&cinfo, sizeof(cinfo));
+
 	sCU_CHARACTER_LOAD_RES clres;
 	memset(&clres, 0, sizeof(sCU_CHARACTER_LOAD_RES));
 	clres.OpCode = CU_CHARACTER_LOAD_RES;

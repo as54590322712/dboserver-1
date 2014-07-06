@@ -27,7 +27,6 @@ void AuthServer::OnDisconnect(Client* client)
 
 bool AuthServer::OnDataReceived(Client* client, Packet* pData)
 {
-	
 	PacketControl((AuthClient*)client, pData);
 	return true;
 }
@@ -51,16 +50,18 @@ void AuthServer::PacketControl(AuthClient* client, Packet* pData)
 	{
 	case UA_LOGIN_DISCONNECT_REQ:
 		{
+			Logger::Log("-- DISCONNECT REQ --\n");
 			sAU_LOGIN_DISCONNECT_RES dRes;
 			memset(&dRes, 0, sizeof(sAU_LOGIN_DISCONNECT_RES));
 			dRes.OpCode = AU_LOGIN_DISCONNECT_RES;
+			client->Send((unsigned char*)&dRes, sizeof(dRes));
 			client->Send((unsigned char*)&dRes, sizeof(dRes));
 		}
 		break;
 	case UA_LOGIN_REQ:
 		{
 			sUA_LOGIN_REQ* lReq = (sUA_LOGIN_REQ*)data;
-			Logger::Log("USER: %S PASS: %S\n", lReq->UserName, lReq->PassWord);
+			Logger::Log("-- LOGIN  RESULT USER: %S PASS: %S --\n", lReq->UserName, lReq->PassWord);
 
 			memcpy(client->userName, lReq->UserName, MAX_USERNAME_SIZE);
 			memcpy(client->passWord, lReq->PassWord, MAX_PASSWORD_SIZE);

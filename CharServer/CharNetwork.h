@@ -13,7 +13,7 @@ public:
 	// PROTOCOL FUNCTIONS
 	void SendLoginResult(sUC_LOGIN_REQ* data);
 	void SendServerlistOne();
-	void SendCharLoadResult();
+	void SendCharLoadResult(sUC_CHARACTER_LOAD_REQ* data);
 };
 
 class CharServer : public Server

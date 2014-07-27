@@ -41,6 +41,8 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
+    <IncludePath>C:\Arquivos\Projetos\DBOServer\Deps\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Arquivos\Projetos\DBOServer\Deps\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -53,7 +55,7 @@
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>$(SolutionDir)BaseLib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -89,6 +91,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AuthClient.cpp" />
+    <ClCompile Include="AuthProtocol.cpp" />
     <ClCompile Include="AuthServer.cpp" />
     <ClCompile Include="Main.cpp" />
   </ItemGroup>
@@ -96,6 +99,9 @@
     <ProjectReference Include="..\BaseLib\BaseLib.vcxproj">
       <Project>{a0d9b4bd-fbb1-427d-afd6-ef330f7e4915}</Project>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Xml Include="AuthServerConfig.xml" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

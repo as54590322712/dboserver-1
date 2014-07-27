@@ -2,6 +2,8 @@
 
 AuthServer::AuthServer()
 {
+	ServerConfig = new Config("AuthServer");
+	this->sPort = ServerConfig->GetInt("Port");
 	if (!Start()) Logger::Log("Server ERROR!\n");
 }
 
@@ -11,7 +13,7 @@ AuthServer::~AuthServer()
 
 void AuthServer::OnReady()
 {
-	Logger::Log("Server Listening ...\n");
+	Logger::Log("Server Listening on port (%d) ...\n", sPort);
 }
 
 bool AuthServer::OnConnect(Client* client)
@@ -48,42 +50,8 @@ void AuthServer::PacketControl(AuthClient* client, Packet* pData)
 
 	switch (data->wOpCode)
 	{
-	case UA_LOGIN_DISCONNECT_REQ:
-		{
-			Logger::Log("-- DISCONNECT REQ --\n");
-			sAU_LOGIN_DISCONNECT_RES dRes;
-			memset(&dRes, 0, sizeof(sAU_LOGIN_DISCONNECT_RES));
-			dRes.OpCode = AU_LOGIN_DISCONNECT_RES;
-			client->Send((unsigned char*)&dRes, sizeof(dRes));
-			client->Send((unsigned char*)&dRes, sizeof(dRes));
-		}
-		break;
-	case UA_LOGIN_REQ:
-		{
-			sUA_LOGIN_REQ* lReq = (sUA_LOGIN_REQ*)data;
-			Logger::Log("-- LOGIN  RESULT USER: %S PASS: %S --\n", lReq->UserName, lReq->PassWord);
-
-			memcpy(client->userName, lReq->UserName, MAX_USERNAME_SIZE);
-			memcpy(client->passWord, lReq->PassWord, MAX_PASSWORD_SIZE);
-
-			sAU_LOGIN_RES lRes;
-			memset(&lRes, 0, sizeof(sAU_LOGIN_RES));
-			lRes.OpCode = AU_LOGIN_RES;
-			lRes.AccountID = 1;
-			lRes.AcLevel = 0xFFFF;
-			strcpy_s((char*)lRes.AuthKey, MAX_AUTHKEY_SIZE, client->GenAuthKey());
-			lRes.LastServerID = 0;
-			lRes.ResultCode = AUTH_SUCCESS;
-			memcpy(lRes.UserName, client->userName, MAX_USERNAME_SIZE);
-
-			// servers
-			lRes.ServerCount = 1;
-			strcpy_s((char*)lRes.Servers[0].CharServerIP, MAX_SRVADDR_SIZE, "127.0.0.1");
-			lRes.Servers[0].CharServerPort = 50300;
-			lRes.Servers[0].Load = 0;
-			client->Send((unsigned char*)&lRes, sizeof(lRes));
-		}
-		break;
+	case UA_LOGIN_DISCONNECT_REQ: client->SendDisconnectRes((sUA_LOGIN_DISCONNECT_REQ*)data); break;
+	case UA_LOGIN_REQ: client->SendLoginRes((sUA_LOGIN_REQ*)data);  break;
 	case 1: break;
 	default:
 		{

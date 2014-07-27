@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AuthServer>
+  <Port value="50200" />
+</AuthServer>

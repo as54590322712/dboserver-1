@@ -19,26 +19,11 @@ bool Server::Start()
 		return false;
 	}
 
-	rc = setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, (char *)&Opt, sizeof(Opt));
-	if (rc < 0)
-	{
-		std::cout << "setsockopt() failed" << std::endl;
-		close(sock);
-		return false;
-	}
-
-	rc = ioctlsocket(sock, FIONBIO, (u_long*)&Opt);
-	if (rc < 0)
-	{
-		std::cout << "ioctl() failed" << std::endl;
-		close(sock);
-		return false;
-	}
-
 	memset(&addrServer, 0, sizeof(addrServer));
 	addrServer.sin_family = AF_INET;
 	addrServer.sin_addr.s_addr = htonl(INADDR_ANY);
 	addrServer.sin_port = htons(sPort);
+	memset(&(addrServer.sin_zero), '\0', 8);
 
 	if (bind(sock, (const sockaddr*)&addrServer, sizeof(addrServer)))
 	{
@@ -48,7 +33,7 @@ bool Server::Start()
 		return false;
 	}
 
-	rc = listen(sock, 32);
+	rc = listen(sock, 5);
 	if (rc < 0)
 	{
 		std::cout << "listen() failed" << std::endl;

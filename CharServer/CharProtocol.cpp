@@ -3,7 +3,7 @@
 
 void CharClient::SendLoginResult(sUC_LOGIN_REQ* data)
 {
-	Logger::Log("-- LOGIN RESULT ACCID: %d SRVID: %d AUTHKEY: %s --\n", data->accountId, data->serverID, data->AuthKey);
+	Logger::Log("-- LOGIN RESULT ACCID: %d SRVID: %d --\n", data->accountId, data->serverID);
 	LastServerID = data->serverID;
 	AccountID = data->accountId;
 	memcpy(AuthKey, data->AuthKey, MAX_AUTHKEY_SIZE);
@@ -12,6 +12,7 @@ void CharClient::SendLoginResult(sUC_LOGIN_REQ* data)
 	memset(&lRes, 0, sizeof(sCU_LOGIN_RES));
 	lRes.OpCode = CU_LOGIN_RES;
 	lRes.ResultCode = CHARACTER_SUCCESS;
+	lRes.RaceAllowedFlag = 255;
 	Send((unsigned char*)&lRes, sizeof(lRes));
 }
 
@@ -73,4 +74,14 @@ void CharClient::SendCharLoadResult(sUC_CHARACTER_LOAD_REQ* data)
 	clres.OpCode = CU_CHARACTER_LOAD_RES;
 	clres.ResultCode = CHARACTER_SUCCESS;
 	Send((unsigned char*)&clres, sizeof(clres));
+}
+
+void CharClient::SendCharExitRes(sUC_CHARACTER_EXIT_REQ* data)
+{
+	Logger::Log("-- CHARSERVER EXIT RES --\n");
+	sCU_CHARACTER_EXIT_RES cexit;
+	memset(&cexit, 0, sizeof(cexit));
+	cexit.OpCode = CU_CHARACTER_EXIT_RES;
+	cexit.ResultCode = CHARACTER_SUCCESS;
+	Send((unsigned char*)&cexit, sizeof(cexit));
 }

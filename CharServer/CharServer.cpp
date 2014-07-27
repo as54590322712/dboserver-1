@@ -2,7 +2,8 @@
 
 CharServer::CharServer()
 {
-	this->sPort = 50300;
+	ServerConfig = new Config("CharServer");
+	this->sPort = ServerConfig->GetInt("Port");
 	if (!Start()) Logger::Log("Server ERROR!\n");
 }
 
@@ -12,7 +13,7 @@ CharServer::~CharServer()
 
 void CharServer::OnReady()
 {
-	Logger::Log("Server Listening ...\n");
+	Logger::Log("Server Listening on port (%d) ...\n", sPort);
 }
 
 bool CharServer::OnConnect(Client* client)
@@ -52,6 +53,7 @@ void CharServer::PacketControl(CharClient* client, Packet* pData)
 		case UC_LOGIN_REQ: client->SendLoginResult((sUC_LOGIN_REQ*)data); break;
 		case UC_CHARACTER_SERVERLIST_ONE_REQ: client->SendServerlistOne(); break;
 		case UC_CHARACTER_LOAD_REQ: client->SendCharLoadResult((sUC_CHARACTER_LOAD_REQ*)data); break;
+		case UC_CHARACTER_EXIT_REQ: client->SendCharExitRes((sUC_CHARACTER_EXIT_REQ*)data); break;
 		case 1: break;
 		default:
 			{

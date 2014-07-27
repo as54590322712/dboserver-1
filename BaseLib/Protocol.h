@@ -3,8 +3,8 @@
 
 #pragma once
 
+#include <string>
 #include "Def.h"
-#include "Structs.h"
 
 struct sPACKETHEADER
 {
@@ -13,7 +13,6 @@ struct sPACKETHEADER
 	WORD			OpCode;
 };
 
-#pragma pack(push, 1)
 #define BEGIN_PACKET(opcode) \
 struct s##opcode :			 \
 	public sPACKETHEADER	 \
@@ -23,6 +22,5 @@ struct s##opcode :			 \
 {						 \
 }
 #define END_PACKET() };
-#pragma pack(pop)
 
 #endif

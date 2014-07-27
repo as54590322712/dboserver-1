@@ -33,6 +33,9 @@
     <ClCompile Include="AuthClient.cpp">
       <Filter>Source Files\Network</Filter>
     </ClCompile>
+    <ClCompile Include="AuthProtocol.cpp">
+      <Filter>Source Files\Network</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AuthNetwork.h">
@@ -41,5 +44,8 @@
     <ClInclude Include="AuthProtocol.h">
       <Filter>Header Files\Network</Filter>
     </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Xml Include="AuthServerConfig.xml" />
   </ItemGroup>
 </Project>

@@ -45,6 +45,9 @@
     <ClCompile Include="Packet.cpp">
       <Filter>Source Files\Network</Filter>
     </ClCompile>
+    <ClCompile Include="Config.cpp">
+      <Filter>Source Files\Config</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Def.h">
@@ -62,8 +65,8 @@
     <ClInclude Include="Protocol.h">
       <Filter>Header Files\Network</Filter>
     </ClInclude>
-    <ClInclude Include="Structs.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="Config.h">
+      <Filter>Header Files\Config</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

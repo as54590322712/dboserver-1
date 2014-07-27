@@ -2,6 +2,7 @@
 #define _AUTHNETWORK_H
 
 #include <Network.h>
+#include <Config.h>
 #include <iostream>
 #include <fstream>
 #include "AuthProtocol.h"
@@ -13,6 +14,8 @@ public:
 	~AuthClient();
 
 	char* GenAuthKey();
+	void SendLoginRes(sUA_LOGIN_REQ* data);
+	void SendDisconnectRes(sUA_LOGIN_DISCONNECT_REQ* data);
 };
 
 class AuthServer : public Server
@@ -30,6 +33,8 @@ public:
 	void DeleteClient(Client* client);
 
 	void PacketControl(AuthClient* client, Packet* pData);
+
+	Config* ServerConfig;
 };
 
 #endif

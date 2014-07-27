@@ -19,13 +19,6 @@ enum eOpcode
 
 #pragma pack(1)
 
-struct SRVINFO
-{
-	BYTE CharServerIP[MAX_SRVADDR_SIZE + 1];
-	WORD CharServerPort;
-	DWORD Load;
-};
-
 BEGIN_PACKET(UA_LOGIN_REQ)
 	WCHAR UserName[MAX_USERNAME_SIZE + 1];
 	WCHAR PassWord[MAX_PASSWORD_SIZE + 1];

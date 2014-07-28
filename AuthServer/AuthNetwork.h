@@ -14,6 +14,9 @@ public:
 	~AuthClient();
 
 	char* GenAuthKey();
+	int GetDBAccountID();
+	ResultCodes LoginVerifyAccount();
+
 	void SendLoginRes(sUA_LOGIN_REQ* data);
 	void SendDisconnectRes(sUA_LOGIN_DISCONNECT_REQ* data);
 };
@@ -33,8 +36,6 @@ public:
 	void DeleteClient(Client* client);
 
 	void PacketControl(AuthClient* client, Packet* pData);
-
-	Config* ServerConfig;
 };
 
 #endif

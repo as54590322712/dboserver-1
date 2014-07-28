@@ -3,6 +3,13 @@
 CharServer::CharServer()
 {
 	ServerConfig = new Config("CharServer");
+	ServerDB = new Database();
+	ServerDB->Connect(
+		ServerConfig->GetStr("MySQL", "Host"),
+		ServerConfig->GetStr("MySQL", "Database"),
+		ServerConfig->GetStr("MySQL", "User"),
+		ServerConfig->GetStr("MySQL", "Password"),
+		ServerConfig->GetInt("MySQL", "Port"));
 	this->sPort = ServerConfig->GetInt("Port");
 	if (!Start()) Logger::Log("Server ERROR!\n");
 }

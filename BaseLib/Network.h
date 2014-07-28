@@ -19,6 +19,8 @@
 #include "Def.h"
 #include "Packet.h"
 #include "Logger.h"
+#include "Config.h"
+#include "Database.h"
 
 #define close closesocket
 
@@ -80,6 +82,8 @@ class Server : public Base
 		int sPort = SERVER_PORT;
 		sockaddr_in addrServer;
 		std::vector<Client*> Clients;
+		Config* ServerConfig;
+		Database* ServerDB;
 };
 
 #endif

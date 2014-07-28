@@ -3,7 +3,7 @@
 
 void CharClient::SendLoginResult(sUC_LOGIN_REQ* data)
 {
-	Logger::Log("-- LOGIN RESULT ACCID: %d SRVID: %d --\n", data->accountId, data->serverID);
+	Logger::Log("-- CHAR LOGIN RESULT --\n", data->accountId, data->serverID);
 	LastServerID = data->serverID;
 	AccountID = data->accountId;
 	memcpy(AuthKey, data->AuthKey, MAX_AUTHKEY_SIZE);
@@ -12,7 +12,7 @@ void CharClient::SendLoginResult(sUC_LOGIN_REQ* data)
 	memset(&lRes, 0, sizeof(sCU_LOGIN_RES));
 	lRes.OpCode = CU_LOGIN_RES;
 	lRes.ResultCode = CHARACTER_SUCCESS;
-	lRes.RaceAllowedFlag = 255;
+	lRes.RaceAllowedFlag = 255; // Opened Races at Character Creation (0 = none, 255 = all)
 	Send((unsigned char*)&lRes, sizeof(lRes));
 }
 
@@ -66,7 +66,7 @@ void CharClient::SendCharLoadResult(sUC_CHARACTER_LOAD_REQ* data)
 	cinfo.CharData[0].NeedNameChange = false;
 	cinfo.CharData[0].Race = 0;
 	cinfo.CharData[0].SkinColor = 0;
-	wcscpy_s(cinfo.CharData[0].Name, L"Test");
+	wcscpy_s(cinfo.CharData[0].Name, L"Asuna");
 	Send((unsigned char*)&cinfo, sizeof(cinfo));
 
 	sCU_CHARACTER_LOAD_RES clres;

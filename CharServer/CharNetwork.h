@@ -31,8 +31,6 @@ public:
 	CharClient* CreateClient();
 	void DeleteClient(Client* client);
 	void PacketControl(CharClient* client, Packet* pData);
-
-	Config* ServerConfig;
 };
 
 #endif

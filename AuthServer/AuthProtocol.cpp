@@ -3,7 +3,7 @@
 
 void AuthClient::SendLoginRes(sUA_LOGIN_REQ* data)
 {
-	Logger::Log("-- LOGIN  RESULT USER: %S PASS: %S --\n", data->UserName, data->PassWord);
+	Logger::Log("-- LOGIN  RESULT --\n");
 
 	memcpy(userName, data->UserName, MAX_USERNAME_SIZE);
 	memcpy(passWord, data->PassWord, MAX_PASSWORD_SIZE);
@@ -11,18 +11,23 @@ void AuthClient::SendLoginRes(sUA_LOGIN_REQ* data)
 	sAU_LOGIN_RES lRes;
 	memset(&lRes, 0, sizeof(sAU_LOGIN_RES));
 	lRes.OpCode = AU_LOGIN_RES;
-	lRes.AccountID = 10002;
+	lRes.AccountID = GetDBAccountID();
 	memcpy(lRes.AuthKey, GenAuthKey(), MAX_AUTHKEY_SIZE);
 	lRes.LastServerID = 0;
-	lRes.ResultCode = AUTH_SUCCESS;
+	lRes.ResultCode = LoginVerifyAccount();
 	lRes.AcLevel = 0xFFFF;
 	memcpy(lRes.UserName, data->UserName, MAX_USERNAME_SIZE);
 
 	// servers
-	lRes.ServerCount = 1;
-	memcpy(lRes.Servers[0].CharServerIP, "127.0.0.1", MAX_SRVADDR_SIZE);
-	lRes.Servers[0].CharServerPort = 50300;
-	lRes.Servers[0].Load = 100;
+	lRes.ServerCount = pServer->ServerConfig->GetInt("ServerList", "count");
+	for (int x = 0; x < lRes.ServerCount; x++)
+	{
+		char snode[20];
+		sprintf_s(snode, "Server%d", x + 1);
+		memcpy(lRes.Servers[x].CharServerIP, pServer->ServerConfig->GetChildStr("ServerList", snode, "IP"), MAX_SRVADDR_SIZE);
+		lRes.Servers[x].CharServerPort = pServer->ServerConfig->GetChildInt("ServerList", snode, "Port");
+		lRes.Servers[x].Load = x;
+	}
 	Send((unsigned char*)&lRes, sizeof(lRes));
 }
 

@@ -5,7 +5,7 @@
 
 #include <libxml/xmlmemory.h>
 #include <libxml/parser.h>
-#include <libxml\tree.h>
+#include <libxml/tree.h>
 
 #pragma comment(lib, "libxml2_a.lib")
 #pragma comment(lib, "iconv_a.lib")
@@ -17,7 +17,13 @@ public:
 	Config(char* rootname);
 	~Config();
 	int GetInt(char* fieldname);
-	std::string GetStr(char* fieldname);
+	int GetInt(char* fieldname, char* valuename);
+	char* GetStr(char* fieldname);
+	char* GetStr(char* fieldname, char* valuename);
+	int GetChildInt(char* child, char* fieldname);
+	int GetChildInt(char* child, char* fieldname, char* valuename);
+	char* GetChildStr(char* child, char* fieldname);
+	char* GetChildStr(char* child, char* fieldname, char* valuename);
 
 	xmlDocPtr doc;
 	xmlNodePtr root, node;

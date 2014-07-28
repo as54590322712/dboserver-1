@@ -13,12 +13,14 @@
   <ItemGroup>
     <ClCompile Include="Client.cpp" />
     <ClCompile Include="Config.cpp" />
+    <ClCompile Include="Database.cpp" />
     <ClCompile Include="Logger.cpp" />
     <ClCompile Include="Packet.cpp" />
     <ClCompile Include="Server.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Config.h" />
+    <ClInclude Include="Database.h" />
     <ClInclude Include="Def.h" />
     <ClInclude Include="Logger.h" />
     <ClInclude Include="Network.h" />

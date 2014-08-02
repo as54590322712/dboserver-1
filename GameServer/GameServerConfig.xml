@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<GameServer>
+  <!-- Server Configuration -->
+  <Port value="50400" />
+  <MySQL Host="127.0.0.1" Port="3306" Database="DBO" User="root" Password="" />
+</GameServer>

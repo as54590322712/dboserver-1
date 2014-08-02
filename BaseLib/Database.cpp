@@ -34,7 +34,7 @@ MYSQL_RES* Database::GetResult()
 
 bool Database::ExecuteQuery(char* Format, ...)
 {
-	char szQuery[MAX_PATH];
+	char szQuery[6000];
 	va_list ap;
 	va_start(ap, Format);
 	vsprintf_s(szQuery, Format, ap);

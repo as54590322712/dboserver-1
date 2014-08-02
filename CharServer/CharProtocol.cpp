@@ -19,11 +19,13 @@ void CharClient::SendLoginResult(sUC_LOGIN_REQ* data)
 void CharClient::SendServerlistOne()
 {
 	Logger::Log("-- SERVER LIST ONE --\n");
+	char snode[20];
+	sprintf_s(snode, "Server%d", LastServerID + 1);
 	sCU_SERVER_FARM_INFO sinfo;
 	memset(&sinfo, 0, sizeof(sCU_SERVER_FARM_INFO));
 	sinfo.OpCode = CU_SERVER_FARM_INFO;
 	sinfo.serverInfo.serverId = LastServerID;
-	wcscpy_s(sinfo.serverInfo.ServerName, L"Beta Test");
+	memcpy(sinfo.serverInfo.ServerName, charToWChar(pServer->ServerConfig->GetChildStr("ServerList", snode, "Name")), MAX_SERVERNAME_SIZE);
 	sinfo.serverInfo.ServerStatus = SERVERSTATUS_UP;
 	sinfo.serverInfo.Load = 0;
 	sinfo.serverInfo.MaxLoad = 100;
@@ -53,20 +55,8 @@ void CharClient::SendCharLoadResult(sUC_CHARACTER_LOAD_REQ* data)
 	Logger::Log("-- CHAR LOAD RESULT --\n");
 	sCU_CHARACTER_INFO cinfo;
 	memset(&cinfo, 0, sizeof(sCU_CHARACTER_INFO));
-	cinfo.Count = 1;
+	cinfo.Count = GetDBAccCharListData(&cinfo);
 	cinfo.OpCode = CU_CHARACTER_INFO;
-	cinfo.CharData[0].charId = 1000;
-	cinfo.CharData[0].Class = 0;
-	cinfo.CharData[0].Face = 3;
-	cinfo.CharData[0].Gender = 1;
-	cinfo.CharData[0].Hair = 4;
-	cinfo.CharData[0].HairColor = 2;
-	cinfo.CharData[0].IsAdult = true;
-	cinfo.CharData[0].Level = 1;
-	cinfo.CharData[0].NeedNameChange = false;
-	cinfo.CharData[0].Race = 0;
-	cinfo.CharData[0].SkinColor = 0;
-	wcscpy_s(cinfo.CharData[0].Name, L"Asuna");
 	Send((unsigned char*)&cinfo, sizeof(cinfo));
 
 	sCU_CHARACTER_LOAD_RES clres;
@@ -84,4 +74,33 @@ void CharClient::SendCharExitRes(sUC_CHARACTER_EXIT_REQ* data)
 	cexit.OpCode = CU_CHARACTER_EXIT_RES;
 	cexit.ResultCode = CHARACTER_SUCCESS;
 	Send((unsigned char*)&cexit, sizeof(cexit));
+}
+
+void CharClient::SendCharCreateRes(sUC_CHARACTER_ADD_REQ* data)
+{
+	sCU_CHARACTER_ADD_RES Res;
+	memset(&Res, 0, sizeof(Res));
+	Res.OpCode = CU_CHARACTER_ADD_RES;
+	Res.ResultCode = CheckUsedName(data->CharName);
+	if (Res.ResultCode == CHARACTER_SUCCESS)
+	{
+		memcpy(Res.CharData.Name, data->CharName, MAX_CHARNAME_SIZE);
+		Res.CharData.charId = rand();
+		Res.CharData.Class = data->Class;
+		Res.CharData.Face = data->Face;
+		Res.CharData.Gender = data->Gender;
+		Res.CharData.Hair = data->Hair;
+		Res.CharData.HairColor = data->HairColor;
+		Res.CharData.Race = data->Race;
+		Res.CharData.SkinColor = data->SkinColor;
+		Res.CharData.Level = 1;
+		Res.CharData.MapInfoId = 1;
+		Res.CharData.TutorialFlag = false;
+		Res.CharData.Money = 10000;
+		Res.CharData.MoneyBank = 100000;
+		Res.CharData.IsAdult = false;
+		Res.CharData.NeedNameChange = false;
+		DBInsertCharData(Res.CharData);
+	}
+	Send((unsigned char*)&Res, sizeof(Res));
 }

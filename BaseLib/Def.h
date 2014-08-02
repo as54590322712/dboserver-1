@@ -36,6 +36,14 @@ typedef unsigned long long QWORD;
 #define INVALID_BYTE (0xffui8)
 #define MAX_CHARSLOT_COUNT (8)
 
+static wchar_t* charToWChar(const char* text)
+{
+	size_t conv, size = strlen(text) + 1;
+	wchar_t* wa = new wchar_t[size];
+	mbstowcs_s(&conv, wa, size, text, size);
+	return wa;
+}
+
 enum ResultCodes
 {
 	// BASE
@@ -215,17 +223,17 @@ struct DOGIDATA
 
 struct CHARDATA
 {
-	int charId;
-	WCHAR Name[MAX_CHARNAME_SIZE + 1];
-	BYTE Race;
-	BYTE Class;
-	bool IsAdult;
-	BYTE Gender;
-	BYTE Face;
-	BYTE Hair;
-	BYTE HairColor;
-	BYTE SkinColor;
-	BYTE Level;
+	int charId; //
+	WCHAR Name[MAX_CHARNAME_SIZE + 1]; //
+	BYTE Race; //
+	BYTE Class; //
+	bool IsAdult; //
+	BYTE Gender; // 
+	BYTE Face; //
+	BYTE Hair; //
+	BYTE HairColor; //
+	BYTE SkinColor; //
+	BYTE Level; //
 	int worldTblidx;
 	int worldId;
 	float PositionX;
@@ -237,7 +245,7 @@ struct CHARDATA
 	DWORD MapInfoId;
 	bool TutorialFlag;
 	MARKING Marking;
-	bool NeedNameChange;
+	bool NeedNameChange; //
 	DOGIDATA Dogi;
 };
 

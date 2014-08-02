@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ChatServer>
+  <!-- Server Configuration -->
+  <Port value="50100" />
+  <MySQL Host="127.0.0.1" Port="3306" Database="DBO" User="root" Password="" />
+  
+  <!-- Server List Configuration -->
+  <ServerList count="1">
+    <Server1 Name="Test Server" IP="127.0.0.1" Port="50400" />
+  </ServerList>
+</ChatServer>

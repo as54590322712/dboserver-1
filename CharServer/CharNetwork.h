@@ -11,11 +11,16 @@ public:
 	CharClient();
 	~CharClient();
 
+	int GetDBAccCharListData(sCU_CHARACTER_INFO* outdata);
+	void DBInsertCharData(CHARDATA data);
+	ResultCodes CheckUsedName(WCHAR* Name);
+
 	// PROTOCOL FUNCTIONS
 	void SendLoginResult(sUC_LOGIN_REQ* data);
 	void SendServerlistOne();
 	void SendCharLoadResult(sUC_CHARACTER_LOAD_REQ* data);
 	void SendCharExitRes(sUC_CHARACTER_EXIT_REQ* data);
+	void SendCharCreateRes(sUC_CHARACTER_ADD_REQ* data);
 };
 
 class CharServer : public Server

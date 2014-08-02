@@ -1,8 +1,8 @@
-#include "CharNetwork.h"
+#include "GameNetwork.h"
 
-CharServer::CharServer()
+GameServer::GameServer()
 {
-	ServerConfig = new Config("CharServer");
+	ServerConfig = new Config("GameServer");
 	ServerDB = new Database();
 	ServerDB->Connect(
 		ServerConfig->GetStr("MySQL", "Host"),
@@ -14,54 +14,49 @@ CharServer::CharServer()
 	if (!Start()) Logger::Log("Server ERROR!\n");
 }
 
-CharServer::~CharServer()
+GameServer::~GameServer()
 {
 }
 
-void CharServer::OnReady()
+void GameServer::OnReady()
 {
 	Logger::Log("Server Listening on port (%d) ...\n", sPort);
 }
 
-bool CharServer::OnConnect(Client* client)
+bool GameServer::OnConnect(Client* client)
 {
 	Logger::Log("Client Connected\n");
 	return true;
 }
 
-void CharServer::OnDisconnect(Client* client)
+void GameServer::OnDisconnect(Client* client)
 {
 	Logger::Log("Client Disconnected\n");
 }
 
-bool CharServer::OnDataReceived(Client* client, Packet* pData)
+bool GameServer::OnDataReceived(Client* client, Packet* pData)
 {
-	PacketControl((CharClient*)client, pData);
+	PacketControl((GameClient*)client, pData);
 	return true;
 }
 
-CharClient* CharServer::CreateClient()
+GameClient* GameServer::CreateClient()
 {
-	return new CharClient();
+	return new GameClient();
 }
 
-void CharServer::DeleteClient(Client* client)
+void GameServer::DeleteClient(Client* client)
 {
-	delete (CharClient*)client;
+	delete (GameClient*)client;
 }
 
-void CharServer::PacketControl(CharClient* client, Packet* pData)
+void GameServer::PacketControl(GameClient* client, Packet* pData)
 {
 	LPPACKETHEADER header = pData->GetPacketHeader();
 	LPPACKETDATA data = (LPPACKETDATA)pData->GetPacketData();
 
 	switch (data->wOpCode)
 	{
-		case UC_LOGIN_REQ: client->SendLoginResult((sUC_LOGIN_REQ*)data); break;
-		case UC_CHARACTER_SERVERLIST_ONE_REQ: client->SendServerlistOne(); break;
-		case UC_CHARACTER_LOAD_REQ: client->SendCharLoadResult((sUC_CHARACTER_LOAD_REQ*)data); break;
-		case UC_CHARACTER_EXIT_REQ: client->SendCharExitRes((sUC_CHARACTER_EXIT_REQ*)data); break;
-		case UC_CHARACTER_ADD_REQ: client->SendCharCreateRes((sUC_CHARACTER_ADD_REQ*)data); break;
 		case 1: break;
 		default:
 			{

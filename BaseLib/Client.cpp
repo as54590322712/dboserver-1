@@ -32,14 +32,4 @@ void Client::Send(unsigned char* pData, int size)
 	iMode = 0;
 	if (ioctlsocket(sock, FIONBIO, &iMode) != 0) std::cout << "error - ioctlsocket" << std::endl;
 	SendCount++;
-
-	char filename[60];
-	sprintf_s(filename, 60, "logs/out_%d.dat", size);
-	FILE* fp;
-	fopen_s(&fp, filename, "w+");
-	if (fp != NULL)
-	{
-		fwrite(pData, size, 1, fp);
-		fclose(fp);
-	}
 }

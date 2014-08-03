@@ -12,7 +12,7 @@ void CharClient::SendLoginResult(sUC_LOGIN_REQ* data)
 	lRes.lastServerId = CurrServerID;
 	lRes.OpCode = CU_LOGIN_RES;
 	lRes.ResultCode = CHARACTER_SUCCESS;
-	lRes.RaceAllowedFlag = GetDBAllowedRaces(); // Opened Races at Character Creation (0 = none, 255 = all)
+	lRes.RaceAllowedFlag = GetDBAllowedRaces();
 	Send((unsigned char*)&lRes, sizeof(lRes));
 }
 
@@ -31,23 +31,6 @@ void CharClient::SendServerlist()
 		sinfo.serverInfo.Load = 0;
 		sinfo.serverInfo.MaxLoad = pServer->ServerConfig->GetInt(snode, "MaxLoad");
 		Send((unsigned char*)&sinfo, sizeof(sinfo));
-
-		sCU_SERVER_CHANNEL_INFO cinfo;
-		memset(&cinfo, 0, sizeof(sCU_SERVER_CHANNEL_INFO));
-		cinfo.OpCode = CU_SERVER_CHANNEL_INFO;
-		cinfo.Count = pServer->ServerConfig->GetInt(snode, "Count");
-		for (int x = 0; x < cinfo.Count; x++)
-		{
-			char cnode[20];
-			sprintf_s(cnode, "Channel%d", x + 1);
-			cinfo.channelInfo[x].ChannelId = x;
-			cinfo.channelInfo[x].serverId = i;
-			cinfo.channelInfo[x].IsVisible = true;
-			cinfo.channelInfo[x].Load = x;
-			cinfo.channelInfo[x].MaxLoad = pServer->ServerConfig->GetChildInt(snode, cnode, "MaxLoad");
-			cinfo.channelInfo[x].ServerStatus = SERVERSTATUS_UP;
-		}
-		Send((unsigned char*)&cinfo, sizeof(cinfo));
 	}
 
 	sCU_CHARACTER_SERVERLIST_RES slres;
@@ -72,23 +55,6 @@ void CharClient::SendServerlistOne()
 		sinfo.serverInfo.Load = 0;
 		sinfo.serverInfo.MaxLoad = pServer->ServerConfig->GetInt(snode, "MaxLoad");
 		Send((unsigned char*)&sinfo, sizeof(sinfo));
-
-		sCU_SERVER_CHANNEL_INFO cinfo;
-		memset(&cinfo, 0, sizeof(sCU_SERVER_CHANNEL_INFO));
-		cinfo.OpCode = CU_SERVER_CHANNEL_INFO;
-		cinfo.Count = pServer->ServerConfig->GetInt(snode, "Count");
-		for (int x = 0; x < cinfo.Count; x++)
-		{
-			char cnode[20];
-			sprintf_s(cnode, "Channel%d", x + 1);
-			cinfo.channelInfo[x].ChannelId = x;
-			cinfo.channelInfo[x].serverId = i;
-			cinfo.channelInfo[x].IsVisible = true;
-			cinfo.channelInfo[x].Load = x;
-			cinfo.channelInfo[x].MaxLoad = pServer->ServerConfig->GetChildInt(snode, cnode, "MaxLoad");
-			cinfo.channelInfo[x].ServerStatus = SERVERSTATUS_UP;
-		}
-		Send((unsigned char*)&cinfo, sizeof(cinfo));
 	}
 
 	sCU_CHARACTER_SERVERLIST_ONE_RES slone;
@@ -96,6 +62,7 @@ void CharClient::SendServerlistOne()
 	slone.OpCode = CU_CHARACTER_SERVERLIST_ONE_RES;
 	slone.ResultCode = CHARACTER_SUCCESS;
 	Send((unsigned char*)&slone, sizeof(slone));
+
 }
 
 void CharClient::SendCharLoadResult(sUC_CHARACTER_LOAD_REQ* data)
@@ -103,6 +70,25 @@ void CharClient::SendCharLoadResult(sUC_CHARACTER_LOAD_REQ* data)
 	CurrServerID = data->serverId;
 	AccountID = data->accountId;
 	DBUpdateLastServer();
+
+	sCU_SERVER_CHANNEL_INFO cninfo;
+	memset(&cninfo, 0, sizeof(sCU_SERVER_CHANNEL_INFO));
+	cninfo.OpCode = CU_SERVER_CHANNEL_INFO;
+	char snode[20];
+	sprintf_s(snode, "Server%d", CurrServerID + 1);
+	cninfo.Count = pServer->ServerConfig->GetInt(snode, "Count");
+	for (int x = 0; x < cninfo.Count; x++)
+	{
+		char cnode[20];
+		sprintf_s(cnode, "Channel%d", x + 1);
+		cninfo.channelInfo[x].ChannelId = x;
+		cninfo.channelInfo[x].serverId = CurrServerID;
+		cninfo.channelInfo[x].IsVisible = true;
+		cninfo.channelInfo[x].Load = 0;
+		cninfo.channelInfo[x].MaxLoad = pServer->ServerConfig->GetChildInt(snode, cnode, "MaxLoad");
+		cninfo.channelInfo[x].ServerStatus = SERVERSTATUS_UP;
+	}
+	Send((unsigned char*)&cninfo, sizeof(cninfo));
 
 	sCU_CHARACTER_INFO cinfo;
 	memset(&cinfo, 0, sizeof(sCU_CHARACTER_INFO));

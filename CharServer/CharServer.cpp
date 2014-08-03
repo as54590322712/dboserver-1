@@ -67,19 +67,6 @@ void CharServer::PacketControl(CharClient* client, Packet* pData)
 		case UC_CHARACTER_DEL_CANCEL_REQ: client->SendCharDelCancelRes((sUC_CHARACTER_DEL_CANCEL_REQ*)data); break;
 		case UC_CONNECT_WAIT_CHECK_REQ: break;
 		case 1: break;
-		default:
-			{
-				Logger::Log("Received Opcode: %d\n", data->wOpCode);
-				char filename[60];
-				sprintf_s(filename, 60, "logs/packet_%x_%x.dat", data->wOpCode, header->wPacketLen);
-				FILE* fp;
-				fopen_s(&fp, filename, "w+");
-				if (fp != NULL)
-				{
-					fwrite(pData, client->LastPacketSize, 1, fp);
-					fclose(fp);
-				}
-			}
-			break;
+		default: Logger::Log("Received Opcode: %d\n", data->wOpCode); break;
 	}
 }

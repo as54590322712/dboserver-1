@@ -57,22 +57,9 @@ void AuthServer::PacketControl(AuthClient* client, Packet* pData)
 
 	switch (data->wOpCode)
 	{
-	case UA_LOGIN_DISCONNECT_REQ: client->SendDisconnectRes((sUA_LOGIN_DISCONNECT_REQ*)data); break;
-	case UA_LOGIN_REQ: client->SendLoginRes((sUA_LOGIN_REQ*)data);  break;
-	case 1: break;
-	default:
-		{
-			Logger::Log("Received Opcode: %d\n", data->wOpCode);
-			char filename[60];
-			sprintf_s(filename, 60, "logs/packet_%x_%x.dat", data->wOpCode, header->wPacketLen);
-			FILE* fp;
-			fopen_s(&fp, filename, "w+");
-			if (fp != NULL)
-			{
-				fwrite(pData, client->LastPacketSize, 1, fp);
-				fclose(fp);
-			}
-		}
-		break;
+		case UA_LOGIN_DISCONNECT_REQ: client->SendDisconnectRes((sUA_LOGIN_DISCONNECT_REQ*)data); break;
+		case UA_LOGIN_REQ: client->SendLoginRes((sUA_LOGIN_REQ*)data);  break;
+		case 1: break;
+		default: Logger::Log("Received Opcode: %d\n", data->wOpCode); break;
 	}
 }

@@ -56,19 +56,6 @@ void GameServer::PacketControl(GameClient* client, Packet* pData)
 	switch (data->wOpCode)
 	{
 		case 1: break;
-		default:
-			{
-				Logger::Log("Received Opcode: %d\n", data->wOpCode);
-				char filename[60];
-				sprintf_s(filename, 60, "logs/packet_%x_%x.dat", data->wOpCode, header->wPacketLen);
-				FILE* fp;
-				fopen_s(&fp, filename, "w+");
-				if (fp != NULL)
-				{
-					fwrite(pData, client->LastPacketSize, 1, fp);
-					fclose(fp);
-				}
-			}
-			break;
+		default: Logger::Log("Received Opcode: %d\n", data->wOpCode); break;
 	}
 }

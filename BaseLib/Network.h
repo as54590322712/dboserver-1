@@ -49,6 +49,7 @@ public:
 	int LastPacketSize;
 	int RecvCount;
 	int SendCount;
+	sockaddr_in* addr;
 
 	WCHAR userName[MAX_USERNAME_SIZE + 1];
 	WCHAR passWord[MAX_PASSWORD_SIZE + 1];
@@ -56,6 +57,9 @@ public:
 	int AccountID;
 	BYTE LastServerID;
 	DWORD AcLevel;
+	BYTE CurrServerID;
+	bool goCharServer;
+	bool goGameServer;
 };
 
 class Server : public Base

@@ -5,6 +5,7 @@ Client::Client()
 	pServer = NULL;
 	SendCount = RecvCount = LastPacketSize = 0;
 	ZeroMemory(&pData, MAX_BUFFER_SIZE);
+	goCharServer = goGameServer = false;
 }
 
 bool Client::ReceivingData()
@@ -15,7 +16,7 @@ bool Client::ReceivingData()
 	if (LastPacketSize <= 0) return false;
 
 	RecvCount++;
-	pkt->Attach(pData);
+	pkt->Attach(pData, false);
 	pServer->OnDataReceived(this, pkt);
 
 	return true;
@@ -23,7 +24,7 @@ bool Client::ReceivingData()
 
 void Client::Send(unsigned char* pData, int size)
 {
-	Packet* out = new Packet(pData, size);
+	Packet* out = new Packet(pData, size, false);
 	out->pHeader->bySequence = SendCount;
 	u_long iMode = 1;
 	if (ioctlsocket(sock, FIONBIO, &iMode) != 0) std::cout << "error - ioctlsocket" << std::endl;

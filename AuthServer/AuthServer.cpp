@@ -25,13 +25,13 @@ void AuthServer::OnReady()
 
 bool AuthServer::OnConnect(Client* client)
 {
-	Logger::Log("Client Connected\n");
 	return true;
 }
 
 void AuthServer::OnDisconnect(Client* client)
 {
-	Logger::Log("Client Disconnected\n");
+	if (client->goCharServer) ServerDB->ExecuteQuery("UPDATE `account` SET `State` = '2' WHERE `ID` = '%d';", client->AccountID);
+	else ServerDB->ExecuteQuery("UPDATE `account` SET `State` = '0' WHERE `ID` = '%d';", client->AccountID);
 }
 
 bool AuthServer::OnDataReceived(Client* client, Packet* pData)

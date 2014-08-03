@@ -14,13 +14,18 @@ public:
 	int GetDBAccCharListData(sCU_CHARACTER_INFO* outdata);
 	void DBInsertCharData(CHARDATA data);
 	ResultCodes CheckUsedName(WCHAR* Name);
+	int GetDBAllowedRaces();
+	void DBUpdateLastServer();
 
 	// PROTOCOL FUNCTIONS
 	void SendLoginResult(sUC_LOGIN_REQ* data);
+	void SendServerlist();
 	void SendServerlistOne();
 	void SendCharLoadResult(sUC_CHARACTER_LOAD_REQ* data);
 	void SendCharExitRes(sUC_CHARACTER_EXIT_REQ* data);
 	void SendCharCreateRes(sUC_CHARACTER_ADD_REQ* data);
+	void SendCharDelRes(sUC_CHARACTER_DEL_REQ* data);
+	void SendCharDelCancelRes(sUC_CHARACTER_DEL_CANCEL_REQ* data);
 };
 
 class CharServer : public Server

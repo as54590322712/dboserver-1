@@ -25,13 +25,11 @@ void ChatServer::OnReady()
 
 bool ChatServer::OnConnect(Client* client)
 {
-	Logger::Log("Client Connected\n");
 	return true;
 }
 
 void ChatServer::OnDisconnect(Client* client)
 {
-	Logger::Log("Client Disconnected\n");
 }
 
 bool ChatServer::OnDataReceived(Client* client, Packet* pData)

@@ -14,6 +14,8 @@ public:
 	~AuthClient();
 
 	char* GenAuthKey();
+	int GetDBAccountAcLevel();
+	BYTE GetDBLastServerID();
 	int GetDBAccountID();
 	ResultCodes LoginVerifyAccount();
 

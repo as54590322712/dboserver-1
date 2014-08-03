@@ -99,6 +99,7 @@ void Server::AddClient(SOCKET sock, sockaddr_in* addr)
 	client->pServer = this;
 	client->sock = sock;
 	client->isActive = true;
+	client->addr = addr;
 
 	if (!OnConnect(client)) {
 		close(client->sock);
@@ -106,6 +107,7 @@ void Server::AddClient(SOCKET sock, sockaddr_in* addr)
 		client = 0;
 		return;
 	}
+	Logger::Log("Client connected %s (%d)\n", inet_ntoa(client->addr->sin_addr), client->sock);
 	Clients.push_back(client);
 }
 
@@ -145,6 +147,7 @@ void Server::HandleClients(fd_set* fds)
 void Server::Disconnect(Client* client)
 {
 	OnDisconnect(client);
+	Logger::Log("Client disconnected %s (%d)\n", inet_ntoa(client->addr->sin_addr), client->sock);
 	close(client->sock);
 	client->sock = INVALID_SOCKET;
 	client->isActive = false;

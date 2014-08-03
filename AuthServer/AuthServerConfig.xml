@@ -5,7 +5,8 @@
   <MySQL Host="127.0.0.1" Port="3306" Database="DBO" User="root" Password="" />
   
   <!-- Server List Configuration -->
-  <ServerList count="1">
+  <ServerList Count="2">
     <Server1 IP="127.0.0.1" Port="50300" />
+    <Server2 IP="127.0.0.1" Port="50300" />
   </ServerList>
 </AuthServer>

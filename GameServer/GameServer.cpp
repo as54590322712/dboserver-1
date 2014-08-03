@@ -25,13 +25,11 @@ void GameServer::OnReady()
 
 bool GameServer::OnConnect(Client* client)
 {
-	Logger::Log("Client Connected\n");
 	return true;
 }
 
 void GameServer::OnDisconnect(Client* client)
 {
-	Logger::Log("Client Disconnected\n");
 }
 
 bool GameServer::OnDataReceived(Client* client, Packet* pData)

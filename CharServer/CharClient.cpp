@@ -8,6 +8,30 @@ CharClient::~CharClient()
 {
 }
 
+void CharClient::DBUpdateLastServer()
+{
+	if (pServer->ServerDB->ExecuteQuery("UPDATE `account` SET `LastServerID` = '%d' WHERE `ID` = '%d';", CurrServerID, AccountID))
+		LastServerID = CurrServerID;
+}
+
+int CharClient::GetDBAllowedRaces()
+{
+	MYSQL_RES* Res;
+	MYSQL_ROW Row;
+	if (pServer->ServerDB->ExecuteQuery("SELECT `AllowedRace` FROM account WHERE ID='%d'", AccountID))
+	{
+		Res = pServer->ServerDB->GetResult();
+		while (Row = mysql_fetch_row(Res))
+		{
+			return atoi(Row[0]);
+		}
+	}
+	else
+	{
+		return ALLRACES;
+	}
+}
+
 ResultCodes CharClient::CheckUsedName(WCHAR* Name)
 {
 	MYSQL_RES* Res;
@@ -27,7 +51,7 @@ void CharClient::DBInsertCharData(CHARDATA data)
 {
 	MYSQL_RES* Res;
 	MYSQL_ROW Row;
-	pServer->ServerDB->ExecuteQuery("INSERT INTO `character` (`AccID`, `Name`, `Class`, `Face`, `Gender`, `Hair`, `HairColor`, `Adult`, `Level`, `NeedNameChange`, `Race`, `SkinColor`, `worldTblidx`, `worldId`, `PositionX`, `PositionY`, `PositionZ`, `Money`, `MoneyBank`, `MapInfoId`, `TutorialFlag`)VALUES('%d', '%S', '%d', '%d', '%d', '%d', '%d', '%d', '%d', '%d', '%d', '%d', '%d', '%d', '%f', '%f', '%f', '%d', '%d', '%d', '%d');",
+	pServer->ServerDB->ExecuteQuery("INSERT INTO `character` (`AccID`, `Name`, `Class`, `Face`, `Gender`, `Hair`, `HairColor`, `Adult`, `Level`, `NeedNameChange`, `Race`, `SkinColor`, `worldTblidx`, `worldId`, `PositionX`, `PositionY`, `PositionZ`, `Money`, `MoneyBank`, `MapInfoId`, `TutorialFlag`, `ServerID`) VALUES ('%d', '%S', '%d', '%d', '%d', '%d', '%d', '%d', '%d', '%d', '%d', '%d', '%d', '%d', '%f', '%f', '%f', '%d', '%d', '%d', '%d', '%d');",
 		AccountID,
 		data.Name,
 		data.Class,
@@ -48,14 +72,15 @@ void CharClient::DBInsertCharData(CHARDATA data)
 		data.Money,
 		data.MoneyBank,
 		data.MapInfoId,
-		data.TutorialFlag);
+		data.TutorialFlag,
+		CurrServerID);
 }
 
 int CharClient::GetDBAccCharListData(sCU_CHARACTER_INFO* outdata)
 {
 	MYSQL_RES* Res;
 	MYSQL_ROW Row;
-	if (pServer->ServerDB->ExecuteQuery("SELECT * FROM `character` WHERE `AccID`='%d' LIMIT 8;", AccountID))
+	if (pServer->ServerDB->ExecuteQuery("SELECT * FROM `character` WHERE `AccID`='%d' AND `ServerID`='%d' LIMIT 8;", AccountID, CurrServerID))
 	{
 		Res = pServer->ServerDB->GetResult();
 		int c = 0;
@@ -83,6 +108,12 @@ int CharClient::GetDBAccCharListData(sCU_CHARACTER_INFO* outdata)
 			outdata->CharData[c].MapInfoId = atoi(Row[20]);
 			outdata->CharData[c].TutorialFlag = atoi(Row[21]);
 			//MARKING
+
+			// Check to delete char flag
+			if (atoi(Row[23]))
+			{
+				outdata->CharDelData[c].charId = atoi(Row[0]);
+			}
 			c++;
 		}
 		return c;

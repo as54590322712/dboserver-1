@@ -35,6 +35,7 @@ typedef unsigned long long QWORD;
 #define INVALID_MARKING_TYPE (0xffui8)
 #define INVALID_BYTE (0xffui8)
 #define MAX_CHARSLOT_COUNT (8)
+#define ALLRACES (0xFF)
 
 static wchar_t* charToWChar(const char* text)
 {
@@ -183,11 +184,11 @@ struct GAMECHANNEL_INFO
 
 struct ITEMDATA
 {
-	int tblidx;
+	unsigned int tblidx;
 	BYTE Rank;
 	BYTE Grade;
 	BYTE BattleAttribute;
-	int OptionTblidx[MAX_ITEM_OPTION];
+	unsigned int OptionTblidx[MAX_ITEM_OPTION];
 };
 
 struct MARKING
@@ -202,19 +203,7 @@ public:
 
 struct DOGIDATA
 {
-	bool IsIntialized(bool IsDojo)
-	{
-		if (IsDojo)
-		{
-			if (INVALID_BYTE == DojoColor) return false;
-			else return true;
-		}
-		else
-		{
-			if (INVALID_BYTE == GuildColor) return false;
-			else return true;
-		}
-	}
+	bool IsIntialized;
 	int guildId;
 	BYTE Type;
 	BYTE GuildColor;
@@ -223,7 +212,7 @@ struct DOGIDATA
 
 struct CHARDATA
 {
-	int charId; //
+	unsigned int charId; //
 	WCHAR Name[MAX_CHARNAME_SIZE + 1]; //
 	BYTE Race; //
 	BYTE Class; //
@@ -234,8 +223,8 @@ struct CHARDATA
 	BYTE HairColor; //
 	BYTE SkinColor; //
 	BYTE Level; //
-	int worldTblidx;
-	int worldId;
+	unsigned int worldTblidx;
+	unsigned int worldId;
 	float PositionX;
 	float PositionY;
 	float PositionZ;

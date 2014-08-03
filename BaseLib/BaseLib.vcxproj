@@ -14,6 +14,7 @@
     <ClCompile Include="Client.cpp" />
     <ClCompile Include="Config.cpp" />
     <ClCompile Include="Database.cpp" />
+    <ClCompile Include="Encryption.cpp" />
     <ClCompile Include="Logger.cpp" />
     <ClCompile Include="Packet.cpp" />
     <ClCompile Include="Server.cpp" />
@@ -22,6 +23,7 @@
     <ClInclude Include="Config.h" />
     <ClInclude Include="Database.h" />
     <ClInclude Include="Def.h" />
+    <ClInclude Include="Encryption.h" />
     <ClInclude Include="Logger.h" />
     <ClInclude Include="Network.h" />
     <ClInclude Include="Packet.h" />

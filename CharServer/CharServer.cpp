@@ -58,15 +58,16 @@ void CharServer::PacketControl(CharClient* client, Packet* pData)
 	switch (data->wOpCode)
 	{
 		case UC_LOGIN_REQ: client->SendLoginResult((sUC_LOGIN_REQ*)data); break;
-		case UC_CHARACTER_SERVERLIST_REQ: client->SendServerlist(); break;
-		case UC_CHARACTER_SERVERLIST_ONE_REQ: client->SendServerlistOne(); break;
+		case UC_CHARACTER_SERVERLIST_REQ: client->SendServerlist(false); break;
+		case UC_CHARACTER_SERVERLIST_ONE_REQ: client->SendServerlist(true); break;
 		case UC_CHARACTER_LOAD_REQ: client->SendCharLoadResult((sUC_CHARACTER_LOAD_REQ*)data); break;
 		case UC_CHARACTER_EXIT_REQ: client->SendCharExitRes((sUC_CHARACTER_EXIT_REQ*)data); break;
 		case UC_CHARACTER_ADD_REQ: client->SendCharCreateRes((sUC_CHARACTER_ADD_REQ*)data); break;
 		case UC_CHARACTER_DEL_REQ: client->SendCharDelRes((sUC_CHARACTER_DEL_REQ*)data); break;
 		case UC_CHARACTER_DEL_CANCEL_REQ: client->SendCharDelCancelRes((sUC_CHARACTER_DEL_CANCEL_REQ*)data); break;
-		case UC_CONNECT_WAIT_CHECK_REQ: break;
-		case 1: break;
+		case UC_CONNECT_WAIT_CHECK_REQ: client->SendCharConnWaitCheckRes((sUC_CONNECT_WAIT_CHECK_REQ*)data); break;
+		case UC_CHARACTER_SELECT_REQ: client->SendCharSelectRes((sUC_CHARACTER_SELECT_REQ*)data); break;
+		case 1: case 0: break;
 		default: Logger::Log("Received Opcode: %d\n", data->wOpCode); break;
 	}
 }

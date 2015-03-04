@@ -18,18 +18,27 @@ bool Client::ReceivingData()
 	RecvCount++;
 	pkt->Attach(pData, false);
 	pServer->OnDataReceived(this, pkt);
-
 	return true;
 }
 
-void Client::Send(unsigned char* pData, int size)
+void Client::Send(void* pData, int size)
 {
-	Packet* out = new Packet(pData, size, false);
+	Packet* out = new Packet((unsigned char*)pData, size, false);
 	out->pHeader->bySequence = SendCount;
 	u_long iMode = 1;
-	if (ioctlsocket(sock, FIONBIO, &iMode) != 0) std::cout << "error - ioctlsocket" << std::endl;
-	int retval = send(sock, (char*)out->GetPacketBuffer(), out->GetUsedSize(), 0);
+	int rc = ioctlsocket(sock, FIONBIO, &iMode);
+	if (rc == SOCKET_ERROR)	std::cout << "ioctlsocket() failed" << std::endl;
+	send(sock, (char*)out->GetPacketBuffer(), out->GetUsedSize(), 0);
 	iMode = 0;
-	if (ioctlsocket(sock, FIONBIO, &iMode) != 0) std::cout << "error - ioctlsocket" << std::endl;
+	rc = ioctlsocket(sock, FIONBIO, &iMode);
+	if (rc == SOCKET_ERROR)	std::cout << "ioctlsocket() failed" << std::endl;
 	SendCount++;
+}
+
+bool Client::IsConnected()
+{
+	int optval, optlen = sizeof(optval);
+	int res = getsockopt(this->sock, SOL_SOCKET, SO_ERROR, (char *)&optval, &optlen);
+	if (optval == 0 && res == 0) return true;
+	return false;
 }

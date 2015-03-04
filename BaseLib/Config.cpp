@@ -64,7 +64,6 @@ char* Config::GetStr(char* fieldname, char* valuename)
 			Logger::Log("Error on Loading Config xml File, Root node not found (%s)\n", rootname);
 		}
 
-		char res[MAX_PATH];
 		for (node = root->children; node; node = node->next)
 		{
 			if (xmlStrcmp(node->name, (const xmlChar*)fieldname) == 0)

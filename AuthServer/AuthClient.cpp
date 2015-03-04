@@ -91,7 +91,26 @@ ResultCodes AuthClient::LoginVerifyAccount()
 						Res = pServer->ServerDB->GetResult();
 						if (mysql_num_rows(Res) == 0)
 						{
-							return AUTH_USER_EXIST;
+							bool reconnect = false;
+
+							for each (Client* var in pServer->Clients)
+							{
+								if ((wcscmp(userName, var->userName) == 0) && (sock == var->sock))
+								{
+									reconnect = true;
+									break;
+								}
+							}
+
+							if (reconnect)
+							{
+								if (pServer->ServerDB->ExecuteQuery("UPDATE `account` SET `State` = '1' WHERE `ID` = '%d';", AccountID))
+									return AUTH_SUCCESS;
+								else
+									return AUTH_DB_FAIL;
+							}
+							else
+								return AUTH_USER_EXIST;
 						}
 						else
 						{

@@ -12,12 +12,20 @@ bool Server::Start()
 	}
 
 	sock = socket(AF_INET, SOCK_STREAM, 0);
-
 	if (sock == INVALID_SOCKET)
 	{
 		std::cout << "socket() failed" << std::endl;
 		return false;
 	}
+
+	int opval;
+	rc = setsockopt(sock, SOL_SOCKET, SO_KEEPALIVE, (char*)&opval, sizeof(opval));
+	if (rc == SOCKET_ERROR)
+	{
+		std::cout << "setsockopt() failed" << std::endl;
+		return false;
+	}
+	setsockopt(sock, IPPROTO_TCP, TCP_NODELAY, (const char*)&opval, sizeof(opval));
 
 	memset(&addrServer, 0, sizeof(addrServer));
 	addrServer.sin_family = AF_INET;
@@ -33,7 +41,7 @@ bool Server::Start()
 		return false;
 	}
 
-	rc = listen(sock, 5);
+	rc = listen(sock, SOMAXCONN);
 	if (rc < 0)
 	{
 		std::cout << "listen() failed" << std::endl;
@@ -53,21 +61,19 @@ void Server::Loop()
 	int activity;
 	sockaddr_in ClientInfo;
 	SOCKET NewSocket;
-	timeval timeout = { 0, 2000 };
+	timeval timeout;
 	OnServerStep();
 	do
 	{
+		timeout.tv_sec = 0;
+		timeout.tv_usec = 100;
+		NewSocket = INVALID_SOCKET;
 		FD_ZERO(&fds);
-		CheckFDS(&fds);
 		FD_SET(sock, &fds);
-
 		activity = select(0, &fds, NULL, NULL, &timeout);
-		if (activity == 0)
+		if (activity == 0) continue;
+		if (activity < 0 && errno != EINTR)
 		{
-			continue;
-		}
-
-		if (activity < 0 && errno != EINTR) {
 			std::cout << "Select command failed: " << WSAGetLastError() << std::endl;
 			isActive = false;
 		}
@@ -80,7 +86,6 @@ void Server::Loop()
 			else
 				std::cout << "Error accepting socket: " << WSAGetLastError() << std::endl;
 		}
-		HandleClients(&fds);
 	} while (isActive);
 }
 
@@ -95,7 +100,6 @@ void Server::AddClient(SOCKET sock, sockaddr_in* addr)
 		return;
 	}
 
-
 	client->pServer = this;
 	client->sock = sock;
 	client->isActive = true;
@@ -109,39 +113,7 @@ void Server::AddClient(SOCKET sock, sockaddr_in* addr)
 	}
 	Logger::Log("Client connected %s (%d)\n", inet_ntoa(client->addr->sin_addr), client->sock);
 	Clients.push_back(client);
-}
-
-void Server::CheckFDS(fd_set* fds)
-{
-	for (unsigned int i = 0; i < Clients.size(); i++)
-	{
-		Client* client = Clients.at(i);
-		if (client->isActive)
-		{
-			FD_SET((unsigned)client->sock, fds);
-		}
-		else
-		{
-			Disconnect(client);
-		}
-	}
-}
-
-void Server::HandleClients(fd_set* fds)
-{
-	for (unsigned int i = 0; i < Clients.size(); i++)
-	{
-		Client* client = Clients.at(i);
-		if (!client->isActive)
-			continue;
-		if (FD_ISSET((unsigned)client->sock, fds))
-		{
-			if (!client->ReceivingData())
-			{
-				Disconnect(client);
-			}
-		}
-	}
+	pthread_create(&threads[sock], NULL, ClientThread, (void*)client);
 }
 
 void Server::Disconnect(Client* client)
@@ -171,4 +143,31 @@ Client* Server::CreateClient()
 void Server::DeleteClient(Client* client)
 {
 	delete client;
+}
+
+void* ClientThread(void* _client)
+{
+	Client* client = (Client*)_client;
+	fd_set fds;
+	while (client->isActive)
+	{
+		FD_ZERO(&fds);
+		FD_SET(client->sock, &fds);
+		int Select = select(client->sock, &fds, NULL, NULL, NULL);
+		if (Select == SOCKET_ERROR)
+		{
+			Logger::Log("Select command failed\n");
+			client->isActive = false;
+		}
+		else
+		{
+			if (FD_ISSET(client->sock, &fds))
+			{
+				if (!client->ReceivingData()) client->isActive = false;
+			}
+		}
+	}
+	client->pServer->Disconnect(client);
+	pthread_exit(client);
+	return 0;
 }

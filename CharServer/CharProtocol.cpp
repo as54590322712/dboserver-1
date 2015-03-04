@@ -16,7 +16,7 @@ void CharClient::SendLoginResult(sUC_LOGIN_REQ* data)
 	Send((unsigned char*)&lRes, sizeof(lRes));
 }
 
-void CharClient::SendServerlist()
+void CharClient::SendServerlist(bool one)
 {
 	for (int i = 0; i < pServer->ServerConfig->GetInt("ServerCount"); i++)
 	{
@@ -33,36 +33,22 @@ void CharClient::SendServerlist()
 		Send((unsigned char*)&sinfo, sizeof(sinfo));
 	}
 
-	sCU_CHARACTER_SERVERLIST_RES slres;
-	memset(&slres, 0, sizeof(slres));
-	slres.OpCode = CU_CHARACTER_SERVERLIST_RES;
-	slres.ResultCode = CHARACTER_SUCCESS;
-	Send((unsigned char*)&slres, sizeof(slres));
-}
-
-void CharClient::SendServerlistOne()
-{
-	for (int i = 0; i < pServer->ServerConfig->GetInt("ServerCount"); i++)
+	if (one)
 	{
-		char snode[20];
-		sprintf_s(snode, "Server%d", i + 1);
-		sCU_SERVER_FARM_INFO sinfo;
-		memset(&sinfo, 0, sizeof(sCU_SERVER_FARM_INFO));
-		sinfo.OpCode = CU_SERVER_FARM_INFO;
-		sinfo.serverInfo.serverId = i;
-		memcpy(sinfo.serverInfo.ServerName, charToWChar(pServer->ServerConfig->GetStr(snode, "Name")), MAX_SERVERNAME_SIZE);
-		sinfo.serverInfo.ServerStatus = SERVERSTATUS_UP;
-		sinfo.serverInfo.Load = 0;
-		sinfo.serverInfo.MaxLoad = pServer->ServerConfig->GetInt(snode, "MaxLoad");
-		Send((unsigned char*)&sinfo, sizeof(sinfo));
+		sCU_CHARACTER_SERVERLIST_ONE_RES slone;
+		memset(&slone, 0, sizeof(sCU_CHARACTER_SERVERLIST_ONE_RES));
+		slone.OpCode = CU_CHARACTER_SERVERLIST_ONE_RES;
+		slone.ResultCode = CHARACTER_SUCCESS;
+		Send((unsigned char*)&slone, sizeof(slone));
 	}
-
-	sCU_CHARACTER_SERVERLIST_ONE_RES slone;
-	memset(&slone, 0, sizeof(sCU_CHARACTER_SERVERLIST_ONE_RES));
-	slone.OpCode = CU_CHARACTER_SERVERLIST_ONE_RES;
-	slone.ResultCode = CHARACTER_SUCCESS;
-	Send((unsigned char*)&slone, sizeof(slone));
-
+	else
+	{
+		sCU_CHARACTER_SERVERLIST_RES slres;
+		memset(&slres, 0, sizeof(slres));
+		slres.OpCode = CU_CHARACTER_SERVERLIST_RES;
+		slres.ResultCode = CHARACTER_SUCCESS;
+		Send((unsigned char*)&slres, sizeof(slres));
+	}
 }
 
 void CharClient::SendCharLoadResult(sUC_CHARACTER_LOAD_REQ* data)
@@ -132,6 +118,11 @@ void CharClient::SendCharCreateRes(sUC_CHARACTER_ADD_REQ* data)
 		Res.CharData.SkinColor = data->SkinColor;
 		Res.CharData.Level = 1;
 		Res.CharData.MapInfoId = 1;
+		Res.CharData.worldId = 1;
+		Res.CharData.worldTblidx = 1;
+		Res.CharData.PositionX = 4583.0f;
+		Res.CharData.PositionY = 0.0f;
+		Res.CharData.PositionZ = 4070.0f;
 		Res.CharData.TutorialFlag = false;
 		Res.CharData.Money = 10000;
 		Res.CharData.MoneyBank = 100000;
@@ -166,4 +157,38 @@ void CharClient::SendCharDelCancelRes(sUC_CHARACTER_DEL_CANCEL_REQ* data)
 	else
 		Res.ResultCode = CHARACTER_DB_QUERY_FAIL;
 	Send((unsigned char*)&Res, sizeof(Res));
+}
+
+void CharClient::SendCharConnWaitCheckRes(sUC_CONNECT_WAIT_CHECK_REQ* data)
+{
+	CurrChannelID = data->ChannelId;
+
+	sCU_CONNECT_WAIT_CHECK_RES checkRes;
+	checkRes.OpCode = CU_CONNECT_WAIT_CHECK_RES;
+	checkRes.ResultCode = GAME_SUCCESS;
+	Send((unsigned char*)&checkRes, sizeof(checkRes));
+
+	sCU_CONNECT_WAIT_COUNT_NFY connNfy;
+	connNfy.OpCode = CU_CONNECT_WAIT_COUNT_NFY;
+	connNfy.CountWaiting = 0;
+	Send((unsigned char*)&connNfy, sizeof(connNfy));
+}
+
+void CharClient::SendCharSelectRes(sUC_CHARACTER_SELECT_REQ* data)
+{
+	CurrCharID = data->charId;
+	CurrChannelID = data->ChannelId;
+
+	sCU_CHARACTER_SELECT_RES selRes;
+	memset(&selRes, 0, sizeof(selRes));
+	selRes.OpCode = CU_CHARACTER_SELECT_RES;
+	memcpy(selRes.AuthKey, AuthKey, MAX_AUTHKEY_SIZE);
+	selRes.charId = CurrCharID;
+	char snode[20], cnode[20];
+	sprintf_s(snode, "Server%d", CurrServerID + 1);
+	sprintf_s(cnode, "Channel%d", CurrChannelID + 1);
+	memcpy(selRes.GameServerIP, pServer->ServerConfig->GetChildStr(snode, cnode, "IP"), MAX_SRVADDR_SIZE);
+	selRes.GameServerPort = pServer->ServerConfig->GetChildInt(snode, cnode, "Port");
+	selRes.ResultCode = CHARACTER_SUCCESS;
+	Send((unsigned char*)&selRes, sizeof(selRes));
 }

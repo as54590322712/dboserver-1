@@ -7,9 +7,6 @@
 #include <Windows.h>
 #include "Def.h"
 
-#define HEADER_SIZE sizeof(PACKETHEADER);
-#define PACKET_LIMIT_SIZE 0x7FFF
-
 typedef struct PACKETHEADER
 {
 	WORD		bEncrypt : 1;
@@ -25,6 +22,11 @@ typedef struct PACKETDATA
 	PACKETDATA(WORD opcode) :wOpCode(opcode) {}
 	WORD		wOpCode;
 } PACKETDATA, *LPPACKETDATA;
+
+const int HEADER_SIZE = sizeof(PACKETHEADER);
+const int PACKET_LIMIT_SIZE = 0x7FFF;
+const BYTE PACKET_MAX_SEQUENCE = 0xFF;
+const int PACKET_MAX_SIZE = 4096;
 
 class Packet
 {

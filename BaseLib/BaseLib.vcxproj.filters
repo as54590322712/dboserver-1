@@ -31,6 +31,9 @@
     <Filter Include="Source Files\Config">
       <UniqueIdentifier>{e867cb52-6f5b-444b-b03b-d52a7b820fcc}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Table">
+      <UniqueIdentifier>{471f2889-8ffe-40ed-9c17-ef2b09124b4a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Server.cpp">

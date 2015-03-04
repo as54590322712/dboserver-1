@@ -1,5 +1,5 @@
-#ifndef _CHARNETWORK_H
-#define _CHARNETWORK_H
+#ifndef _GAMENETWORK_H
+#define _GAMENETWORK_H
 
 #include <Network.h>
 #include <Config.h>
@@ -11,7 +11,11 @@ public:
 	GameClient();
 	~GameClient();
 
-	// PROTOCOL FUNCTIONS
+	// FUNCTIONS
+	void LoadSendCharacterData(sGU_AVATAR_CHAR_INFO* data);
+
+	// PROTOCOL
+	void SendGameEnterRes(sUG_GAME_ENTER_REQ* data);
 };
 
 class GameServer : public Server

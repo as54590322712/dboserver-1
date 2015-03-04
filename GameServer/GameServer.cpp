@@ -11,6 +11,7 @@ GameServer::GameServer()
 		ServerConfig->GetStr("MySQL", "Password"),
 		ServerConfig->GetInt("MySQL", "Port"));
 	this->sPort = ServerConfig->GetInt("Port");
+	this->ServerID = ServerConfig->GetInt("ID");
 	if (!Start()) Logger::Log("Server ERROR!\n");
 }
 
@@ -30,6 +31,8 @@ bool GameServer::OnConnect(Client* client)
 
 void GameServer::OnDisconnect(Client* client)
 {
+	if (client->goCharServer) ServerDB->ExecuteQuery("UPDATE `account` SET `State` = '2' WHERE `ID` = '%d';", client->AccountID);
+	else ServerDB->ExecuteQuery("UPDATE `account` SET `State` = '0' WHERE `ID` = '%d';", client->AccountID);
 }
 
 bool GameServer::OnDataReceived(Client* client, Packet* pData)
@@ -55,7 +58,11 @@ void GameServer::PacketControl(GameClient* client, Packet* pData)
 
 	switch (data->wOpCode)
 	{
-		case 1: break;
+		case UG_CHAR_MOVE: break;
+		case UG_CHAR_DEST_MOVE: break;
+		case UG_GAME_ENTER_REQ: client->SendGameEnterRes((sUG_GAME_ENTER_REQ*)data); break;
+		case UG_PING : break;
+		case 1: case 0: break;
 		default: Logger::Log("Received Opcode: %d\n", data->wOpCode); break;
 	}
 }

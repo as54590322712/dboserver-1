@@ -16,6 +16,7 @@
 #include <assert.h>
 #include <math.h>
 #include <csignal>
+#include <pthread.h>
 #include "Def.h"
 #include "Packet.h"
 #include "Logger.h"
@@ -23,8 +24,10 @@
 #include "Database.h"
 
 #define close closesocket
+#define MAX_THREADS 65535
 
 #pragma comment(lib, "ws2_32.lib")
+#pragma comment(lib, "pthreadVC2.lib")
 
 class Base
 {
@@ -43,12 +46,13 @@ public:
 	Client();
 	virtual ~Client() {};
 	bool ReceivingData();
-	void Send(unsigned char* pData, int size);
+	void Send(void* pData, int size);
+	bool IsConnected();
 	class Server* pServer;
 	unsigned char pData[MAX_BUFFER_SIZE];
-	int LastPacketSize;
-	int RecvCount;
-	int SendCount;
+	unsigned int LastPacketSize;
+	unsigned int RecvCount;
+	unsigned int SendCount;
 	sockaddr_in* addr;
 
 	WCHAR userName[MAX_USERNAME_SIZE + 1];
@@ -58,6 +62,8 @@ public:
 	BYTE LastServerID;
 	DWORD AcLevel;
 	BYTE CurrServerID;
+	BYTE CurrChannelID;
+	unsigned int CurrCharID;
 	bool goCharServer;
 	bool goGameServer;
 };
@@ -88,6 +94,10 @@ class Server : public Base
 		std::vector<Client*> Clients;
 		Config* ServerConfig;
 		Database* ServerDB;
+		int ServerID;
+		pthread_t threads[MAX_THREADS];
 };
+
+void* ClientThread(void* _client);
 
 #endif

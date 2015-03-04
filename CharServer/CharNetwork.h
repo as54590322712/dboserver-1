@@ -19,13 +19,14 @@ public:
 
 	// PROTOCOL FUNCTIONS
 	void SendLoginResult(sUC_LOGIN_REQ* data);
-	void SendServerlist();
-	void SendServerlistOne();
+	void SendServerlist(bool one);
 	void SendCharLoadResult(sUC_CHARACTER_LOAD_REQ* data);
 	void SendCharExitRes(sUC_CHARACTER_EXIT_REQ* data);
 	void SendCharCreateRes(sUC_CHARACTER_ADD_REQ* data);
 	void SendCharDelRes(sUC_CHARACTER_DEL_REQ* data);
 	void SendCharDelCancelRes(sUC_CHARACTER_DEL_CANCEL_REQ* data);
+	void SendCharConnWaitCheckRes(sUC_CONNECT_WAIT_CHECK_REQ* data);
+	void SendCharSelectRes(sUC_CHARACTER_SELECT_REQ* data);
 };
 
 class CharServer : public Server

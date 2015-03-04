@@ -18,18 +18,17 @@ int CharClient::GetDBAllowedRaces()
 {
 	MYSQL_RES* Res;
 	MYSQL_ROW Row;
+	int allraces = ALLRACES;
 	if (pServer->ServerDB->ExecuteQuery("SELECT `AllowedRace` FROM account WHERE ID='%d'", AccountID))
 	{
 		Res = pServer->ServerDB->GetResult();
 		while (Row = mysql_fetch_row(Res))
 		{
-			return atoi(Row[0]);
+			allraces = atoi(Row[0]);
 		}
 	}
-	else
-	{
-		return ALLRACES;
-	}
+	return allraces;
+
 }
 
 ResultCodes CharClient::CheckUsedName(WCHAR* Name)
@@ -49,8 +48,6 @@ ResultCodes CharClient::CheckUsedName(WCHAR* Name)
 
 void CharClient::DBInsertCharData(CHARDATA data)
 {
-	MYSQL_RES* Res;
-	MYSQL_ROW Row;
 	pServer->ServerDB->ExecuteQuery("INSERT INTO `character` (`AccID`, `Name`, `Class`, `Face`, `Gender`, `Hair`, `HairColor`, `Adult`, `Level`, `NeedNameChange`, `Race`, `SkinColor`, `worldTblidx`, `worldId`, `PositionX`, `PositionY`, `PositionZ`, `Money`, `MoneyBank`, `MapInfoId`, `TutorialFlag`, `ServerID`) VALUES ('%d', '%S', '%d', '%d', '%d', '%d', '%d', '%d', '%d', '%d', '%d', '%d', '%d', '%d', '%f', '%f', '%f', '%d', '%d', '%d', '%d', '%d');",
 		AccountID,
 		data.Name,
@@ -93,20 +90,20 @@ int CharClient::GetDBAccCharListData(sCU_CHARACTER_INFO* outdata)
 			outdata->CharData[c].Gender = atoi(Row[5]);
 			outdata->CharData[c].Hair = atoi(Row[6]);
 			outdata->CharData[c].HairColor = atoi(Row[7]);
-			outdata->CharData[c].IsAdult = atoi(Row[8]);
+			outdata->CharData[c].IsAdult = (bool)atoi(Row[8]);
 			outdata->CharData[c].Level = atoi(Row[9]);
-			outdata->CharData[c].NeedNameChange = atoi(Row[10]);
+			outdata->CharData[c].NeedNameChange = (bool)atoi(Row[10]);
 			outdata->CharData[c].Race = atoi(Row[11]);
 			outdata->CharData[c].SkinColor = atoi(Row[12]);
 			outdata->CharData[c].worldTblidx = atoi(Row[13]);
 			outdata->CharData[c].worldId = atoi(Row[14]);
-			outdata->CharData[c].PositionX = atof(Row[15]);
-			outdata->CharData[c].PositionY = atof(Row[16]);
-			outdata->CharData[c].PositionZ = atof(Row[17]);
+			outdata->CharData[c].PositionX = (float)atof(Row[15]);
+			outdata->CharData[c].PositionY = (float)atof(Row[16]);
+			outdata->CharData[c].PositionZ = (float)atof(Row[17]);
 			outdata->CharData[c].Money = atoi(Row[18]);
 			outdata->CharData[c].MoneyBank = atoi(Row[19]);
 			outdata->CharData[c].MapInfoId = atoi(Row[20]);
-			outdata->CharData[c].TutorialFlag = atoi(Row[21]);
+			outdata->CharData[c].TutorialFlag = (bool)atoi(Row[21]);
 			//MARKING
 
 			// Check to delete char flag

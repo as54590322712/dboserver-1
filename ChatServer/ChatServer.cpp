@@ -55,7 +55,7 @@ void ChatServer::PacketControl(ChatClient* client, Packet* pData)
 
 	switch (data->wOpCode)
 	{
-		case 1: break;
+		case 1: case 0: break;
 		default: Logger::Log("Received Opcode: %d\n", data->wOpCode); break;
 	}
 }

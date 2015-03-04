@@ -37,5 +37,5 @@ void AuthClient::SendDisconnectRes(sUA_LOGIN_DISCONNECT_REQ* data)
 	memset(&dRes, 0, sizeof(sAU_LOGIN_DISCONNECT_RES));
 	dRes.OpCode = AU_LOGIN_DISCONNECT_RES;
 	Send((unsigned char*)&dRes, sizeof(dRes));
-	pServer->Disconnect(this);
+	isActive = false;
 }

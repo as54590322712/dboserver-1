@@ -59,7 +59,7 @@ void AuthServer::PacketControl(AuthClient* client, Packet* pData)
 	{
 		case UA_LOGIN_DISCONNECT_REQ: client->SendDisconnectRes((sUA_LOGIN_DISCONNECT_REQ*)data); break;
 		case UA_LOGIN_REQ: client->SendLoginRes((sUA_LOGIN_REQ*)data);  break;
-		case 1: break;
+		case 1: case 0: break;
 		default: Logger::Log("Received Opcode: %d\n", data->wOpCode); break;
 	}
 }

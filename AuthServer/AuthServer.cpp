@@ -30,8 +30,8 @@ bool AuthServer::OnConnect(Client* client)
 
 void AuthServer::OnDisconnect(Client* client)
 {
-	if (client->goCharServer) ServerDB->ExecuteQuery("UPDATE `account` SET `State` = '2' WHERE `ID` = '%d';", client->AccountID);
-	else ServerDB->ExecuteQuery("UPDATE `account` SET `State` = '0' WHERE `ID` = '%d';", client->AccountID);
+	if (client->goCharServer) ServerDB->ExecuteUpdate("UPDATE `account` SET `State` = '2' WHERE `ID` = '%d';", client->AccountID);
+	else ServerDB->ExecuteUpdate("UPDATE `account` SET `State` = '0' WHERE `ID` = '%d';", client->AccountID);
 }
 
 bool AuthServer::OnDataReceived(Client* client, Packet* pData)
@@ -52,14 +52,13 @@ void AuthServer::DeleteClient(Client* client)
 
 void AuthServer::PacketControl(AuthClient* client, Packet* pData)
 {
-	LPPACKETHEADER header = pData->GetPacketHeader();
 	LPPACKETDATA data = (LPPACKETDATA)pData->GetPacketData();
-
 	switch (data->wOpCode)
 	{
 		case UA_LOGIN_DISCONNECT_REQ: client->SendDisconnectRes((sUA_LOGIN_DISCONNECT_REQ*)data); break;
 		case UA_LOGIN_REQ: client->SendLoginRes((sUA_LOGIN_REQ*)data);  break;
-		case 1: case 0: break;
+		case 1: { sPACKETHEADER reply(1); client->Send(&reply, sizeof(reply)); } break;
+		case 0: break;
 		default: Logger::Log("Received Opcode: %d\n", data->wOpCode); break;
 	}
 }

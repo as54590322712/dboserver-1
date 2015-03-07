@@ -139,7 +139,7 @@ void CharClient::SendCharDelRes(sUC_CHARACTER_DEL_REQ* data)
 	memset(&Res, 0, sizeof(Res));
 	Res.OpCode = CU_CHARACTER_DEL_RES;
 	Res.charId = data->charId;
-	if (pServer->ServerDB->ExecuteQuery("UPDATE `character` SET `ToDelete` = '1' WHERE `ID` = '%d';", Res.charId))
+	if (pServer->ServerDB->ExecuteUpdate("UPDATE `character` SET `ToDelete` = '1' WHERE `ID` = '%d';", Res.charId))
 		Res.ResultCode = CHARACTER_SUCCESS;
 	else
 		Res.ResultCode = CHARACTER_DELETE_CHAR_FAIL;
@@ -152,7 +152,7 @@ void CharClient::SendCharDelCancelRes(sUC_CHARACTER_DEL_CANCEL_REQ* data)
 	memset(&Res, 0, sizeof(Res));
 	Res.OpCode = CU_CHARACTER_DEL_CANCEL_RES;
 	Res.charId = data->charId;
-	if (pServer->ServerDB->ExecuteQuery("UPDATE `character` SET `ToDelete` = '0' WHERE `ID` = '%d';", Res.charId))
+	if (pServer->ServerDB->ExecuteUpdate("UPDATE `character` SET `ToDelete` = '0' WHERE `ID` = '%d';", Res.charId))
 		Res.ResultCode = CHARACTER_SUCCESS;
 	else
 		Res.ResultCode = CHARACTER_DB_QUERY_FAIL;

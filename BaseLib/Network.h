@@ -17,11 +17,13 @@
 #include <math.h>
 #include <csignal>
 #include <pthread.h>
+#include <asio.hpp>
 #include "Def.h"
 #include "Packet.h"
 #include "Logger.h"
 #include "Config.h"
 #include "Database.h"
+#include "Encryption.h"
 
 #define close closesocket
 #define MAX_THREADS 65535
@@ -29,15 +31,19 @@
 #pragma comment(lib, "ws2_32.lib")
 #pragma comment(lib, "pthreadVC2.lib")
 
+using namespace asio;
+using namespace asio::ip;
+
 class Base
 {
 public:
-	Base() { isActive = false; sock = INVALID_SOCKET; pkt = new Packet(); };
+	Base() { isActive = false; sock = INVALID_SOCKET; pkt = new Packet(); pEncoder = new PacketEncoder(false); };
 	virtual ~Base() {};
 	SOCKET sock;
 	bool isActive;
 	int Opt = 1;
 	Packet* pkt;
+	PacketEncoder* pEncoder;
 };
 
 class Client : public Base

@@ -14,10 +14,10 @@ Packet::Packet(Packet& rhs)
 Packet::Packet(BYTE * pAttachBuffer)
 {
 	Init();
-	Attach(pAttachBuffer, false);
+	Attach(pAttachBuffer);
 }
 
-Packet::Packet(BYTE * pPacketData, WORD wPacketBodySize, bool encrypt)
+Packet::Packet(BYTE * pPacketData, WORD wPacketBodySize)
 {
 	Init();
 	InitUseInternalBuffer(NULL, (WORD)GetHeaderSize() + wPacketBodySize);
@@ -61,17 +61,11 @@ void Packet::Destroy()
 	SAFE_FREE(mAllocBuffer);
 }
 
-void Packet::Attach(BYTE * pPacketBuffer, bool encrypted)
+void Packet::Attach(BYTE * pPacketBuffer)
 {
-	if (encrypted)
-	{
-	}
-	else
-	{
-		LPPACKETHEADER pPacketHeader = (LPPACKETHEADER)&pPacketBuffer[0];
-		WORD wPacketTotalSize = pPacketHeader->wPacketLen + (WORD)GetHeaderSize();
-		InitUseExternalBuffer(pPacketBuffer, wPacketTotalSize);
-	}
+	LPPACKETHEADER pPacketHeader = (LPPACKETHEADER)&pPacketBuffer[0];
+	WORD wPacketTotalSize = pPacketHeader->wPacketLen + (WORD)GetHeaderSize();
+	InitUseExternalBuffer(pPacketBuffer, wPacketTotalSize);
 }
 
 void Packet::AttachData(BYTE * pPacketBuffer, WORD wBufferUsedSize)

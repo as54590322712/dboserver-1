@@ -13,9 +13,15 @@ public:
 
 	// FUNCTIONS
 	void LoadSendCharacterData(sGU_AVATAR_CHAR_INFO* data);
+	void LoadWorldInfoData(sGU_AVATAR_WORLD_INFO* data);
 
 	// PROTOCOL
 	void SendGameEnterRes(sUG_GAME_ENTER_REQ* data);
+	void SendCharInfo();
+	void SendCharInfoEnd();
+	void SendCharWorldInfo();
+	void SendCharWorldInfoEnd();
+	void SendCharMove(sUG_CHAR_MOVE* data);
 };
 
 class GameServer : public Server

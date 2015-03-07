@@ -31,8 +31,8 @@ bool GameServer::OnConnect(Client* client)
 
 void GameServer::OnDisconnect(Client* client)
 {
-	if (client->goCharServer) ServerDB->ExecuteQuery("UPDATE `account` SET `State` = '2' WHERE `ID` = '%d';", client->AccountID);
-	else ServerDB->ExecuteQuery("UPDATE `account` SET `State` = '0' WHERE `ID` = '%d';", client->AccountID);
+	if (client->goCharServer) ServerDB->ExecuteUpdate("UPDATE `account` SET `State` = '2' WHERE `ID` = '%d';", client->AccountID);
+	else ServerDB->ExecuteUpdate("UPDATE `account` SET `State` = '0' WHERE `ID` = '%d';", client->AccountID);
 }
 
 bool GameServer::OnDataReceived(Client* client, Packet* pData)
@@ -60,9 +60,20 @@ void GameServer::PacketControl(GameClient* client, Packet* pData)
 	{
 		case UG_CHAR_MOVE: break;
 		case UG_CHAR_DEST_MOVE: break;
-		case UG_GAME_ENTER_REQ: client->SendGameEnterRes((sUG_GAME_ENTER_REQ*)data); break;
-		case UG_PING : break;
-		case 1: case 0: break;
+		case UG_ENTER_WORLD: { 
+			client->SendCharWorldInfo();
+			// TO DO WORLD SPAWNS
+			client->SendCharWorldInfoEnd();
+		} break;
+		case UG_GAME_ENTER_REQ: {
+			client->SendGameEnterRes((sUG_GAME_ENTER_REQ*)data);
+			client->SendCharInfo();
+			// TO DO LOAD ITEMS ETC
+			client->SendCharInfoEnd();
+		} break;
+		case UG_PING: break;
+		case 1: { sPACKETHEADER reply(1); client->Send(&reply, sizeof(reply)); } break;
+		case 0: break;
 		default: Logger::Log("Received Opcode: %d\n", data->wOpCode); break;
 	}
 }

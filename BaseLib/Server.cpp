@@ -69,6 +69,9 @@ void Server::Loop()
 		timeout.tv_usec = 100;
 		NewSocket = INVALID_SOCKET;
 		FD_ZERO(&fds);
+#ifndef _USETHEREADS
+		CheckFDS(&fds);
+#endif
 		FD_SET(sock, &fds);
 		activity = select(0, &fds, NULL, NULL, &timeout);
 		if (activity == 0) continue;
@@ -86,6 +89,9 @@ void Server::Loop()
 			else
 				std::cout << "Error accepting socket: " << WSAGetLastError() << std::endl;
 		}
+#ifndef _USETHEREADS
+		HandleClients(&fds);
+#endif
 	} while (isActive);
 }
 
@@ -113,7 +119,45 @@ void Server::AddClient(SOCKET sock, sockaddr_in* addr)
 	}
 	Logger::Log("Client connected %s (%d)\n", inet_ntoa(client->addr->sin_addr), client->sock);
 	Clients.push_back(client);
+#ifdef _USETHEREADS
 	pthread_create(&threads[sock], NULL, ClientThread, (void*)client);
+#endif
+}
+
+void Server::CheckFDS(fd_set* fds)
+{
+	for (unsigned int i = 0; i < Clients.size(); i++)
+	{
+		Client* client = Clients.at(i);
+
+		if (!client->IsConnected()) client->isActive = false;
+
+		if (client->isActive)
+		{
+			FD_SET((unsigned)client->sock, fds);
+		}
+		else
+		{
+			Disconnect(client);
+		}
+	}
+}
+
+void Server::HandleClients(fd_set* fds)
+{
+	for (unsigned int i = 0; i < Clients.size(); i++)
+	{
+		Client* client = Clients.at(i);
+		if (!client->isActive)
+			continue;
+		if (FD_ISSET((unsigned)client->sock, fds))
+		{
+			if (!client->ReceivingData())
+			{
+				Disconnect(client);
+			}
+		}
+	}
 }
 
 void Server::Disconnect(Client* client)

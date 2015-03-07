@@ -34,12 +34,12 @@ public:
 	Packet();
 	Packet(Packet& rhs);
 	Packet(BYTE * pAttachBuffer);
-	Packet(BYTE * pPacketData, WORD wPacketBodySize, bool encrypt);
+	Packet(BYTE * pPacketData, WORD wPacketBodySize);
 	Packet(WORD wPacketBodySize);
 	~Packet();
 	void Init();
 	void Destroy();
-	void Attach(BYTE * pPacketBuffer, bool encrypted);
+	void Attach(BYTE * pPacketBuffer);
 	void AttachData(BYTE * pPacketBuffer, WORD wBufferUsedSize);
 	void InitUseInternalBuffer(BYTE * pPacketBuffer, WORD wBufferUsedSize);
 	void InitUseExternalBuffer(BYTE * pPacketBuffer, WORD wBufferUsedSize);

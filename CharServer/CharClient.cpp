@@ -10,21 +10,18 @@ CharClient::~CharClient()
 
 void CharClient::DBUpdateLastServer()
 {
-	if (pServer->ServerDB->ExecuteQuery("UPDATE `account` SET `LastServerID` = '%d' WHERE `ID` = '%d';", CurrServerID, AccountID))
+	if (pServer->ServerDB->ExecuteUpdate("UPDATE `account` SET `LastServerID` = '%d' WHERE `ID` = '%d';", CurrServerID, AccountID))
 		LastServerID = CurrServerID;
 }
 
 int CharClient::GetDBAllowedRaces()
 {
-	MYSQL_RES* Res;
-	MYSQL_ROW Row;
 	int allraces = ALLRACES;
 	if (pServer->ServerDB->ExecuteQuery("SELECT `AllowedRace` FROM account WHERE ID='%d'", AccountID))
 	{
-		Res = pServer->ServerDB->GetResult();
-		while (Row = mysql_fetch_row(Res))
+		while (pServer->ServerDB->Fetch())
 		{
-			allraces = atoi(Row[0]);
+			allraces = pServer->ServerDB->getInt("AllowedRace");
 		}
 	}
 	return allraces;
@@ -33,11 +30,10 @@ int CharClient::GetDBAllowedRaces()
 
 ResultCodes CharClient::CheckUsedName(WCHAR* Name)
 {
-	MYSQL_RES* Res;
 	if (pServer->ServerDB->ExecuteQuery("SELECT * FROM `character` WHERE `Name`='%S';", Name))
 	{
-		Res = pServer->ServerDB->GetResult();
-		if (mysql_num_rows(Res) == 0)
+		pServer->ServerDB->Fetch();
+		if (pServer->ServerDB->rowsCount() == 0)
 			return CHARACTER_SUCCESS;
 		else
 			return CHARACTER_SAMENAME_EXIST;
@@ -75,41 +71,38 @@ void CharClient::DBInsertCharData(CHARDATA data)
 
 int CharClient::GetDBAccCharListData(sCU_CHARACTER_INFO* outdata)
 {
-	MYSQL_RES* Res;
-	MYSQL_ROW Row;
 	if (pServer->ServerDB->ExecuteQuery("SELECT * FROM `character` WHERE `AccID`='%d' AND `ServerID`='%d' LIMIT 8;", AccountID, CurrServerID))
 	{
-		Res = pServer->ServerDB->GetResult();
 		int c = 0;
-		while (Row = mysql_fetch_row(Res))
+		while (pServer->ServerDB->Fetch())
 		{
-			outdata->CharData[c].charId = atoi(Row[0]);
-			memcpy(outdata->CharData[c].Name, charToWChar(Row[2]), MAX_CHARNAME_SIZE);
-			outdata->CharData[c].Class = atoi(Row[3]);
-			outdata->CharData[c].Face = atoi(Row[4]);
-			outdata->CharData[c].Gender = atoi(Row[5]);
-			outdata->CharData[c].Hair = atoi(Row[6]);
-			outdata->CharData[c].HairColor = atoi(Row[7]);
-			outdata->CharData[c].IsAdult = (bool)atoi(Row[8]);
-			outdata->CharData[c].Level = atoi(Row[9]);
-			outdata->CharData[c].NeedNameChange = (bool)atoi(Row[10]);
-			outdata->CharData[c].Race = atoi(Row[11]);
-			outdata->CharData[c].SkinColor = atoi(Row[12]);
-			outdata->CharData[c].worldTblidx = atoi(Row[13]);
-			outdata->CharData[c].worldId = atoi(Row[14]);
-			outdata->CharData[c].PositionX = (float)atof(Row[15]);
-			outdata->CharData[c].PositionY = (float)atof(Row[16]);
-			outdata->CharData[c].PositionZ = (float)atof(Row[17]);
-			outdata->CharData[c].Money = atoi(Row[18]);
-			outdata->CharData[c].MoneyBank = atoi(Row[19]);
-			outdata->CharData[c].MapInfoId = atoi(Row[20]);
-			outdata->CharData[c].TutorialFlag = (bool)atoi(Row[21]);
+			outdata->CharData[c].charId = pServer->ServerDB->getInt("ID");
+			memcpy(outdata->CharData[c].Name, charToWChar(pServer->ServerDB->getString("Name").c_str()), MAX_CHARNAME_SIZE);
+			outdata->CharData[c].Class = pServer->ServerDB->getInt("Class");
+			outdata->CharData[c].Face = pServer->ServerDB->getInt("Face");
+			outdata->CharData[c].Gender = pServer->ServerDB->getInt("Gender");
+			outdata->CharData[c].Hair = pServer->ServerDB->getInt("Hair");
+			outdata->CharData[c].HairColor = pServer->ServerDB->getInt("HairColor");
+			outdata->CharData[c].IsAdult = pServer->ServerDB->getBoolean("Adult");
+			outdata->CharData[c].Level = pServer->ServerDB->getInt("Level");
+			outdata->CharData[c].NeedNameChange = pServer->ServerDB->getBoolean("NeedNameChange");
+			outdata->CharData[c].Race = pServer->ServerDB->getInt("Race");
+			outdata->CharData[c].SkinColor = pServer->ServerDB->getInt("SkinColor");
+			outdata->CharData[c].worldTblidx = pServer->ServerDB->getInt("worldTblidx");
+			outdata->CharData[c].worldId = pServer->ServerDB->getInt("worldId");
+			outdata->CharData[c].PositionX = pServer->ServerDB->getDouble("PositionX");
+			outdata->CharData[c].PositionY = pServer->ServerDB->getDouble("PositionY");
+			outdata->CharData[c].PositionZ = pServer->ServerDB->getDouble("PositionZ");
+			outdata->CharData[c].Money = pServer->ServerDB->getInt("Money");
+			outdata->CharData[c].MoneyBank = pServer->ServerDB->getInt("MoneyBank");
+			outdata->CharData[c].MapInfoId = pServer->ServerDB->getInt("MapInfoId");
+			outdata->CharData[c].TutorialFlag = pServer->ServerDB->getBoolean("TutorialFlag");
 			//MARKING
 
 			// Check to delete char flag
-			if (atoi(Row[23]))
+			if (pServer->ServerDB->getBoolean("ToDelete"))
 			{
-				outdata->CharDelData[c].charId = atoi(Row[0]);
+				outdata->CharDelData[c].charId = pServer->ServerDB->getInt("ID");
 			}
 			c++;
 		}

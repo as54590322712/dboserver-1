@@ -14,17 +14,27 @@ bool Client::ReceivingData()
 
 	LastPacketSize = recv(sock, (char*)pData, MAX_BUFFER_SIZE, 0);
 	if (LastPacketSize <= 0) return false;
-
 	RecvCount++;
-	pkt->Attach(pData, false);
-	pServer->OnDataReceived(this, pkt);
+	if (LastPacketSize > HEADER_SIZE)
+	{
+		pkt->Attach(pData);
+		LPPACKETHEADER header = pkt->GetPacketHeader();
+		if (pEncoder) pEncoder->RxDecrypt(header);
+		unsigned int pktsize = header->wPacketLen + HEADER_SIZE;
+		if (LastPacketSize >= pktsize)
+		{
+			if (pEncoder) pEncoder->RxDecrypt(*pkt);
+			pServer->OnDataReceived(this, pkt);
+		}
+	}
 	return true;
 }
 
 void Client::Send(void* pData, int size)
 {
-	Packet* out = new Packet((unsigned char*)pData, size, false);
-	out->pHeader->bySequence = SendCount;
+	Packet* out = new Packet((unsigned char*)pData, size);
+	out->GetPacketHeader()->bySequence = (BYTE)(SendCount & PACKET_MAX_SEQUENCE);
+	if (pEncoder) pEncoder->TxEncrypt(*out);
 	u_long iMode = 1;
 	int rc = ioctlsocket(sock, FIONBIO, &iMode);
 	if (rc == SOCKET_ERROR)	std::cout << "ioctlsocket() failed" << std::endl;

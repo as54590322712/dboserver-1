@@ -11,11 +11,11 @@ Client::Client()
 bool Client::ReceivingData()
 {
 	ZeroMemory(&pData, MAX_BUFFER_SIZE);
-
+	
 	LastPacketSize = recv(sock, (char*)pData, MAX_BUFFER_SIZE, 0);
-	if (LastPacketSize <= 0) return false;
 	RecvCount++;
-	if (LastPacketSize > HEADER_SIZE)
+	if (LastPacketSize == -1) return false;
+	else if (LastPacketSize >= (HEADER_SIZE + 2))
 	{
 		pkt->Attach(pData);
 		LPPACKETHEADER header = pkt->GetPacketHeader();
@@ -25,9 +25,11 @@ bool Client::ReceivingData()
 		{
 			if (pEncoder) pEncoder->RxDecrypt(*pkt);
 			pServer->OnDataReceived(this, pkt);
+			return true;
 		}
+		else if (pktsize <= 4) return false;
 	}
-	return true;
+	else return false;
 }
 
 void Client::Send(void* pData, int size)
@@ -49,6 +51,7 @@ bool Client::IsConnected()
 {
 	int optval, optlen = sizeof(optval);
 	int res = getsockopt(this->sock, SOL_SOCKET, SO_ERROR, (char *)&optval, &optlen);
-	if (optval == 0 && res == 0) return true;
+	if (optval == 0 && res == 0)
+		return true;
 	return false;
 }

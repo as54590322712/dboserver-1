@@ -60,6 +60,7 @@ bool Database::Connect(char* host, char* database, char* user, char* password, i
 bool Database::ChangeDB(char* db)
 {
 	try {
+		stmt->close();
 		m_conn->setSchema(db);
 		stmt = m_conn->createStatement();
 		return true;
@@ -72,7 +73,7 @@ bool Database::ChangeDB(char* db)
 	return false;
 }
 
-bool Database::ExecuteUpdate(char* Format, ...)
+bool Database::ExecuteQuery(char* Format, ...)
 {
 	char szQuery[6000];
 	va_list ap;
@@ -95,7 +96,7 @@ bool Database::ExecuteUpdate(char* Format, ...)
 	return false;
 }
 
-bool Database::ExecuteQuery(char* Format, ...)
+bool Database::ExecuteSelect(char* Format, ...)
 {
 	char szQuery[6000];
 	va_list ap;

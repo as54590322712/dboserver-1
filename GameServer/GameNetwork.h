@@ -11,9 +11,13 @@ public:
 	GameClient();
 	~GameClient();
 
+	PCHAR_PROFILE PcProfile;
+	CHARSTATE CharState;
+
 	// FUNCTIONS
 	void LoadSendCharacterData(sGU_AVATAR_CHAR_INFO* data);
 	void LoadWorldInfoData(sGU_AVATAR_WORLD_INFO* data);
+	unsigned int GetPCTblidx(BYTE Race, BYTE Gender, BYTE Class);
 
 	// PROTOCOL
 	void SendGameEnterRes(sUG_GAME_ENTER_REQ* data);

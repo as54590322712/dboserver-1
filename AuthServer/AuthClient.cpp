@@ -13,7 +13,7 @@ char* AuthClient::GenAuthKey()
 
 int AuthClient::GetDBAccountAcLevel()
 {
-	if (pServer->ServerDB->ExecuteQuery("SELECT `AcLevel` FROM account WHERE ID='%d'", AccountID))
+	if (pServer->ServerDB->ExecuteSelect("SELECT `AcLevel` FROM account WHERE ID='%d'", AccountID))
 	{
 		while (pServer->ServerDB->Fetch())
 		{
@@ -25,7 +25,7 @@ int AuthClient::GetDBAccountAcLevel()
 
 BYTE AuthClient::GetDBLastServerID()
 {
-	if (pServer->ServerDB->ExecuteQuery("SELECT `LastServerID` FROM account WHERE ID='%d'", AccountID))
+	if (pServer->ServerDB->ExecuteSelect("SELECT `LastServerID` FROM account WHERE ID='%d'", AccountID))
 	{
 		while (pServer->ServerDB->Fetch())
 		{
@@ -37,7 +37,7 @@ BYTE AuthClient::GetDBLastServerID()
 
 int AuthClient::GetDBAccountID()
 {
-	if (pServer->ServerDB->ExecuteQuery("SELECT `ID` FROM account WHERE userName='%S' AND passWord='%S'", userName, passWord))
+	if (pServer->ServerDB->ExecuteSelect("SELECT `ID` FROM account WHERE userName='%S' AND passWord='%S'", userName, passWord))
 	{
 		while (pServer->ServerDB->Fetch())
 		{
@@ -49,7 +49,7 @@ int AuthClient::GetDBAccountID()
 
 ResultCodes AuthClient::LoginVerifyAccount()
 {
-	if (pServer->ServerDB->ExecuteQuery("SELECT `ID` FROM account WHERE userName='%S'", userName))
+	if (pServer->ServerDB->ExecuteSelect("SELECT `ID` FROM account WHERE userName='%S'", userName))
 	{
 		pServer->ServerDB->Fetch();
 		if (pServer->ServerDB->rowsCount() == 0)
@@ -58,7 +58,7 @@ ResultCodes AuthClient::LoginVerifyAccount()
 		}
 		else
 		{
-			if (pServer->ServerDB->ExecuteQuery("SELECT `ID` FROM account WHERE userName='%S' AND passWord='%S'", userName, passWord))
+			if (pServer->ServerDB->ExecuteSelect("SELECT `ID` FROM account WHERE userName='%S' AND passWord='%S'", userName, passWord))
 			{
 				pServer->ServerDB->Fetch();
 				if (pServer->ServerDB->rowsCount() == 0)
@@ -67,7 +67,7 @@ ResultCodes AuthClient::LoginVerifyAccount()
 				}
 				else
 				{
-					if (pServer->ServerDB->ExecuteQuery("SELECT `ID` FROM `account` WHERE `userName`='%S' AND `passWord`='%S' AND `State`='0'", userName, passWord))
+					if (pServer->ServerDB->ExecuteSelect("SELECT `ID` FROM `account` WHERE `userName`='%S' AND `passWord`='%S' AND `State`='0'", userName, passWord))
 					{
 						pServer->ServerDB->Fetch();
 						if (pServer->ServerDB->rowsCount() == 0)
@@ -85,7 +85,7 @@ ResultCodes AuthClient::LoginVerifyAccount()
 
 							if (reconnect)
 							{
-								if (pServer->ServerDB->ExecuteUpdate("UPDATE `account` SET `State` = '1' WHERE `ID` = '%d';", AccountID))
+								if (pServer->ServerDB->ExecuteQuery("UPDATE `account` SET `State` = '1' WHERE `ID` = '%d';", AccountID))
 									return AUTH_SUCCESS;
 								else
 									return AUTH_DB_FAIL;
@@ -95,7 +95,7 @@ ResultCodes AuthClient::LoginVerifyAccount()
 						}
 						else
 						{
-							if (pServer->ServerDB->ExecuteUpdate("UPDATE `account` SET `State` = '1' WHERE `ID` = '%d';", AccountID))
+							if (pServer->ServerDB->ExecuteQuery("UPDATE `account` SET `State` = '1' WHERE `ID` = '%d';", AccountID))
 								return AUTH_SUCCESS;
 							else
 								return AUTH_DB_FAIL;

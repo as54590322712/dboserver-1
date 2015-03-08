@@ -21,8 +21,8 @@ public:
 	~Database();
 	bool Connect(char* host, char* database, char* user, char* password, int port);
 	bool ChangeDB(char* db);
-	bool ExecuteUpdate(char* Format, ...);
 	bool ExecuteQuery(char* Format, ...);
+	bool ExecuteSelect(char* Format, ...);
 	bool Fetch();
 	long double getDouble(const char* index);
 	bool getBoolean(const char* index);

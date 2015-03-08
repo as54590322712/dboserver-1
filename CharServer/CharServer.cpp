@@ -30,8 +30,8 @@ bool CharServer::OnConnect(Client* client)
 
 void CharServer::OnDisconnect(Client* client)
 {
-	if (client->goGameServer) ServerDB->ExecuteUpdate("UPDATE `account` SET `State` = '3' WHERE `ID` = '%d';", client->AccountID);
-	else ServerDB->ExecuteUpdate("UPDATE `account` SET `State` = '0' WHERE `ID` = '%d';", client->AccountID);
+	if (client->goGameServer) ServerDB->ExecuteQuery("UPDATE `account` SET `State` = '3' WHERE `ID` = '%d';", client->AccountID);
+	else ServerDB->ExecuteQuery("UPDATE `account` SET `State` = '0' WHERE `ID` = '%d';", client->AccountID);
 }
 
 bool CharServer::OnDataReceived(Client* client, Packet* pData)
@@ -65,6 +65,8 @@ void CharServer::PacketControl(CharClient* client, Packet* pData)
 		case UC_CHARACTER_DEL_CANCEL_REQ: client->SendCharDelCancelRes((sUC_CHARACTER_DEL_CANCEL_REQ*)data); break;
 		case UC_CONNECT_WAIT_CHECK_REQ: client->SendCharConnWaitCheckRes((sUC_CONNECT_WAIT_CHECK_REQ*)data); break;
 		case UC_CHARACTER_SELECT_REQ: client->SendCharSelectRes((sUC_CHARACTER_SELECT_REQ*)data); break;
+		case UC_CHARACTER_RENAME_REQ: client->SendCharRenameRes((sUC_CHARACTER_RENAME_REQ*)data); break;
+		case UC_CONNECT_WAIT_CANCEL_REQ: client->SendCancelWaitReq((sUC_CONNECT_WAIT_CANCEL_REQ*)data); break;
 		case 1: { sPACKETHEADER reply(1); client->Send(&reply, sizeof(reply)); } break;
 		case 0: break;
 		default: Logger::Log("Received Opcode: %d\n", data->wOpCode); break;

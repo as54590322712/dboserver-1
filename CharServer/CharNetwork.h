@@ -14,6 +14,7 @@ public:
 	int GetDBAccCharListData(sCU_CHARACTER_INFO* outdata);
 	void DBInsertCharData(CHARDATA data);
 	ResultCodes CheckUsedName(WCHAR* Name);
+	ResultCodes DBChangeCharName(WCHAR* Name, int charId);
 	int GetDBAllowedRaces();
 	void DBUpdateLastServer();
 
@@ -27,6 +28,8 @@ public:
 	void SendCharDelCancelRes(sUC_CHARACTER_DEL_CANCEL_REQ* data);
 	void SendCharConnWaitCheckRes(sUC_CONNECT_WAIT_CHECK_REQ* data);
 	void SendCharSelectRes(sUC_CHARACTER_SELECT_REQ* data);
+	void SendCharRenameRes(sUC_CHARACTER_RENAME_REQ* data);
+	void SendCancelWaitReq(sUC_CONNECT_WAIT_CANCEL_REQ* data);
 };
 
 class CharServer : public Server

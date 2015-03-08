@@ -130,16 +130,13 @@ void Server::CheckFDS(fd_set* fds)
 	{
 		Client* client = Clients.at(i);
 
-		if (!client->IsConnected()) client->isActive = false;
+		if (!client->IsConnected())
+			client->isActive = false;
 
 		if (client->isActive)
-		{
 			FD_SET((unsigned)client->sock, fds);
-		}
 		else
-		{
 			Disconnect(client);
-		}
 	}
 }
 
@@ -150,13 +147,7 @@ void Server::HandleClients(fd_set* fds)
 		Client* client = Clients.at(i);
 		if (!client->isActive)
 			continue;
-		if (FD_ISSET((unsigned)client->sock, fds))
-		{
-			if (!client->ReceivingData())
-			{
-				Disconnect(client);
-			}
-		}
+		if (FD_ISSET((unsigned)client->sock, fds)) if (!client->ReceivingData()) Disconnect(client);
 	}
 }
 

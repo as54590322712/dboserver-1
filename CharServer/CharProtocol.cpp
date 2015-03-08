@@ -139,7 +139,7 @@ void CharClient::SendCharDelRes(sUC_CHARACTER_DEL_REQ* data)
 	memset(&Res, 0, sizeof(Res));
 	Res.OpCode = CU_CHARACTER_DEL_RES;
 	Res.charId = data->charId;
-	if (pServer->ServerDB->ExecuteUpdate("UPDATE `character` SET `ToDelete` = '1' WHERE `ID` = '%d';", Res.charId))
+	if (pServer->ServerDB->ExecuteQuery("UPDATE `character` SET `ToDelete` = '1' WHERE `ID` = '%d';", Res.charId))
 		Res.ResultCode = CHARACTER_SUCCESS;
 	else
 		Res.ResultCode = CHARACTER_DELETE_CHAR_FAIL;
@@ -152,7 +152,7 @@ void CharClient::SendCharDelCancelRes(sUC_CHARACTER_DEL_CANCEL_REQ* data)
 	memset(&Res, 0, sizeof(Res));
 	Res.OpCode = CU_CHARACTER_DEL_CANCEL_RES;
 	Res.charId = data->charId;
-	if (pServer->ServerDB->ExecuteUpdate("UPDATE `character` SET `ToDelete` = '0' WHERE `ID` = '%d';", Res.charId))
+	if (pServer->ServerDB->ExecuteQuery("UPDATE `character` SET `ToDelete` = '0' WHERE `ID` = '%d';", Res.charId))
 		Res.ResultCode = CHARACTER_SUCCESS;
 	else
 		Res.ResultCode = CHARACTER_DB_QUERY_FAIL;
@@ -191,4 +191,21 @@ void CharClient::SendCharSelectRes(sUC_CHARACTER_SELECT_REQ* data)
 	selRes.GameServerPort = pServer->ServerConfig->GetChildInt(snode, cnode, "Port");
 	selRes.ResultCode = CHARACTER_SUCCESS;
 	Send((unsigned char*)&selRes, sizeof(selRes));
+}
+
+void CharClient::SendCharRenameRes(sUC_CHARACTER_RENAME_REQ* data)
+{
+	sCU_CHARACTER_RENAME_RES res;
+	res.OpCode = CU_CHARACTER_RENAME_RES;
+	res.charId = data->charId;
+	res.ResultCode = DBChangeCharName(data->CharName, data->charId);
+	Send(&res, sizeof(res));
+}
+
+void CharClient::SendCancelWaitReq(sUC_CONNECT_WAIT_CANCEL_REQ* data)
+{
+	sCU_CONNECT_WAIT_CANCEL_RES res;
+	res.OpCode = CU_CONNECT_WAIT_CANCEL_RES;
+	res.ResultCode = CHARACTER_SUCCESS;
+	Send(&res, sizeof(res));
 }

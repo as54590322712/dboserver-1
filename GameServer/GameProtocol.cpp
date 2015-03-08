@@ -6,6 +6,7 @@ void GameClient::SendGameEnterRes(sUG_GAME_ENTER_REQ* data)
 	this->AccountID = data->accountId;
 	this->CurrCharID = data->charId;
 	this->CurrServerID = pServer->ServerID;
+	memcpy(this->AuthKey, data->AuthKey, MAX_AUTHKEY_SIZE);
 
 	sGU_GAME_ENTER_RES geRes;
 	memset(&geRes, 0, sizeof(geRes));

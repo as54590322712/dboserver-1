@@ -93,7 +93,7 @@ int CharClient::GetDBAccCharListData(sCU_CHARACTER_INFO* outdata)
 			while (pServer->ServerDB->Fetch())
 			{
 				outdata->CharData[c].charId = pServer->ServerDB->getInt("ID");
-				memcpy(outdata->CharData[c].Name, charToWChar(pServer->ServerDB->getString("Name").c_str()), MAX_CHARNAME_SIZE);
+				memcpy(outdata->CharData[c].Name, charToWChar(pServer->ServerDB->getString("Name")), MAX_CHARNAME_SIZE);
 				outdata->CharData[c].Class = pServer->ServerDB->getInt("Class");
 				outdata->CharData[c].Face = pServer->ServerDB->getInt("Face");
 				outdata->CharData[c].Gender = pServer->ServerDB->getInt("Gender");

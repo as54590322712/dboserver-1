@@ -21,9 +21,6 @@ Database::~Database()
 	try
 	{
 		driver->threadEnd();
-		delete m_conn;
-		delete stmt;
-		delete res;
 	}
 	catch (SQLException &e) {
 		Logger::Log("# ERROR #\n");
@@ -38,11 +35,11 @@ bool Database::Connect(char* host, char* database, char* user, char* password, i
 	{
 		char _host[MAX_PATH];
 		sprintf_s(_host, MAX_PATH, "tcp://%s:%d", host, port);
-		m_conn = driver->connect(_host, user, password);
+		m_conn = (std::unique_ptr<Connection>)(driver->connect(_host, user, password));
 		if (m_conn->isValid())
 		{
 			m_conn->setSchema(database);
-			stmt = m_conn->createStatement();
+			stmt = (std::unique_ptr<Statement>)(m_conn->createStatement());
 			Logger::Log("Connected to Database Server (%s:%d) [%s]\n", host, port, database);
 			return true;
 		}
@@ -60,9 +57,9 @@ bool Database::Connect(char* host, char* database, char* user, char* password, i
 bool Database::ChangeDB(char* db)
 {
 	try {
-		stmt->close();
+		stmt.release();
 		m_conn->setSchema(db);
-		stmt = m_conn->createStatement();
+		stmt = (std::unique_ptr<Statement>)(m_conn->createStatement());
 		return true;
 	}
 	catch (SQLException &e) {
@@ -83,8 +80,6 @@ bool Database::ExecuteQuery(char* Format, ...)
 	SQLString query = SQLString(szQuery);
 
 	try {
-		stmt->close();
-		stmt = m_conn->createStatement();
 		stmt->executeUpdate(query);
 		return true;
 	}
@@ -106,9 +101,7 @@ bool Database::ExecuteSelect(char* Format, ...)
 	SQLString query = SQLString(szQuery);
 
 	try {
-		stmt->close();
-		stmt = m_conn->createStatement();
-		res = stmt->executeQuery(query);
+		res = (std::unique_ptr<ResultSet>)(stmt->executeQuery(query));
 		return true;
 	}
 	catch (SQLException &e) {
@@ -139,9 +132,9 @@ int Database::getInt(const char* index)
 	return res->getInt(index);
 }
 
-std::string Database::getString(const char* index)
+char* Database::getString(const char* index)
 {
-	return res->getString(index);
+	return _strdup(((std::string)res->getString(index)).c_str());
 }
 
 size_t Database::rowsCount()

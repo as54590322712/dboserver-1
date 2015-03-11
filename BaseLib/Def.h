@@ -62,6 +62,8 @@ typedef unsigned long long QWORD;
 #define MAX_PCHARDEBUFF_COUNT (8)
 #define MAX_WOLDDOJO_COUNT (7)
 #define MAX_NEXT_DEST_LOC_COUNT (10)
+#define MAX_SIZE_CP_COOKIE (1024 * 2)
+#define MAX_SIZE_CJI_KOR_UNI_ID (12)
 
 static wchar_t* charToWChar(const char* text)
 {

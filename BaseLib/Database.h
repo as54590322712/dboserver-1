@@ -3,6 +3,7 @@
 
 #define CPPCONN_LIB_BUILD 1
 
+#include <vector>
 #include <cppconn/connection.h>
 #include <cppconn/driver.h>
 #include <cppconn/exception.h>
@@ -27,13 +28,13 @@ public:
 	long double getDouble(const char* index);
 	bool getBoolean(const char* index);
 	int getInt(const char* index);
-	std::string getString(const char* index);
+	char* getString(const char* index);
 	size_t rowsCount();
 
-	Connection* m_conn;
 	Driver* driver;
-	Statement* stmt;
-	ResultSet* res;
+	std::unique_ptr<Connection> m_conn;
+	std::unique_ptr<Statement> stmt;
+	std::unique_ptr<ResultSet> res;
 };
 
 #endif

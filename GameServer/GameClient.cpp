@@ -18,172 +18,167 @@ unsigned int GameClient::GetPCTblidx(BYTE Race, BYTE Gender, BYTE Class)
 	return 0xFFFFFFFF;
 }
 
-void GameClient::LoadWorldInfoData(sGU_AVATAR_WORLD_INFO* data)
-{
-	if (pServer->ServerDB->ExecuteSelect("SELECT * FROM `character` WHERE `AccID`='%d' AND `ID`='%d';", this->AccountID, this->CurrCharID))
-	{
-		while (pServer->ServerDB->Fetch())
-		{
-			data->worldInfo.tblidx = pServer->ServerDB->getInt("worldTblidx");
-			data->worldInfo.worldID = pServer->ServerDB->getInt("worldId");
-			data->worldInfo.TriggerObjectOffset = 100000; // WHAT IS THIS??
-			data->worldInfo.RuleInfo.RuleType = GAMERULE_NORMAL;
-			data->DojoCount = 0;
-			data->CurLoc.x = pServer->ServerDB->getDouble("PositionX") + (float)(rand() % 5);
-			data->CurLoc.y = pServer->ServerDB->getDouble("PositionY") + (float)(rand() % 5);
-			data->CurLoc.z = pServer->ServerDB->getDouble("positionZ") + (float)(rand() % 5);
-			data->CurDir.x = pServer->ServerDB->getDouble("DirectionX");
-			data->CurDir.y = pServer->ServerDB->getDouble("DirectionY");
-			data->CurDir.z = pServer->ServerDB->getDouble("DirectionZ");
-		}
-	}
-}
-
-void GameClient::LoadSendCharacterData(sGU_AVATAR_CHAR_INFO* data)
+void GameClient::LoadWorldInfoData()
 {
 	if (pServer->ServerDB->ExecuteSelect("SELECT * FROM `character` WHERE `AccID`='%d' AND `ID`='%d';", this->AccountID, this->CurrCharID))
 	{
 		pServer->ServerDB->Fetch();
-		memcpy(data->PcProfile.Name, charToWChar(pServer->ServerDB->getString("Name").c_str()), MAX_CHARNAME_SIZE);
-		data->PcProfile.charId = pServer->ServerDB->getInt("ID");
-		data->PcProfile.IsGameMaster = false;
-		data->PcProfile.Level = 1;
-		data->PcProfile.CurExp = 50;
-		data->PcProfile.IsAdult = true;
-		data->PcProfile.MaxExpInThisLevel = 100;
-		data->PcProfile.TutorialHint = 1;
-		data->PcProfile.CurEP = 10000;
-		data->PcProfile.CurLP = 10000;
-		data->PcProfile.CurRP = 100;
-		data->PcProfile.Zenny = 100000000;
+		worldInfo.tblidx = pServer->ServerDB->getInt("worldTblidx");
+		worldInfo.worldID = pServer->ServerDB->getInt("worldId");
+		worldInfo.TriggerObjectOffset = 100000; // WHAT IS THIS??
+		worldInfo.RuleInfo.RuleType = GAMERULE_NORMAL;
+		//data->CurLoc.x = pServer->ServerDB->getDouble("PositionX") + (float)(rand() % 5);
+		//data->CurLoc.y = pServer->ServerDB->getDouble("PositionY") + (float)(rand() % 5);
+		//data->CurLoc.z = pServer->ServerDB->getDouble("positionZ") + (float)(rand() % 5);
+	}
+}
 
-		data->PcProfile.avatarAttribute.BaseMaxEP = 10000;
-		data->PcProfile.avatarAttribute.LastMaxEP = 10000;
-		data->PcProfile.avatarAttribute.BaseMaxLP = 10000;
-		data->PcProfile.avatarAttribute.LastMaxLP = 10000;
-		data->PcProfile.avatarAttribute.BaseMaxRP = 100;
-		data->PcProfile.avatarAttribute.LastMaxRP = 100;
-		data->PcProfile.avatarAttribute.BaseAttackRange = 10.0f;
-		data->PcProfile.avatarAttribute.LastAttackRange = 10.0f;
-		data->PcProfile.avatarAttribute.BaseAttackRate = 10;
-		data->PcProfile.avatarAttribute.LastAttackRate = 10;
-		data->PcProfile.avatarAttribute.BaseAttackSpeedRate = 10;
-		data->PcProfile.avatarAttribute.LastAttackSpeedRate = 10;
-		data->PcProfile.avatarAttribute.BaseBlockRate = 10;
-		data->PcProfile.avatarAttribute.LastBlockRate = 10;
-		data->PcProfile.avatarAttribute.BaseCon = 255;
-		data->PcProfile.avatarAttribute.LastCon = 255;
-		data->PcProfile.avatarAttribute.BaseCurseSuccessRate = 10;
-		data->PcProfile.avatarAttribute.LastCurseSuccessRate = 10;
-		data->PcProfile.avatarAttribute.BaseCurseToleranceRate = 10;
-		data->PcProfile.avatarAttribute.LastCurseToleranceRate = 10;
-		data->PcProfile.avatarAttribute.BaseDex = 255;
-		data->PcProfile.avatarAttribute.LastDex = 255;
-		data->PcProfile.avatarAttribute.BaseDodgeRate = 10;
-		data->PcProfile.avatarAttribute.LastDodgeRate = 10;
-		data->PcProfile.avatarAttribute.BaseEnergyCriticalRate = 10;
-		data->PcProfile.avatarAttribute.LastEnergyCriticalRate = 10;
-		data->PcProfile.avatarAttribute.BaseEnergyDefence = 10;
-		data->PcProfile.avatarAttribute.LastEnergyDefence = 10;
-		data->PcProfile.avatarAttribute.BaseEnergyOffence = 10;
-		data->PcProfile.avatarAttribute.LastEnergyOffence = 10;
-		data->PcProfile.avatarAttribute.BaseEng = 255;
-		data->PcProfile.avatarAttribute.LastEng = 255;
-		data->PcProfile.avatarAttribute.BaseEpBattleRegen = 10;
-		data->PcProfile.avatarAttribute.LastEpBattleRegen = 10;
-		data->PcProfile.avatarAttribute.BaseEpRegen = 10;
-		data->PcProfile.avatarAttribute.LastEpRegen = 10;
-		data->PcProfile.avatarAttribute.BaseEpSitdownRegen = 10;
-		data->PcProfile.avatarAttribute.LastEpSitdownRegen = 10;
-		data->PcProfile.avatarAttribute.BaseFoc = 255;
-		data->PcProfile.avatarAttribute.LastFoc = 255;
-		data->PcProfile.avatarAttribute.BaseLpBattleRegen = 10;
-		data->PcProfile.avatarAttribute.LastLpBattleRegen = 10;
-		data->PcProfile.avatarAttribute.BaseLpRegen = 10;
-		data->PcProfile.avatarAttribute.LastLpRegen = 10;
-		data->PcProfile.avatarAttribute.BaseLpSitdownRegen = 10;
-		data->PcProfile.avatarAttribute.LastLpSitdownRegen = 10;
-		data->PcProfile.avatarAttribute.BasePhysicalCriticalRate = 10;
-		data->PcProfile.avatarAttribute.LastPhysicalCriticalRate = 10;
-		data->PcProfile.avatarAttribute.BasePhysicalDefence = 10;
-		data->PcProfile.avatarAttribute.LastPhysicalDefence = 10;
-		data->PcProfile.avatarAttribute.BasePhysicalOffence = 10;
-		data->PcProfile.avatarAttribute.LastPhysicalOffence = 10;
-		data->PcProfile.avatarAttribute.BaseRpRegen = 10;
-		data->PcProfile.avatarAttribute.LastRpRegen = 10;
-		data->PcProfile.avatarAttribute.BaseSol = 255;
-		data->PcProfile.avatarAttribute.LastSol = 255;
-		data->PcProfile.avatarAttribute.BaseStr = 255;
-		data->PcProfile.avatarAttribute.LastStr = 255;
-		data->PcProfile.avatarAttribute.BleedingKeepTimeDown = 2;
-		data->PcProfile.avatarAttribute.CandyKeepTimeDown = 3;
-		data->PcProfile.avatarAttribute.CandyToleranceRate = 10;
-		data->PcProfile.avatarAttribute.CastingTimeChangePercent = 100;
-		data->PcProfile.avatarAttribute.ConfuseKeepTimeDown = 1;
-		data->PcProfile.avatarAttribute.ConfuseToleranceRate = 100;
-		data->PcProfile.avatarAttribute.CoolTimeChangePercent = 100;
-		data->PcProfile.avatarAttribute.CriticalBlockSuccessRate = 100;
-		data->PcProfile.avatarAttribute.CurseBlockModeSuccessRate = 100;
-		data->PcProfile.avatarAttribute.DotTimeChangeAbsolute = 1;
-		data->PcProfile.avatarAttribute.DotValueChangePercent = 1;
-		data->PcProfile.avatarAttribute.EleganceDefence = 100;
-		data->PcProfile.avatarAttribute.EleganceOffence = 100;
-		data->PcProfile.avatarAttribute.EnergyCriticalDamageBonusRate = 100;
-		data->PcProfile.avatarAttribute.FunnyDefence = 100;
-		data->PcProfile.avatarAttribute.FunnyOffence = 100;
-		data->PcProfile.avatarAttribute.GuardRate = 100;
-		data->PcProfile.avatarAttribute.HonestDefence = 100;
-		data->PcProfile.avatarAttribute.HonestOffence = 100;
-		data->PcProfile.avatarAttribute.HtbBlockModeSuccessRate = 100;
-		data->PcProfile.avatarAttribute.ItemUpgradeBonusRate = 100;
-		data->PcProfile.avatarAttribute.ItemUpgradeBreakBonusRate = 0;
-		data->PcProfile.avatarAttribute.KeepTimeChangePercent = 100;
-		data->PcProfile.avatarAttribute.KnockdownBlockModeSuccessRate = 100;
-		data->PcProfile.avatarAttribute.ParalyzeKeepTimeDown = 100;
-		data->PcProfile.avatarAttribute.PhysicalCriticalDamageBonusRate = 100;
-		data->PcProfile.avatarAttribute.PoisonKeepTimeDown = 100;
-		data->PcProfile.avatarAttribute.RequiredEpChangePercent = 100;
-		data->PcProfile.avatarAttribute.SitDownEpRegenBonusRate = 100;
-		data->PcProfile.avatarAttribute.SitDownLpRegenBonusRate = 100;
-		data->PcProfile.avatarAttribute.SkillDamageBlockModeSuccessRate = 100;
-		data->PcProfile.avatarAttribute.StomachacheKeepTimeDown = 100;
-		data->PcProfile.avatarAttribute.StoneKeepTimeDown = 100;
-		data->PcProfile.avatarAttribute.StoneToleranceRate = 100;
-		data->PcProfile.avatarAttribute.StrangeDefence = 100;
-		data->PcProfile.avatarAttribute.StrangeOffence = 100;
-		data->PcProfile.avatarAttribute.TerrorKeepTimeDown = 100;
-		data->PcProfile.avatarAttribute.TerrorToleranceRate = 100;
-		data->PcProfile.avatarAttribute.WildDefence = 100;
-		data->PcProfile.avatarAttribute.WildOffence = 100;
-		data->PcProfile.avatarAttribute.LastRunSpeed = 10.0f;
+void GameClient::LoadCharacterData()
+{
+	if (pServer->ServerDB->ExecuteSelect("SELECT * FROM `character` WHERE `AccID`='%d' AND `ID`='%d';", AccountID, CurrCharID))
+	{
+		pServer->ServerDB->Fetch();
+		memset(&PcProfile, 0, sizeof(PcProfile));
+		memcpy(PcProfile.Name, charToWChar(pServer->ServerDB->getString("Name")), MAX_CHARNAME_SIZE);
+		PcProfile.charId = pServer->ServerDB->getInt("ID");
+		PcProfile.IsGameMaster = false;
+		PcProfile.Level = pServer->ServerDB->getInt("Level");
+		PcProfile.CurExp = pServer->ServerDB->getInt("Exp");
+		PcProfile.IsAdult = pServer->ServerDB->getBoolean("Adult");
+		PcProfile.MaxExpInThisLevel = 100;
+		PcProfile.TutorialHint = 1;
+		PcProfile.CurEP = 10000;
+		PcProfile.CurLP = 10000;
+		PcProfile.CurRP = 100;
+		PcProfile.Zenny = pServer->ServerDB->getInt("Money");
 
-		data->PcProfile.CharShape.Face = pServer->ServerDB->getInt("Face");
-		data->PcProfile.CharShape.Hair = pServer->ServerDB->getInt("Hair");
-		data->PcProfile.CharShape.HairColor = pServer->ServerDB->getInt("HairColor");
-		data->PcProfile.CharShape.SkinColor = pServer->ServerDB->getInt("SkinColor");
+		PcProfile.avatarAttribute.BaseMaxEP = 10000;
+		PcProfile.avatarAttribute.LastMaxEP = 10000;
+		PcProfile.avatarAttribute.BaseMaxLP = 10000;
+		PcProfile.avatarAttribute.LastMaxLP = 10000;
+		PcProfile.avatarAttribute.BaseMaxRP = 100;
+		PcProfile.avatarAttribute.LastMaxRP = 100;
+		PcProfile.avatarAttribute.BaseAttackRange = 10.0f;
+		PcProfile.avatarAttribute.LastAttackRange = 10.0f;
+		PcProfile.avatarAttribute.BaseAttackRate = 10;
+		PcProfile.avatarAttribute.LastAttackRate = 10;
+		PcProfile.avatarAttribute.BaseAttackSpeedRate = 10;
+		PcProfile.avatarAttribute.LastAttackSpeedRate = 10;
+		PcProfile.avatarAttribute.BaseBlockRate = 10;
+		PcProfile.avatarAttribute.LastBlockRate = 10;
+		PcProfile.avatarAttribute.BaseCon = 255;
+		PcProfile.avatarAttribute.LastCon = 255;
+		PcProfile.avatarAttribute.BaseCurseSuccessRate = 10;
+		PcProfile.avatarAttribute.LastCurseSuccessRate = 10;
+		PcProfile.avatarAttribute.BaseCurseToleranceRate = 10;
+		PcProfile.avatarAttribute.LastCurseToleranceRate = 10;
+		PcProfile.avatarAttribute.BaseDex = 255;
+		PcProfile.avatarAttribute.LastDex = 255;
+		PcProfile.avatarAttribute.BaseDodgeRate = 10;
+		PcProfile.avatarAttribute.LastDodgeRate = 10;
+		PcProfile.avatarAttribute.BaseEnergyCriticalRate = 10;
+		PcProfile.avatarAttribute.LastEnergyCriticalRate = 10;
+		PcProfile.avatarAttribute.BaseEnergyDefence = 10;
+		PcProfile.avatarAttribute.LastEnergyDefence = 10;
+		PcProfile.avatarAttribute.BaseEnergyOffence = 10;
+		PcProfile.avatarAttribute.LastEnergyOffence = 10;
+		PcProfile.avatarAttribute.BaseEng = 255;
+		PcProfile.avatarAttribute.LastEng = 255;
+		PcProfile.avatarAttribute.BaseEpBattleRegen = 10;
+		PcProfile.avatarAttribute.LastEpBattleRegen = 10;
+		PcProfile.avatarAttribute.BaseEpRegen = 10;
+		PcProfile.avatarAttribute.LastEpRegen = 10;
+		PcProfile.avatarAttribute.BaseEpSitdownRegen = 10;
+		PcProfile.avatarAttribute.LastEpSitdownRegen = 10;
+		PcProfile.avatarAttribute.BaseFoc = 255;
+		PcProfile.avatarAttribute.LastFoc = 255;
+		PcProfile.avatarAttribute.BaseLpBattleRegen = 10;
+		PcProfile.avatarAttribute.LastLpBattleRegen = 10;
+		PcProfile.avatarAttribute.BaseLpRegen = 10;
+		PcProfile.avatarAttribute.LastLpRegen = 10;
+		PcProfile.avatarAttribute.BaseLpSitdownRegen = 10;
+		PcProfile.avatarAttribute.LastLpSitdownRegen = 10;
+		PcProfile.avatarAttribute.BasePhysicalCriticalRate = 10;
+		PcProfile.avatarAttribute.LastPhysicalCriticalRate = 10;
+		PcProfile.avatarAttribute.BasePhysicalDefence = 10;
+		PcProfile.avatarAttribute.LastPhysicalDefence = 10;
+		PcProfile.avatarAttribute.BasePhysicalOffence = 10;
+		PcProfile.avatarAttribute.LastPhysicalOffence = 10;
+		PcProfile.avatarAttribute.BaseRpRegen = 10;
+		PcProfile.avatarAttribute.LastRpRegen = 10;
+		PcProfile.avatarAttribute.BaseSol = 255;
+		PcProfile.avatarAttribute.LastSol = 255;
+		PcProfile.avatarAttribute.BaseStr = 255;
+		PcProfile.avatarAttribute.LastStr = 255;
+		PcProfile.avatarAttribute.BleedingKeepTimeDown = 2;
+		PcProfile.avatarAttribute.CandyKeepTimeDown = 3;
+		PcProfile.avatarAttribute.CandyToleranceRate = 10;
+		PcProfile.avatarAttribute.CastingTimeChangePercent = 100;
+		PcProfile.avatarAttribute.ConfuseKeepTimeDown = 1;
+		PcProfile.avatarAttribute.ConfuseToleranceRate = 100;
+		PcProfile.avatarAttribute.CoolTimeChangePercent = 100;
+		PcProfile.avatarAttribute.CriticalBlockSuccessRate = 100;
+		PcProfile.avatarAttribute.CurseBlockModeSuccessRate = 100;
+		PcProfile.avatarAttribute.DotTimeChangeAbsolute = 1;
+		PcProfile.avatarAttribute.DotValueChangePercent = 1;
+		PcProfile.avatarAttribute.EleganceDefence = 100;
+		PcProfile.avatarAttribute.EleganceOffence = 100;
+		PcProfile.avatarAttribute.EnergyCriticalDamageBonusRate = 100;
+		PcProfile.avatarAttribute.FunnyDefence = 100;
+		PcProfile.avatarAttribute.FunnyOffence = 100;
+		PcProfile.avatarAttribute.GuardRate = 100;
+		PcProfile.avatarAttribute.HonestDefence = 100;
+		PcProfile.avatarAttribute.HonestOffence = 100;
+		PcProfile.avatarAttribute.HtbBlockModeSuccessRate = 100;
+		PcProfile.avatarAttribute.ItemUpgradeBonusRate = 100;
+		PcProfile.avatarAttribute.ItemUpgradeBreakBonusRate = 0;
+		PcProfile.avatarAttribute.KeepTimeChangePercent = 100;
+		PcProfile.avatarAttribute.KnockdownBlockModeSuccessRate = 100;
+		PcProfile.avatarAttribute.ParalyzeKeepTimeDown = 100;
+		PcProfile.avatarAttribute.PhysicalCriticalDamageBonusRate = 100;
+		PcProfile.avatarAttribute.PoisonKeepTimeDown = 100;
+		PcProfile.avatarAttribute.RequiredEpChangePercent = 100;
+		PcProfile.avatarAttribute.SitDownEpRegenBonusRate = 100;
+		PcProfile.avatarAttribute.SitDownLpRegenBonusRate = 100;
+		PcProfile.avatarAttribute.SkillDamageBlockModeSuccessRate = 100;
+		PcProfile.avatarAttribute.StomachacheKeepTimeDown = 100;
+		PcProfile.avatarAttribute.StoneKeepTimeDown = 100;
+		PcProfile.avatarAttribute.StoneToleranceRate = 100;
+		PcProfile.avatarAttribute.StrangeDefence = 100;
+		PcProfile.avatarAttribute.StrangeOffence = 100;
+		PcProfile.avatarAttribute.TerrorKeepTimeDown = 100;
+		PcProfile.avatarAttribute.TerrorToleranceRate = 100;
+		PcProfile.avatarAttribute.WildDefence = 100;
+		PcProfile.avatarAttribute.WildOffence = 100;
+		PcProfile.avatarAttribute.LastRunSpeed = 10.0f;
 
-		data->CharState.CharStateBase.ConditionFlag = 0;
-		data->CharState.CharStateBase.FightMode = 0;
-		data->CharState.CharStateBase.StateID = 0;
-		data->CharState.CharStateBase.StateTime = 0;
-		data->CharState.CharStateBase.aspectState.AspectStateBase.AspectStateId = 255;
-		data->CharState.CharStateBase.aspectState.AspectStateDetail.GreatNamek.SourceGrade = 0;
-		data->CharState.CharStateBase.aspectState.AspectStateDetail.Kaioken.RepeatingCount = 0;
-		data->CharState.CharStateBase.aspectState.AspectStateDetail.Kaioken.SourceGrade = 0;
-		data->CharState.CharStateBase.aspectState.AspectStateDetail.PureMajin.SourceGrade = 0;
-		data->CharState.CharStateBase.aspectState.AspectStateDetail.SuperSaiyan.SourceGrade = 0;
-		data->CharState.CharStateBase.aspectState.AspectStateDetail.Vehicle.idVehicleTblidx = 0;
-		data->CharState.CharStateBase.aspectState.AspectStateDetail.Vehicle.IsEngineOn = 0;
+		PcProfile.CharShape.Face = pServer->ServerDB->getInt("Face");
+		PcProfile.CharShape.Hair = pServer->ServerDB->getInt("Hair");
+		PcProfile.CharShape.HairColor = pServer->ServerDB->getInt("HairColor");
+		PcProfile.CharShape.SkinColor = pServer->ServerDB->getInt("SkinColor");
 
-		data->CharState.CharStateBase.CurLoc.x = pServer->ServerDB->getDouble("PositionX");
-		data->CharState.CharStateBase.CurLoc.y = pServer->ServerDB->getDouble("PositionY");
-		data->CharState.CharStateBase.CurLoc.z = pServer->ServerDB->getDouble("PositionZ");
-		data->CharState.CharStateBase.CurDir.x = pServer->ServerDB->getDouble("DirectionX");
-		data->CharState.CharStateBase.CurDir.y = pServer->ServerDB->getDouble("DirectionY");
-		data->CharState.CharStateBase.CurDir.z = pServer->ServerDB->getDouble("DirectionZ");
+		memset(&CharState, 0, sizeof(CharState));
+		CharState.CharStateBase.ConditionFlag = 0;
+		CharState.CharStateBase.FightMode = 0;
+		CharState.CharStateBase.StateID = 0;
+		CharState.CharStateBase.StateTime = 0;
+		CharState.CharStateBase.aspectState.AspectStateBase.AspectStateId = 255;
+		CharState.CharStateBase.aspectState.AspectStateDetail.GreatNamek.SourceGrade = 0;
+		CharState.CharStateBase.aspectState.AspectStateDetail.Kaioken.RepeatingCount = 0;
+		CharState.CharStateBase.aspectState.AspectStateDetail.Kaioken.SourceGrade = 0;
+		CharState.CharStateBase.aspectState.AspectStateDetail.PureMajin.SourceGrade = 0;
+		CharState.CharStateBase.aspectState.AspectStateDetail.SuperSaiyan.SourceGrade = 0;
+		CharState.CharStateBase.aspectState.AspectStateDetail.Vehicle.idVehicleTblidx = 0;
+		CharState.CharStateBase.aspectState.AspectStateDetail.Vehicle.IsEngineOn = 0;
 
-		data->CharStateSize = sizeof(CHARSTATE_BASE);
-		data->PcProfile.tblidx = this->GetPCTblidx(pServer->ServerDB->getInt("Race"), pServer->ServerDB->getInt("Gender"), pServer->ServerDB->getInt("Class"));
+		CharState.CharStateBase.CurLoc.x = pServer->ServerDB->getDouble("PositionX");
+		CharState.CharStateBase.CurLoc.y = pServer->ServerDB->getDouble("PositionY");
+		CharState.CharStateBase.CurLoc.z = pServer->ServerDB->getDouble("PositionZ");
+		CharState.CharStateBase.CurDir.x = pServer->ServerDB->getDouble("DirectionX");
+		CharState.CharStateBase.CurDir.y = pServer->ServerDB->getDouble("DirectionY");
+		CharState.CharStateBase.CurDir.z = pServer->ServerDB->getDouble("DirectionZ");
+
+		PcProfile.tblidx = this->GetPCTblidx(pServer->ServerDB->getInt("Race"), pServer->ServerDB->getInt("Gender"), pServer->ServerDB->getInt("Class"));
 	}
 }
 

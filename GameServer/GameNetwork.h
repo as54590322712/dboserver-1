@@ -13,10 +13,11 @@ public:
 
 	PCHAR_PROFILE PcProfile;
 	CHARSTATE CharState;
+	WORLD_INFO worldInfo;
 
 	// FUNCTIONS
-	void LoadSendCharacterData(sGU_AVATAR_CHAR_INFO* data);
-	void LoadWorldInfoData(sGU_AVATAR_WORLD_INFO* data);
+	void LoadCharacterData();
+	void LoadWorldInfoData();
 	unsigned int GetPCTblidx(BYTE Race, BYTE Gender, BYTE Class);
 
 	// PROTOCOL

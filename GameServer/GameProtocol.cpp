@@ -31,7 +31,10 @@ void GameClient::SendCharInfo()
 	sGU_AVATAR_CHAR_INFO charInfo;
 	memset(&charInfo, 0, sizeof(charInfo));
 	charInfo.OpCode = GU_AVATAR_CHAR_INFO;
-	LoadSendCharacterData(&charInfo);
+	LoadCharacterData();
+	charInfo.PcProfile = PcProfile;
+	charInfo.CharState = CharState;
+	charInfo.CharStateSize = sizeof(CharState);
 	Send((unsigned char*)&charInfo, sizeof(charInfo));
 }
 
@@ -40,7 +43,10 @@ void GameClient::SendCharWorldInfo()
 	sGU_AVATAR_WORLD_INFO wInfo;
 	memset(&wInfo, 0, sizeof(wInfo));
 	wInfo.OpCode = GU_AVATAR_WORLD_INFO;
-	LoadWorldInfoData(&wInfo);
+	LoadWorldInfoData();
+	wInfo.worldInfo = worldInfo;
+	wInfo.CurDir = CharState.CharStateBase.CurDir;
+	wInfo.CurLoc = CharState.CharStateBase.CurLoc;
 	Send((unsigned char*)&wInfo, sizeof(wInfo));
 }
 

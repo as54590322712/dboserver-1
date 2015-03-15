@@ -24,6 +24,8 @@
 #include "Config.h"
 #include "Database.h"
 #include "Encryption.h"
+#include "NewbieTable.h"
+#include "PCTable.h"
 
 #define close closesocket
 #define MAX_THREADS 65535
@@ -102,6 +104,8 @@ class Server : public Base
 		Database* ServerDB;
 		int ServerID;
 		pthread_t threads[MAX_THREADS];
+		NewbieTable* nbTblData;
+		PCTable* pcTblData;
 };
 
 void* ClientThread(void* _client);

@@ -25,11 +25,10 @@ bool Client::ReceivingData()
 		{
 			if (pEncoder) pEncoder->RxDecrypt(*pkt);
 			pServer->OnDataReceived(this, pkt);
-			return true;
 		}
-		else if (pktsize <= 4) return false;
 	}
 	else return false;
+	return true;
 }
 
 void Client::Send(void* pData, int size)

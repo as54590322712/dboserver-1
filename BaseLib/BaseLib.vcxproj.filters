@@ -34,6 +34,9 @@
     <Filter Include="Source Files\Table">
       <UniqueIdentifier>{471f2889-8ffe-40ed-9c17-ef2b09124b4a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Table">
+      <UniqueIdentifier>{48abbf43-ddd8-4852-9c6c-dfa4467174c2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Server.cpp">
@@ -56,6 +59,15 @@
     </ClCompile>
     <ClCompile Include="Encryption.cpp">
       <Filter>Source Files\Network</Filter>
+    </ClCompile>
+    <ClCompile Include="NewbieTable.cpp">
+      <Filter>Source Files\Table</Filter>
+    </ClCompile>
+    <ClCompile Include="Table.cpp">
+      <Filter>Source Files\Table</Filter>
+    </ClCompile>
+    <ClCompile Include="PCTable.cpp">
+      <Filter>Source Files\Table</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -82,6 +94,15 @@
     </ClInclude>
     <ClInclude Include="Encryption.h">
       <Filter>Header Files\Network</Filter>
+    </ClInclude>
+    <ClInclude Include="NewbieTable.h">
+      <Filter>Table</Filter>
+    </ClInclude>
+    <ClInclude Include="Table.h">
+      <Filter>Table</Filter>
+    </ClInclude>
+    <ClInclude Include="PCTable.h">
+      <Filter>Table</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

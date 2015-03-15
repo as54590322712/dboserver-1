@@ -12,6 +12,8 @@ GameServer::GameServer()
 		ServerConfig->GetInt("MySQL", "Port"));
 	this->sPort = ServerConfig->GetInt("Port");
 	this->ServerID = ServerConfig->GetInt("ID");
+	pcTblData = new PCTable();
+	if (pcTblData->Load("..\\Tables\\table_pc_data.edf") != 0) Logger::Log("Failed to load PC Table!\n");
 	if (!Start()) Logger::Log("Server ERROR!\n");
 }
 
@@ -48,7 +50,7 @@ GameClient* GameServer::CreateClient()
 
 void GameServer::DeleteClient(Client* client)
 {
-	delete (GameClient*)client;
+	delete[] (GameClient*)client;
 }
 
 void GameServer::PacketControl(GameClient* client, Packet* pData)

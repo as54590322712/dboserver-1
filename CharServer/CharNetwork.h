@@ -12,7 +12,7 @@ public:
 	~CharClient();
 
 	int GetDBAccCharListData(sCU_CHARACTER_INFO* outdata);
-	void DBInsertCharData(CHARDATA data);
+	int DBInsertCharData(CHARDATA data, NewbieData nbdata);
 	ResultCodes CheckUsedName(WCHAR* Name);
 	ResultCodes DBChangeCharName(WCHAR* Name, int charId);
 	int GetDBAllowedRaces();

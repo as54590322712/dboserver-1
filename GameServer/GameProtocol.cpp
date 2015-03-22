@@ -6,6 +6,7 @@ void GameClient::SendGameEnterRes(sUG_GAME_ENTER_REQ* data)
 	this->AccountID = data->accountId;
 	this->CurrCharID = data->charId;
 	this->CurrServerID = pServer->ServerID;
+	this->TutorialMode = data->TutorialMode;
 	memcpy(this->AuthKey, data->AuthKey, MAX_AUTHKEY_SIZE);
 
 	sGU_GAME_ENTER_RES geRes;
@@ -35,6 +36,7 @@ void GameClient::SendCharInfo()
 	charInfo.PcProfile = PcProfile;
 	charInfo.CharState = CharState;
 	charInfo.CharStateSize = sizeof(CharState);
+	charInfo.handle = this->CurrCharID;
 	Send((unsigned char*)&charInfo, sizeof(charInfo));
 }
 
@@ -47,6 +49,9 @@ void GameClient::SendCharWorldInfo()
 	wInfo.worldInfo = worldInfo;
 	wInfo.CurDir = CharState.CharStateBase.CurDir;
 	wInfo.CurLoc = CharState.CharStateBase.CurLoc;
+	wInfo.CurLoc.x += (float)(rand() % 5);
+	wInfo.CurLoc.y += (float)(rand() % 5);
+	wInfo.CurLoc.z += (float)(rand() % 5);
 	Send((unsigned char*)&wInfo, sizeof(wInfo));
 }
 
@@ -60,6 +65,8 @@ void GameClient::SendCharWorldInfoEnd()
 
 void GameClient::SendCharMove(sUG_CHAR_MOVE* data)
 {
+	Logger::Log("-- char move (%f,%f,%f) --\n", data->CurLoc.x, data->CurLoc.y, data->CurLoc.z);
+	UpdatePositions(data->CurDir, data->CurLoc);
 	sGU_CHAR_MOVE mData;
 	memset(&mData, 0, sizeof(mData));
 	mData.OpCode = GU_CHAR_MOVE;
@@ -68,4 +75,40 @@ void GameClient::SendCharMove(sUG_CHAR_MOVE* data)
 	mData.CurLoc.x = data->CurLoc.x;
 	mData.CurLoc.y = data->CurLoc.y;
 	mData.CurLoc.z = data->CurLoc.z;
+}
+
+void GameClient::SendCharItemInfo()
+{
+	sGU_AVATAR_ITEM_INFO iInfo;
+	memset(&iInfo, 0, sizeof(iInfo));
+	iInfo.OpCode = GU_AVATAR_ITEM_INFO;
+	iInfo.ItemCount = LoadItemData();
+	memcpy(iInfo.ItemProfile, ItemProfile, sizeof(ItemProfile));
+	int psize = 3;
+	psize += sizeof(ITEM_PROFILE) * iInfo.ItemCount;
+	Send(&iInfo, psize);
+}
+
+void GameClient::SendCharSkillInfo()
+{
+	sGU_AVATAR_SKILL_INFO sInfo;
+	memset(&sInfo, 0, sizeof(sInfo));
+	sInfo.OpCode = GU_AVATAR_SKILL_INFO;
+	sInfo.SkillCount = LoadSkillData();
+	memcpy(sInfo.SkillInfo, SkillInfo, sizeof(SkillInfo));
+	int psize = 3;
+	psize += sizeof(SKILL_INFO) * sInfo.SkillCount;
+	Send(&sInfo, psize);
+}
+
+void GameClient::SendCharQuickSlotInfo()
+{
+	sGU_QUICK_SLOT_INFO qsInfo;
+	memset(&qsInfo, 0, sizeof(qsInfo));
+	qsInfo.OpCode = GU_QUICK_SLOT_INFO;
+	qsInfo.QuickSlotCount = LoadQuickslotData();
+	memcpy(qsInfo.QuickSlotData, QuickSlotData, sizeof(QuickSlotData));
+	int psize = 3;
+	psize += sizeof(QUICK_SLOT_PROFILE) * qsInfo.QuickSlotCount;
+	Send(&qsInfo, psize);
 }

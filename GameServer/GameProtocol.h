@@ -2327,97 +2327,94 @@ BEGIN_PACKET(GU_CHAR_CONVERT_CLASS)
 	unsigned int Target;
 	BYTE Class;
 END_PACKET()
-/*
+
 BEGIN_PACKET(GU_CHAR_DIALOG)
-unsigned int				hSubject;				// 대화 하는 캐릭터 핸들
-BYTE				byDialogType;			// 대화 종류 ( eCHAR_DIALOG_TYPE )
-unsigned int				textTblidx;				// 대화 내용 테이블 번호 ( INVALID 가 아니면 해당 텍스트를 찾아 출력하고, INVALID면 아래의 텍스트를 출력해 줄 것)
-bool				bIsRefSpeechTable;		// speech table( NPCSpeechTable 을 참조하는가? )
-WORD				wTextLen;				// 대화내용의 길이
-WCHAR				awchText[NTL_MAX_LENGTH_OF_CHAT_MESSAGE_UNICODE + 1]; // 대화내용
+	unsigned int Subject;
+	BYTE DialogType;
+	unsigned int textTblidx;
+	bool IsRefSpeechTable;
+	WORD TextLen;
+	WCHAR Text[MAX_CHATMESSAGE_USIZE + 1];
 END_PACKET()
 
 BEGIN_PACKET(GU_CHAR_DIRECT_PLAY)
-unsigned int				hSubject;				// 연출 캐릭터 핸들
-BYTE				byPlayMode;				// 연출 모드
-unsigned int				directTblidx;			// 연출 번호
-bool				bSynchronize;			// 서버 클라이언트 동기화
+	unsigned int Subject;
+	BYTE PlayMode;
+	unsigned int directTblidx;
+	bool Synchronize;
 END_PACKET()
 
 BEGIN_PACKET(GU_CHAR_DIRECT_PLAY_END)
 END_PACKET()
 
 BEGIN_PACKET(GU_CHAR_AWAY_RES)
-bool	bIsAway;		// AwayOn 1: Awayoff: 0
-WORD 	wResultCode;
+	bool IsAway;
+	WORD ResultCode;
 END_PACKET()
 
 BEGIN_PACKET(GU_CHAR_MAIL_INFO)
-BYTE	byMailCount;		// 현재 전체메일 카운트 
-BYTE	byManagerCount;		// 읽지 않은 매니져 메일 카운트
-BYTE	byNormalCount;		// 읽지 않은 노멀 메일 카운트
+	BYTE MailCount; 
+	BYTE ManagerCount;
+	BYTE NormalCount;
 END_PACKET()
 
 BEGIN_PACKET(GU_CHAR_KEY_INFO)
-BYTE			byCount;
-sSHORTCUT_DATA  asData[NTL_SHORTCUT_MAX_COUNT];
+	BYTE Count;
+	SHORTCUT_DATA Data[SHORTCUT_MAX_COUNT];
 END_PACKET()
 
 BEGIN_PACKET(GU_CHAR_RANKBATTLE_SCORE)
-sRANKBATTLE_SCORE_INFO	sScoreInfo;
+	RANKBATTLE_SCORE_INFO ScoreInfo;
 END_PACKET()
 
 BEGIN_PACKET(GU_CHAR_KEY_UPDATE_RES)
-WORD			wResultCode;
+	WORD ResultCode;
 END_PACKET()
 
 BEGIN_PACKET(GU_CHAR_ACTION_ATTACK)
-unsigned int			hSubject; // 액션 주체 캐릭터 핸들
-unsigned int			hTarget; // 액션 타겟 캐릭터 핸들
-DWORD			dwLpEpEventId;
-BYTE			bChainAttack : 1; // 체인어택여부
-BYTE			byAttackResult : 7; // 액션 결과 ( eBATTLE_ATTACK_RESULT )
-WORD			wAttackResultValue; // 액션의 결과 값 ( 데미지 )
-BYTE			byAttackSequence; // 어택 시퀀스 번호 (체인어택)
-float			fReflectedDamage; // 타겟으로부터 반사되어 입은 피해
-BYTE			byBlockedAction;		// eDBO_GUARD_TYPE
-VECTORXYZ		vShift; // 어택으로 인한 이동 벡터
+	unsigned int Subject;
+	unsigned int Target;
+	DWORD LpEpEventId;
+	BYTE ChainAttack : 1;
+	BYTE AttackResult : 7;
+	WORD AttackResultValue;
+	BYTE AttackSequence;
+	float ReflectedDamage;
+	BYTE BlockedAction;
+	VECTORXYZ Shift;
 END_PACKET()
 
 BEGIN_PACKET(GU_CHAR_ACTION_SKILL)
-unsigned int				handle;
-WORD				wResultCode;
-DWORD				dwLpEpEventId;
-unsigned int				skillId;
-BYTE				byRpBonusType;		// eDBO_RP_BONUS_TYPE
-unsigned int				hAppointedTarget;
-bool				bIsSkillHarmful;
-BYTE				bySkillResultCount;
-sSKILL_RESULT		aSkillResult[NTL_MAX_NUMBER_OF_SKILL_TARGET];
+	unsigned int handle;
+	WORD ResultCode;
+	DWORD LpEpEventId;
+	unsigned int skillId;
+	BYTE RpBonusType;
+	unsigned int AppointedTarget;
+	bool IsSkillHarmful;
+	BYTE SkillResultCount;
+	SKILL_RESULT SkillResult[MAX_SKILL_TARGET];
 END_PACKET()
 
 BEGIN_PACKET(GU_CHAR_ACTION_ITEM)
-unsigned int				handle;
-WORD				wResultCode;
-DWORD				dwLpEpEventId;
-unsigned int				itemTblidx;
-BYTE				bySkillResultCount;
-sSKILL_RESULT		aSkillResult[NTL_MAX_NUMBER_OF_SKILL_TARGET];
+	unsigned int handle;
+	WORD ResultCode;
+	DWORD LpEpEventId;
+	unsigned int itemTblidx;
+	BYTE SkillResultCount;
+	SKILL_RESULT SkillResult[MAX_SKILL_TARGET];
 END_PACKET()
 
 BEGIN_PACKET(GU_CHAR_REVIVAL_RES)
-WORD			wResultCode;
+	WORD ResultCode;
 END_PACKET()
 
 BEGIN_PACKET(GU_CHAR_TELEPORT_RES)
-WORD			wResultCode;
-VECTORXYZ		vNewLoc;
-VECTORXYZ		vNewDir;
-bool			bIsToMoveAnotherServer;
-// Data in 'sWorldInfo' will not be sent if the character moves within the current world.
-// 현재 월드 안에서의 이동일 경우에는 sWorldInfo 데이타를 보내지 않는다.
-// by YOSHIKI(2007-10-25)
-sWORLD_INFO				sWorldInfo;
+	WORD ResultCode;
+	VECTORXYZ NewLoc;
+	VECTORXYZ NewDir;
+	bool IsToMoveAnotherServer;
+	WORLD_INFO WorldInfo;
 END_PACKET()
 
 BEGIN_PACKET(GU_CHAR_BIND_RES)
@@ -2454,203 +2451,203 @@ BEGIN_PACKET(GU_GAME_EXIT_RES)
 END_PACKET()
 
 BEGIN_PACKET(GU_GAME_KICK_NFY)
-WORD					wResultCode;
+	WORD ResultCode;
 END_PACKET()
 
 BEGIN_PACKET(GU_EFFECT_AFFECTED)
-unsigned int			handle;
-unsigned int			hCaster;
-unsigned int			effectTblidx;
-WORD			wResultCode;
-float			fActualArgument1;
-float			fActualArgument2;
+	unsigned int handle;
+	unsigned int Caster;
+	unsigned int effectTblidx;
+	WORD ResultCode;
+	float ActualArgument1;
+	float ActualArgument2;
 END_PACKET()
 
 BEGIN_PACKET(GU_SKILL_CASTING_CANCELED_NFY)
-unsigned int			handle;
-WORD			wResultCode;
+	unsigned int handle;
+	WORD ResultCode;
 END_PACKET()
 
 BEGIN_PACKET(GU_SKILL_CASTING_DELAYED_NFY)
-unsigned int			handle;
-WORD			wResultCode;
-DWORD			dwCastingTime;
-DWORD			dwCastingTimeRemaining;
+	unsigned int handle;
+	WORD ResultCode;
+	DWORD CastingTime;
+	DWORD CastingTimeRemaining;
 END_PACKET()
 
 BEGIN_PACKET(GU_SKILL_AFFECTING_CANCELED_NFY)
-unsigned int			hSubject;
+	unsigned int Subject;
 END_PACKET()
 
 BEGIN_PACKET(GU_SKILL_TARGET_LIST_REQ)
-BYTE			byAvatarType;
+	BYTE AvatarType;
 END_PACKET()
 
 BEGIN_PACKET(GU_SKILL_LEARN_RES)
-WORD			wResultCode;
+	WORD ResultCode;
 END_PACKET()
 
 BEGIN_PACKET(GU_SKILL_LEARNED_NFY)
-unsigned int			skillId;
-BYTE			bySlot;
+	unsigned int skillId;
+	BYTE Slot;
 END_PACKET()
 
 BEGIN_PACKET(GU_SKILL_UPGRADE_RES)
-WORD			wResultCode;
-unsigned int			skillId;
-BYTE			bySlot;
+	WORD ResultCode;
+	unsigned int skillId;
+	BYTE Slot;
 END_PACKET()
 
 BEGIN_PACKET(GU_SKILL_RP_BONUS_SETTING_RES)
-WORD			wResultCode;
-unsigned int			skillId;
-BYTE			bySlotIndex;
-BYTE			byRpBonusType;		// eDBO_RP_BONUS_TYPE
-bool			bIsRpBonusAuto;
+	WORD ResultCode;
+	unsigned int skillId;
+	BYTE SlotIndex;
+	BYTE RpBonusType;
+	bool IsRpBonusAuto;
 END_PACKET()
 
 BEGIN_PACKET(GU_SKILL_NOTIFY_EXP)
-BYTE			bySlotIndex;
-WORD			wSkillExp;
+	BYTE SlotIndex;
+	WORD SkillExp;
 END_PACKET()
 
 BEGIN_PACKET(GU_SKILL_AFTEREFFECT_REMAINING_TIME_NFY)
-DWORD			dwTimeRemaining;		// in Millisecs.
+	DWORD TimeRemaining;
 END_PACKET()
 
 BEGIN_PACKET(GU_SKILL_COOL_TIME_STARTED_NFY)
-unsigned int			hSubject;
-unsigned int			skillTblidx;
+	unsigned int Subject;
+	unsigned int skillTblidx;
 END_PACKET()
 
 BEGIN_PACKET(GU_BUFF_REGISTERED)
-unsigned int			hHandle;
-BYTE			bySourceType;		// eDBO_OBJECT_SOURCE
-unsigned int			tblidx;
-float			afEffectValue[NTL_MAX_EFFECT_IN_SKILL];
-DWORD			dwInitialDuration;		// In Millisecs.
-DWORD			dwTimeRemaining;		// in millisecs.
-bool			bNeedToDisplayMessage;
+	unsigned int Handle;
+	BYTE SourceType;
+	unsigned int tblidx;
+	float EffectValue[MAX_EFFECTSKILL];
+	DWORD InitialDuration;		// In Millisecs.
+	DWORD TimeRemaining;		// in millisecs.
+	bool NeedToDisplayMessage;
 END_PACKET()
 
 BEGIN_PACKET(GU_BUFF_DROPPED)
-unsigned int			hHandle;
-BYTE			bySourceType;		// eDBO_OBJECT_SOURCE
-unsigned int			tblidx;
+	unsigned int Handle;
+	BYTE SourceType;
+	unsigned int tblidx;
 END_PACKET()
 
 BEGIN_PACKET(GU_BUFF_REFRESH_ALL)
-unsigned int			hHandle;
-BYTE			byCount;
-sBUFF_INFO		aBuffInfo[DBO_MAX_BUFF_CHARACTER_HAS];
+	unsigned int Handle;
+	BYTE Count;
+	BUFF_INFO BuffInfo[MAX_PCHARBUFF_COUNT + MAX_PCHARDEBUFF_COUNT];
 END_PACKET()
 
 BEGIN_PACKET(GU_BUFF_DROP_RES)
-WORD			wResultCode;
+	WORD ResultCode;
 END_PACKET()
 
 BEGIN_PACKET(GU_HTB_START_RES)
-WORD			wResultCode;
-BYTE			bySkillSlot;
+	WORD ResultCode;
+	BYTE SkillSlot;
 END_PACKET()
 
 BEGIN_PACKET(GU_HTB_LEARN_RES)
-WORD			wResultCode;
-unsigned int			skillId;
-BYTE			bySkillSlot;
+	WORD ResultCode;
+	unsigned int skillId;
+	BYTE SkillSlot;
 END_PACKET()
 
 BEGIN_PACKET(GU_HTB_FORWARD_RES)
-WORD			wResultCode;
+	WORD ResultCode;
 END_PACKET()
 
 BEGIN_PACKET(GU_HTB_RP_BALL_USE_RES)
-WORD			wResultCode;
-BYTE			byRpBallCount;
+	WORD ResultCode;
+	BYTE RpBallCount;
 END_PACKET()
 
 BEGIN_PACKET(GU_HTB_RP_BALL_USED_NFY)
-unsigned int			hSubject;
-BYTE			byRpBallCount;
+	unsigned int Subject;
+	BYTE RpBallCount;
 END_PACKET()
 
 BEGIN_PACKET(GU_HTB_RP_BALL_RESULT_DECIDED_NFY)
-unsigned int			hAttacker;
-unsigned int			hWinner;
-bool			bHasSubjectRpBallUsed;
-bool			bHasTargetRpBallUsed;
-BYTE			bySubjectRpBallUsed;
-BYTE			byTargetRpBallUsed;
+	unsigned int Attacker;
+	unsigned int Winner;
+	bool HasSubjectRpBallUsed;
+	bool HasTargetRpBallUsed;
+	BYTE SubjectRpBallUsed;
+	BYTE TargetRpBallUsed;
 END_PACKET()
 
 BEGIN_PACKET(GU_ITEM_CREATE)
-unsigned int			handle;
-sITEM_DATA      sItemData;
-bool			bIsNew;		// Effect 추가 
+	unsigned int handle;
+	ITEM_DATA ItemData;
+	bool IsNew; 
 END_PACKET()
 
 BEGIN_PACKET(GU_ITEM_UPDATE)
-unsigned int			handle;
-sITEM_DATA      sItemData;
+	unsigned int handle;
+	ITEM_DATA ItemData;
 END_PACKET()
 
 BEGIN_PACKET(GU_ITEM_MOVE_RES)
-WORD			wResultCode;
-unsigned int			hSrcItem;
-unsigned int			hDestItem;
-BYTE			bySrcPlace;
-BYTE			bySrcPos;
-BYTE			byDestPlace;
-BYTE			byDestPos;
+	WORD ResultCode;
+	unsigned int SrcItem;
+	unsigned int DestItem;
+	BYTE SrcPlace;
+	BYTE SrcPos;
+	BYTE DestPlace;
+	BYTE DestPos;
 END_PACKET()
 
 BEGIN_PACKET(GU_ITEM_MOVE_STACK_RES)
-WORD			wResultCode;
-unsigned int			hSrcItem;
-unsigned int			hDestItem;
-BYTE			bySrcPlace;
-BYTE			bySrcPos;
-BYTE			byDestPlace;
-BYTE			byDestPos;
-BYTE			byStackCount1;//결과적으로 놓여질값 SOURCE
-BYTE			byStackCount2;//결과적으로 놓여질값 DESTINATION
+	WORD ResultCode;
+	unsigned int SrcItem;
+	unsigned int DestItem;
+	BYTE SrcPlace;
+	BYTE SrcPos;
+	BYTE DestPlace;
+	BYTE DestPos;
+	BYTE StackCount1;
+	BYTE StackCount2;
 END_PACKET()
 
 BEGIN_PACKET(GU_ITEM_DELETE)
-unsigned int			hSrcItem;
-BYTE			bySrcPlace;
-BYTE			bySrcPos;
+	unsigned int SrcItem;
+	BYTE SrcPlace;
+	BYTE SrcPos;
 END_PACKET()
 
 BEGIN_PACKET(GU_ITEM_DELETE_RES)
-WORD			wResultCode;
-BYTE			byPlace;
-BYTE			byPos;
+	WORD ResultCode;
+	BYTE Place;
+	BYTE Pos;
 END_PACKET()
 
 BEGIN_PACKET(GU_ITEM_EQUIP_REPAIR_RES)
-unsigned int			handle;			// hNpchandle
-WORD			wResultCode;
-DWORD			dwSpendedZenny;
+	unsigned int handle; // NPC ID
+	WORD ResultCode;
+	DWORD SpendedZenny;
 END_PACKET()
 
 BEGIN_PACKET(GU_ITEM_REPAIR_RES)
-unsigned int				hNpchandle;
-WORD				wResultCode;
-unsigned int				hItem;
-DWORD				dwSpendedZenny;
+	unsigned int Npchandle;
+	WORD ResultCode;
+	unsigned int Item;
+	DWORD SpendedZenny;
 END_PACKET()
 
 BEGIN_PACKET(GU_ITEM_USE_RES)
-WORD			wResultCode;
-unsigned int			tblidxItem;
-BYTE			byPlace;
-BYTE			byPos;
+	WORD ResultCode;
+	unsigned int tblidxItem;
+	BYTE Place;
+	BYTE Pos;
 END_PACKET()
 
 BEGIN_PACKET(GU_ITEM_CASTING_CANCELED)
-unsigned int			handle;
-WORD			wResultCode;
+	unsigned int handle;
+	WORD ResultCode;
 END_PACKET()
 
 BEGIN_PACKET(GU_ITEM_CASTING_DELAYED_NFY)
@@ -2661,420 +2658,415 @@ DWORD			dwCastingTimeRemaining;
 END_PACKET()
 
 BEGIN_PACKET(GU_ITEM_DUR_DOWN)
-BYTE			byDur[NTL_MAX_EQUIP_ITEM_SLOT];
+	BYTE Dur[EQUIP_SLOT_TYPE_COUNT];
 END_PACKET()
 
 BEGIN_PACKET(GU_ITEM_DUR_UPDATE)
-unsigned int			hItemHandle;
-BYTE			byDur;
+	unsigned int ItemHandle;
+	BYTE Dur;
 END_PACKET()
 
 BEGIN_PACKET(GU_ITEM_STACK_UPDATE)
-unsigned int			hItemHandle;
-BYTE			byStack;
-bool			bIsNew;		// Effect 추가 
+	unsigned int ItemHandle;
+	BYTE Stack;
+	bool IsNew;		// Effect 추가 
 END_PACKET()
 
 BEGIN_PACKET(GU_ITEM_UPGRADE_RES)
-WORD			wResultCode;
-BYTE			byStack;			// 스톤 사용후 스택갯수					-> 변경될 스택
-BYTE			byGrade;			// 변경될 그레이드						-> 변경될 그레이드
-BYTE			byItemPlace;		// 업그레이드 할 아이템의 컨테이너 위치
-BYTE			byItemPos;			// 업그레이드 할 아이템의 위치
-BYTE			byStonPlace;		// 호이포이스톤 컨테이너 위치
-BYTE			byStonPos;			// 호이포이스톤 위치
-BYTE			byBattleAttribute;
+	WORD ResultCode;
+	BYTE Stack;
+	BYTE Grade;
+	BYTE ItemPlace;
+	BYTE ItemPos;
+	BYTE StonPlace;
+	BYTE StonPos;
+	BYTE BattleAttribute;
 END_PACKET()
 
 BEGIN_PACKET(GU_ITEM_IDENTIFY_RES)
-unsigned int			hItemHandle;
-WORD			wResultCode;
-sITEM_DATA      sItemData;			// 성공시에만 세팅
+	unsigned int ItemHandle;
+	WORD ResultCode;
+	ITEM_DATA ItemData;
 END_PACKET()
 
 BEGIN_PACKET(GU_ITEM_PICK_RES)
-unsigned int			itemTblidx;
-WORD			wResultCode;
-// Any message doesn't need to be displayed if 'bByPartyHunting' is true.
-// (If a party member picks up an item, the message is displayed by another type of packet.)
-// bByPartyHunting이 true이면 클라이언트에서 메세지를 출력할 필요가 없다.
-// (파티 상태에서 drop된 아이템을 얻는 경우에는 다른 packet에 의해 메세지가 출력된다.)
-bool			bByPartyHunting;
+	unsigned int itemTblidx;
+	WORD ResultCode;
+	// Any message doesn't need to be displayed if 'bByPartyHunting' is true.
+	// (If a party member picks up an item, the message is displayed by another type of packet.)
+	bool ByPartyHunting;
 END_PACKET()
 
 BEGIN_PACKET(GU_ZENNY_PICK_RES)
-WORD			wResultCode;
-bool			bSharedInParty;
-DWORD			dwZenny;
-DWORD			dwAcquisitionZenny;
-DWORD			dwBonusZenny;
-// 'dwOriginalZenny' MUST NOT be referred if 'bSharedInParty' is false.
-// bSharedInParty가 false이면 dwOriginalZenny값은 참조해서는 안 된다.
-// by YOSHIKI(2007-10-02)
-DWORD			dwOriginalZenny; //Drop Zenny이다.
+	WORD ResultCode;
+	bool SharedInParty;
+	DWORD Zenny;
+	DWORD AcquisitionZenny;
+	DWORD BonusZenny;
+	// 'dwOriginalZenny' MUST NOT be referred if 'bSharedInParty' is false.
+	DWORD OriginalZenny;
 END_PACKET()
 
 BEGIN_PACKET(GU_UPDATE_CHAR_STATE)
-unsigned int			handle;
-sCHARSTATE		sCharState;
+	unsigned int handle;
+	CHARSTATE CharState;
 END_PACKET()
 
 BEGIN_PACKET(GU_UPDATE_CHAR_ASPECT_STATE)
-unsigned int			handle;
-sASPECTSTATE	aspectState;
+	unsigned int handle;
+	ASPECTSTATE	aspectState;
 END_PACKET()
 
 BEGIN_PACKET(GU_UPDATE_CHAR_CONDITION)
-unsigned int			handle;
-DWORD			dwConditionFlag;
+	unsigned int handle;
+	DWORD ConditionFlag;
 END_PACKET()
 
 BEGIN_PACKET(GU_UPDATE_CHAR_EXP)
-unsigned int			handle;
-DWORD			dwCurExp;
-DWORD			dwIncreasedExp;
-DWORD			dwAcquisitionExp;
-DWORD			dwBonusExp;
+	unsigned int handle;
+	DWORD CurExp;
+	DWORD IncreasedExp;
+	DWORD AcquisitionExp;
+	DWORD BonusExp;
 END_PACKET()
 
 BEGIN_PACKET(GU_UPDATE_CHAR_LEVEL)
-unsigned int			handle;
-BYTE			byPrevLevel;
-BYTE			byCurLevel;
-DWORD			dwMaxExpInThisLevel;
+	unsigned int handle;
+	BYTE PrevLevel;
+	BYTE CurLevel;
+	DWORD MaxExpInThisLevel;
 END_PACKET()
 
 BEGIN_PACKET(GU_UPDATE_CHAR_SPEED)
-unsigned int			handle;
-float			fLastWalkingSpeed;
-float			fLastRunningSpeed;
+	unsigned int handle;
+	float LastWalkingSpeed;
+	float LastRunningSpeed;
 END_PACKET()
 
 BEGIN_PACKET(GU_UPDATE_CHAR_ATTACK_SPEEDRATE)
-unsigned int			handle;
-WORD			wAttackSpeedRate;
+	unsigned int handle;
+	WORD AttackSpeedRate;
 END_PACKET()
 
 BEGIN_PACKET(GU_UPDATE_ITEM_EQUIP)
-unsigned int			handle;
-BYTE			byPos;
-sITEM_BRIEF		sItemBrief;		// 장착 해제 되었을 경우 INVALID VALUE가 들어 온다.
+	unsigned int handle;
+	BYTE Pos;
+	ITEM_BRIEF ItemBrief;
 END_PACKET()
 
 BEGIN_PACKET(GU_UPDATE_ITEM_DELETED)
-unsigned int			handle;
+	unsigned int handle;
 END_PACKET()
 
 BEGIN_PACKET(GU_UPDATE_TARGET_INFO)
-unsigned int			handle;
-WORD			wCurLP;
-WORD			wMaxLP;
+	unsigned int handle;
+	WORD CurLP;
+	WORD MaxLP;
 END_PACKET()
 
 BEGIN_PACKET(GU_UPDATE_CHAR_LP)
-unsigned int			handle;
-DWORD			dwLpEpEventId;
-WORD			wCurLP;
-WORD			wMaxLP;
+	unsigned int handle;
+	DWORD LpEpEventId;
+	WORD CurLP;
+	WORD MaxLP;
 END_PACKET()
 
 BEGIN_PACKET(GU_UPDATE_CHAR_EP)
-unsigned int			handle;
-DWORD			dwLpEpEventId;
-WORD			wCurEP;
-WORD			wMaxEP;
+	unsigned int handle;
+	DWORD LpEpEventId;
+	WORD CurEP;
+	WORD MaxEP;
 END_PACKET()
 
 BEGIN_PACKET(GU_UPDATE_CHAR_RP)
-unsigned int			handle;
-WORD			wCurRP;
-WORD			wMaxRP;
-bool			bHitDelay;
+	unsigned int handle;
+	WORD CurRP;
+	WORD MaxRP;
+	bool HitDelay;
 END_PACKET()
 
 BEGIN_PACKET(GU_UPDATE_CHAR_LP_EP)
-unsigned int			handle;
-DWORD			dwLpEpEventId;
-WORD			wCurLP;
-WORD			wMaxLP;
-WORD			wCurEP;
-WORD			wMaxEP;
+	unsigned int handle;
+	DWORD LpEpEventId;
+	WORD CurLP;
+	WORD MaxLP;
+	WORD CurEP;
+	WORD MaxEP;
 END_PACKET()
 
 BEGIN_PACKET(GU_UPDATE_CHAR_ZENNY)
-unsigned int			handle;
-DWORD			dwZenny;
-bool			bIsNew;		// Effect 추가
-BYTE			byChangeType; // eZENNY_CHANGE_TYPE - NtlCharacter.h
+	unsigned int handle;
+	DWORD Zenny;
+	bool IsNew;
+	BYTE ChangeType; // eZENNY_CHANGE_TYPE - NtlCharacter.h
 END_PACKET()
 
 BEGIN_PACKET(GU_UPDATE_CHAR_MUDOSA_POINT)
-DWORD			dwMudosaPoint;
+	DWORD MudosaPoint;
 END_PACKET()
 
 BEGIN_PACKET(GU_SYSTEM_DISPLAY_TEXT)
-WCHAR			awGMChar[MAX_CHARNAME_SIZE + 1];
-BYTE			byDisplayType;				// eSERVER_TEXT_TYPE
-WORD			wMessageLengthInUnicode;
-WCHAR			awchMessage[NTL_MAX_LENGTH_OF_CHAT_MESSAGE_UNICODE + 1]; // 내용
+	WCHAR GMChar[MAX_CHARNAME_SIZE + 1];
+	BYTE DisplayType; // eSERVER_TEXT_TYPE
+	WORD MessageLengthInUnicode;
+	WCHAR Message[MAX_CHATMESSAGE_USIZE + 1];
 END_PACKET()
 
 BEGIN_PACKET(GU_SYSTEM_DISPLAY_RESULTCODE)
-BYTE			byDisplayType;				// eSERVER_TEXT_TYPE
-WORD			wResultCode;				// 출력할 ResultCode
+	BYTE DisplayType; // eSERVER_TEXT_TYPE
+	WORD ResultCode;
 END_PACKET()
 
 BEGIN_PACKET(GU_SHOP_START_RES)
-unsigned int			handle;
-BYTE			byType; //	0: 기본  1:한정수량 판매 이벤트 NPC 
-WORD			wResultCode;
+	unsigned int handle;
+	BYTE Type;
+	WORD ResultCode;
 END_PACKET()
 
 BEGIN_PACKET(GU_SHOP_BUY_RES)
-unsigned int			handle;
-WORD			wResultCode;
+	unsigned int handle;
+	WORD ResultCode;
 END_PACKET()
 
 BEGIN_PACKET(GU_SHOP_SELL_RES)
-unsigned int			handle;
-WORD			wResultCode;
+	unsigned int handle;
+	WORD ResultCode;
 END_PACKET()
 
 BEGIN_PACKET(GU_SHOP_END_RES)
-WORD			wResultCode;
+	WORD ResultCode;
 END_PACKET()
 
 BEGIN_PACKET(GU_SHOP_SKILL_BUY_RES)
-unsigned int				hNpchandle;
-WORD				wResultCode;
+	unsigned int Npchandle;
+	WORD ResultCode;
 END_PACKET()
 
 BEGIN_PACKET(GU_PARTY_CREATE_RES)
-WORD			wResultCode;
-WCHAR			wszPartyName[NTL_MAX_SIZE_PARTY_NAME_IN_UNICODE + 1];
+	WORD ResultCode;
+	WCHAR PartyName[MAX_PARTYNAME_SIZE + 1];
 END_PACKET()
 
 BEGIN_PACKET(GU_PARTY_DISBAND_RES)
-WORD			wResultCode;
+	WORD ResultCode;
 END_PACKET()
 
 BEGIN_PACKET(GU_PARTY_DISBANDED_NFY)
 END_PACKET()
 
 BEGIN_PACKET(GU_PARTY_INVITE_RES)
-WORD			wResultCode;
-WCHAR			wszTargetName[MAX_CHARNAME_SIZE + 1];
+	WORD ResultCode;
+	WCHAR TargetName[MAX_CHARNAME_SIZE + 1];
 END_PACKET()
 
 BEGIN_PACKET(GU_PARTY_INVITE_NFY)
-bool			bFromPc;
-union
-{
-	WCHAR				wszInvitorPcName[MAX_CHARNAME_SIZE + 1];
-	WCHAR				wszInvitorPartyName[NTL_MAX_SIZE_PARTY_NAME_IN_UNICODE + 1];
-};
+	bool FromPc;
+	union
+	{
+		WCHAR InvitorPcName[MAX_CHARNAME_SIZE + 1];
+		WCHAR InvitorPartyName[MAX_PARTYNAME_SIZE + 1];
+	};
 END_PACKET()
 
 BEGIN_PACKET(GU_PARTY_RESPONSE_INVITATION_RES)
-WORD			wResultCode;
+	WORD ResultCode;
 END_PACKET()
 
 BEGIN_PACKET(GU_PARTY_MEMBER_JOINED_NFY)
-sPARTY_MEMBER_INFO		memberInfo;
+	PARTY_MEMBER_INFO memberInfo;
 END_PACKET()
 
 BEGIN_PACKET(GU_PARTY_INFO)
-WCHAR					awchPartyName[NTL_MAX_SIZE_PARTY_NAME_IN_UNICODE + 1];
-unsigned int					hLeader;
-BYTE					byItemLootingMethod;
-BYTE					byZennyLootingMethod;
-unsigned int					registeredCharmTblidx[NTL_PARTY_CHARM_INVENTORY_COUNT];
-DWORD					adwRemainingTime[NTL_PARTY_CHARM_INVENTORY_COUNT];
-sSHARETARGET_INFO		sharetargetInfo[NTL_MAX_SHARETARGET_COUNT];// 공유타겟데이타 [3/28/2008 SGpro]
-PARTYDUNGEON_STATE	eDiff;
-BYTE					byItemRank;			// 파티인벤에 넣을 아이템의 eITEM_RANK 추가
-BYTE					byMemberInfoCount;
-sPARTY_MEMBER_INFO		memberInfo[NTL_MAX_MEMBER_IN_PARTY - 1];
+	WCHAR PartyName[MAX_PARTYNAME_SIZE + 1];
+	unsigned int Leader;
+	BYTE ItemLootingMethod;
+	BYTE ZennyLootingMethod;
+	unsigned int registeredCharmTblidx[PARTY_CHARM_INVENTORY_COUNT];
+	DWORD RemainingTime[PARTY_CHARM_INVENTORY_COUNT];
+	SHARETARGET_INFO sharetargetInfo[MAX_SHARETARGET_COUNT];
+	PARTYDUNGEON_STATE Diff;
+	BYTE ItemRank;
+	BYTE MemberInfoCount;
+	PARTY_MEMBER_INFO memberInfo[MAX_MEMBER_IN_PARTY - 1];
 END_PACKET()
 
 BEGIN_PACKET(GU_PARTY_INVENTORY_INFO)
-BYTE								bySlotInfoCount;
-sDBO_PARTY_INVENTORY_SLOT_INFO		inventorySlotInfo[NTL_PARTY_INVENTORY_SLOT_COUNT];
+	BYTE SlotInfoCount;
+	PARTY_INVENTORY_SLOT_INFO inventorySlotInfo[PARTY_INVENTORY_SLOT_COUNT];
 END_PACKET()
 
 BEGIN_PACKET(GU_PARTY_OPENED_CHARM_INVENTORY_INFO)
-BYTE							byCharmInventoryIndex;
-sDBO_PARTY_VICTIM_ITEM_INFO		victimItemInfo;
-DWORD							dwTotalVictimZenny;
-BYTE							byVictimInfoCount;
-sDBO_VICTIM_INFO				aVictimInfo[NTL_MAX_MEMBER_IN_PARTY - 1];
+	BYTE CharmInventoryIndex;
+	PARTY_VICTIM_ITEM_INFO victimItemInfo;
+	DWORD TotalVictimZenny;
+	BYTE VictimInfoCount;
+	VICTIM_INFO VictimInfo[MAX_MEMBER_IN_PARTY - 1];
 END_PACKET()
 
 BEGIN_PACKET(GU_PARTY_INVITATION_DECLINED_NFY)
-WCHAR			wszPlayerName[MAX_CHARNAME_SIZE + 1];
+	WCHAR PlayerName[MAX_CHARNAME_SIZE + 1];
 END_PACKET()
 
 BEGIN_PACKET(GU_PARTY_INVITATION_EXPIRED_NFY)
-WCHAR			wszPlayerName[MAX_CHARNAME_SIZE + 1];
+	WCHAR PlayerName[MAX_CHARNAME_SIZE + 1];
 END_PACKET()
 
 BEGIN_PACKET(GU_PARTY_LEAVE_RES)
-WORD			wResultCode;
+	WORD ResultCode;
 END_PACKET()
 
 BEGIN_PACKET(GU_PARTY_MEMBER_LEFT_NFY)
-unsigned int			hMember;
+	unsigned int Member;
 END_PACKET()
 
 BEGIN_PACKET(GU_PARTY_KICK_OUT_RES)
-WORD			wResultCode;
-unsigned int			hTargetMember;
+	WORD ResultCode;
+	unsigned int TargetMember;
 END_PACKET()
 
 BEGIN_PACKET(GU_PARTY_MEMBER_KICKED_OUT_NFY)
-unsigned int			hMember;
+	unsigned int Member;
 END_PACKET()
 
 BEGIN_PACKET(GU_PARTY_CHANGE_LEADER_RES)
-WORD			wResultCode;
-unsigned int			hNewLeader;
+	WORD ResultCode;
+	unsigned int NewLeader;
 END_PACKET()
 
 BEGIN_PACKET(GU_PARTY_LEADER_CHANGED_NFY)
-unsigned int					hNewLeader;
+	unsigned int NewLeader;
 END_PACKET()
 
 BEGIN_PACKET(GU_PARTY_MEMBER_LEVELED_UP_NFY)
-unsigned int			hMember;
-BYTE			byLevel;
-WORD			wMaxLP;
-WORD			wMaxEP;
+	unsigned int Member;
+	BYTE Level;
+	WORD MaxLP;
+	WORD MaxEP;
 END_PACKET()
 
 BEGIN_PACKET(GU_PARTY_MEMBER_CLASS_CHANGED_NFY)
-unsigned int			hMember;
-BYTE			byNewClass;		// ePC_CLASS
+	unsigned int Member;
+	BYTE NewClass;
 END_PACKET()
 
 BEGIN_PACKET(GU_PARTY_OPEN_CHARM_SLOT_RES)
-WORD			wResultCode;
-BYTE			byCharmInventoryIndex;
+	WORD ResultCode;
+	BYTE CharmInventoryIndex;
 END_PACKET()
 
 BEGIN_PACKET(GU_PARTY_CHARM_SLOT_OPENED_NFY)
-BYTE			byCharmInventoryIndex;
+	BYTE CharmInventoryIndex;
 END_PACKET()
 
 BEGIN_PACKET(GU_PARTY_CLOSE_CHARM_SLOT_RES)
-WORD			wResultCode;
+	WORD ResultCode;
 END_PACKET()
 
 BEGIN_PACKET(GU_PARTY_CHARM_SLOT_CLOSED_NFY)
 END_PACKET()
 
 BEGIN_PACKET(GU_PARTY_REGISTER_VICTIM_ITEM_RES)
-WORD			wResultCode;
-BYTE			bySrcPlace;
-BYTE			bySrcPos;
-BYTE			byDestSlotIndex;
-DWORD			dwTotalVictimItemScore;
+	WORD ResultCode;
+	BYTE SrcPlace;
+	BYTE SrcPos;
+	BYTE DestSlotIndex;
+	DWORD TotalVictimItemScore;
 END_PACKET()
 
 BEGIN_PACKET(GU_PARTY_VICTIM_ITEM_REGISTERED_NFY)
-unsigned int			hMember;
-sDBO_PARTY_VICTIM_ITEM_INFO		itemInfo;
-DWORD			dwTotalVictimItemScore;
+	unsigned int Member;
+	PARTY_VICTIM_ITEM_INFO itemInfo;
+	DWORD TotalVictimItemScore;
 END_PACKET()
 
 BEGIN_PACKET(GU_PARTY_UNREGISTER_VICTIM_ITEM_RES)
-WORD			wResultCode;
-BYTE			byDestSlotIndex;
-DWORD			dwTotalVictimItemScore;
+	WORD ResultCode;
+	BYTE DestSlotIndex;
+	DWORD TotalVictimItemScore;
 END_PACKET()
 
 BEGIN_PACKET(GU_PARTY_VICTIM_ITEM_UNREGISTERED_NFY)
-unsigned int			hMember;
-unsigned int			itemTblidx;
-BYTE			byDestSlotIndex;
-DWORD			dwTotalVictimItemScore;
+	unsigned int Member;
+	unsigned int itemTblidx;
+	BYTE DestSlotIndex;
+	DWORD TotalVictimItemScore;
 END_PACKET()
 
 BEGIN_PACKET(GU_PARTY_REGISTER_VICTIM_ZENNY_RES)
-WORD			wResultCode;
-DWORD			dwRegisteredZenny;
-DWORD			dwReturningZenny;
+	WORD ResultCode;
+	DWORD RegisteredZenny;
+	DWORD ReturningZenny;
 END_PACKET()
 
 BEGIN_PACKET(GU_PARTY_VICTIM_ZENNY_REGISTERED_NFY)
-unsigned int			hMember;
-DWORD			dwIncreasedZenny;
+	unsigned int Member;
+	DWORD IncreasedZenny;
 END_PACKET()
 
 BEGIN_PACKET(GU_PARTY_UNREGISTER_VICTIM_ZENNY_RES)
-WORD			wResultCode;
-DWORD			dwUnregisteredZenny;
+	WORD ResultCode;
+	DWORD UnregisteredZenny;
 END_PACKET()
 
 BEGIN_PACKET(GU_PARTY_VICTIM_ZENNY_UNREGISTERED_NFY)
-unsigned int			hMember;
-DWORD			dwDecreasedZenny;
+	unsigned int Member;
+	DWORD DecreasedZenny;
 END_PACKET()
 
 BEGIN_PACKET(GU_PARTY_DECLARE_ZENNY_RES)
-WORD							wResultCode;
-
-DWORD							dwInitialZenny;
-DWORD							dwFinalDeclaredZenny;
+	WORD ResultCode;
+	DWORD InitialZenny;
+	DWORD FinalDeclaredZenny;
 END_PACKET()
 
 BEGIN_PACKET(GU_PARTY_DECLARED_ZENNY_CHANGED_NFY)
-unsigned int							hMember;
-DWORD							dwDeclaredZenny;
+	unsigned int Member;
+	DWORD DeclaredZenny;
 END_PACKET()
 
 BEGIN_PACKET(GU_PARTY_CHARM_ACTIVATION_FAILED_NFY)
-WORD							wResultCode;
-unsigned int							hMember;
+	WORD ResultCode;
+	unsigned int Member;
 END_PACKET()
 
 BEGIN_PACKET(GU_PARTY_ACTIVATE_CHARM_RES)
-WORD			wResultCode;
-BYTE							byCharmInventoryIndex;
-unsigned int							registeredCharmTblidx;
-DWORD							dwRemainingTime;
+	WORD ResultCode;
+	BYTE CharmInventoryIndex;
+	unsigned int registeredCharmTblidx;
+	DWORD RemainingTime;
 END_PACKET()
 
 BEGIN_PACKET(GU_PARTY_CHARM_ACTIVATED_NFY)
-BYTE							byCharmInventoryIndex;
-unsigned int							registeredCharmTblidx;
-DWORD							dwRemainingTime;
+	BYTE CharmInventoryIndex;
+	unsigned int registeredCharmTblidx;
+	DWORD RemainingTime;
 END_PACKET()
 
 BEGIN_PACKET(GU_PARTY_DEACTIVATE_CHARM_RES)
-WORD							wResultCode;
-BYTE							byCharmInventoryIndex;
+	WORD ResultCode;
+	BYTE CharmInventoryIndex;
 END_PACKET()
 
 BEGIN_PACKET(GU_PARTY_CHARM_DEACTIVATED_NFY)
-BYTE							byCharmInventoryIndex;
+	BYTE CharmInventoryIndex;
 END_PACKET()
 
 BEGIN_PACKET(GU_PARTY_CHANGE_ZENNY_LOOTING_METHOD_RES)
-WORD							wResultCode;
-BYTE							byNewLootingMethod;
+	WORD ResultCode;
+	BYTE NewLootingMethod;
 END_PACKET()
 
 BEGIN_PACKET(GU_PARTY_ZENNY_LOOTING_METHOD_CHANGED_NFY)
-BYTE							byNewLootingMethod;
+	BYTE NewLootingMethod;
 END_PACKET()
 
 BEGIN_PACKET(GU_PARTY_CHANGE_ITEM_LOOTING_METHOD_RES)
-WORD							wResultCode;
-BYTE							byNewLootingMethod;
+	WORD ResultCode;
+	BYTE NewLootingMethod;
 END_PACKET()
 
 BEGIN_PACKET(GU_PARTY_ITEM_LOOTING_METHOD_CHANGED_NFY)
-BYTE							byNewLootingMethod;
+	BYTE NewLootingMethod;
 END_PACKET()
 
 BEGIN_PACKET(GU_PARTY_ZENNY_LOOTING_METHOD_UNLOCKED_NFY)
@@ -3084,772 +3076,742 @@ BEGIN_PACKET(GU_PARTY_ITEM_LOOTING_METHOD_UNLOCKED_NFY)
 END_PACKET()
 
 BEGIN_PACKET(GU_PARTY_ZENNY_UPDATED_NFY)
-BYTE byMemberCount;
-sINVEST_ZENNY_INFO aZennyInfo[NTL_MAX_MEMBER_IN_PARTY];
+	BYTE MemberCount;
+	INVEST_ZENNY_INFO ZennyInfo[MAX_MEMBER_IN_PARTY];
 END_PACKET()
 
 BEGIN_PACKET(GU_PARTY_INVENTORY_ITEM_ADDED_NFY)
-BYTE							bySlotIndex;
-sPARTY_INVENTORY_ITEM_INFO		newLoot;
+	BYTE SlotIndex;
+	PARTY_INVENTORY_ITEM_INFO newLoot;
 END_PACKET()
 
 BEGIN_PACKET(GU_PARTY_INVENTORY_ITEM_REMOVED_NFY)
-BYTE					byPos;
-bool					bIsYourItem;
+	BYTE Pos;
+	bool IsYourItem;
 END_PACKET()
 
 BEGIN_PACKET(GU_PARTY_MEMBER_GAINED_ITEM_NFY)
-unsigned int					hMember;
-// If itemTblidx is INVALID_unsigned int, this means an unidentified item.
-// itemTblidx가 INVALID_unsigned int일 경우, 감정이 필요한 아이템임을 뜻한다.
-// by YOSHIKI(2006-11-02)
-unsigned int					itemTblidx;
+	unsigned int Member;
+	// If itemTblidx is INVALID_DWORD, this means an unidentified item.
+	unsigned int itemTblidx;
 END_PACKET()
 
 BEGIN_PACKET(GU_PARTY_MEMBER_GAINED_ZENNY_NFY)
-unsigned int					hMember;
-bool					bIsShared;
-DWORD					dwZenny; //dwAcquisitionZenny + dwBonusZenny
-DWORD					dwAcquisitionZenny;
-DWORD					dwBonusZenny;
-
-// 'dwOriginalZenny' MUST NOT be referred if 'bSharedInParty' is false.
-// bSharedInParty가 false이면 dwOriginalZenny값은 참조해서는 안 된다.
-// by YOSHIKI(2007-10-02)
-DWORD					dwOriginalZenny; //Mob이 Drop한 Zenny
+	unsigned int Member;
+	bool IsShared;
+	DWORD Zenny; //dwAcquisitionZenny + dwBonusZenny
+	DWORD AcquisitionZenny;
+	DWORD BonusZenny;
+	// 'dwOriginalZenny' MUST NOT be referred if 'bSharedInParty' is false.
+	DWORD OriginalZenny;
 END_PACKET()
 
 BEGIN_PACKET(GU_PARTY_INVEST_ZENNY_RES)
-WORD					wResultCode;
-BYTE					byPos;
-DWORD					dwInvestedZenny;
+	WORD ResultCode;
+	BYTE Pos;
+	DWORD InvestedZenny;
 END_PACKET()
 
 BEGIN_PACKET(GU_PARTY_INVEST_ZENNY_NFY)
-BYTE					byPos;
-DWORD					dwInvestedZenny;
-unsigned int					hMember;
+	BYTE Pos;
+	DWORD InvestedZenny;
+	unsigned int Member;
 END_PACKET()
 
 BEGIN_PACKET(GU_PARTY_INVENTORY_ITEM_WINNER_CHANGED_NFY)
-BYTE					byPos;
-unsigned int					hWinner;
-DWORD					dwInvestedZenny;
+	BYTE Pos;
+	unsigned int Winner;
+	DWORD InvestedZenny;
 END_PACKET()
 
 BEGIN_PACKET(GU_PARTY_MEMBER_LOCATION_NFY)
-unsigned int					hMember;
-unsigned int					worldTblidx;
-unsigned int					worldId;
-VECTORXYZ				vCurLoc;
+	unsigned int Member;
+	unsigned int worldTblidx;
+	unsigned int worldId;
+	VECTORXYZ CurLoc;
 END_PACKET()
 
 BEGIN_PACKET(GU_BANK_START_RES)
-unsigned int			handle;			// Npc handle
-WORD			wResultCode;
+	unsigned int handle; // Npc id
+	WORD ResultCode;
 END_PACKET()
 
 BEGIN_PACKET(GU_BANK_MOVE_RES)
-unsigned int			handle;
-unsigned int			hSrcItem;
-unsigned int			hDstItem;
-BYTE			bySrcPlace;
-BYTE			bySrcPos;
-BYTE			byDestPlace;
-BYTE			byDestPos;
-WORD			wResultCode;
+	unsigned int handle;
+	unsigned int SrcItem;
+	unsigned int DstItem;
+	BYTE SrcPlace;
+	BYTE SrcPos;
+	BYTE DestPlace;
+	BYTE DestPos;
+	WORD ResultCode;
 END_PACKET()
 
 BEGIN_PACKET(GU_BANK_MOVE_STACK_RES)
-unsigned int			handle;
-unsigned int			hSrcItem;
-unsigned int			hDestItem;
-BYTE			bySrcPlace;
-BYTE			bySrcPos;
-BYTE			byDestPlace;
-BYTE			byDestPos;
-BYTE			byStackCount1;
-BYTE			byStackCount2;
-WORD			wResultCode;
+	unsigned int handle;
+	unsigned int SrcItem;
+	unsigned int DestItem;
+	BYTE SrcPlace;
+	BYTE SrcPos;
+	BYTE DestPlace;
+	BYTE DestPos;
+	BYTE StackCount1;
+	BYTE StackCount2;
+	WORD ResultCode;
 END_PACKET()
 
 BEGIN_PACKET(GU_BANK_END_RES)
-WORD			wResultCode;
+	WORD ResultCode;
 END_PACKET()
 
 BEGIN_PACKET(GU_BANK_ZENNY_INFO)
-DWORD			dwZenny;
+	DWORD Zenny;
 END_PACKET()
 
 BEGIN_PACKET(GU_BANK_ITEM_INFO)
-BYTE			byBeginCount;
-BYTE			byItemCount;
-sITEM_PROFILE	aBankProfile[NTL_MAX_COUNT_USER_HAVE_BANK_ITEM];
+	BYTE BeginCount;
+	BYTE ItemCount;
+	ITEM_PROFILE BankProfile[MAX_COUNT_USER_HAVE_BANK_ITEM];
 END_PACKET()
 
 BEGIN_PACKET(GU_BANK_ZENNY_RES)
-unsigned int				handle;
-WORD				wResultCode;
-DWORD				dwZenny;
-bool				bIsSave;		// 1: 저금 0: 인출
+	unsigned int handle;
+	WORD ResultCode;
+	DWORD Zenny;
+	bool IsSave;
 END_PACKET()
 
 BEGIN_PACKET(GU_BANK_BUY_RES)
-unsigned int				hNpchandle;
-WORD				wResultCode;
-unsigned int				hItemhandle;
-sITEM_DATA			sData;
+	unsigned int Npchandle;
+	WORD ResultCode;
+	unsigned int Itemhandle;
+	ITEM_DATA Data;
 END_PACKET()
 
 BEGIN_PACKET(GU_BANK_ITEM_DELETE_RES)
-WORD			wResultCode;
+	WORD ResultCode;
 END_PACKET()
 
 BEGIN_PACKET(GU_SOCIAL_ACTION)
-unsigned int			hSubject;
-unsigned int			socialActionId;
+	unsigned int Subject;
+	unsigned int socialActionId;
 END_PACKET()
 
 BEGIN_PACKET(GU_SCOUTER_INDICATOR_RES)
-unsigned int			hTarget;
-WORD			wResultCode;
-DWORD			dwRetValue;
+	unsigned int Target;
+	WORD ResultCode;
+	DWORD RetValue;
 END_PACKET()
 
 BEGIN_PACKET(GU_SCOUTER_PREDICT_RES)
-BYTE			byPusNum;
-WORD			wResultCode;
-BYTE			byRetRate;
+	BYTE PusNum;
+	WORD ResultCode;
+	BYTE RetRate;
 END_PACKET()
 
 BEGIN_PACKET(GU_SCOUTER_EQUIP_CHECK_RES)
-unsigned int			hTarget;
-WORD			wResultCode;
-BYTE			byItemCount;
-sITEM_PROFILE	aItemProfile[NTL_MAX_EQUIP_ITEM_SLOT];
+	unsigned int Target;
+	WORD			wResultCode;
+	BYTE			byItemCount;
+	ITEM_PROFILE	aItemProfile[EQUIP_SLOT_TYPE_COUNT];
 END_PACKET()
 
 BEGIN_PACKET(GU_SCOUTER_CHIP_REMOVE_ALL_RES)
-WORD			wResultCode;
+	WORD ResultCode;
 END_PACKET()
 
 BEGIN_PACKET(GU_TS_CONFIRM_STEP_RES)
-BYTE				byTsType; // 트리거 타입
-WORD				wResultCode;
-WORD			tId;
-BYTE		tcCurId;
-BYTE		tcNextId;
-DWORD				dwParam;
+	BYTE TsType;
+	WORD ResultCode;
+	WORD tId;
+	BYTE tcCurId;
+	BYTE tcNextId;
+	DWORD Param;
 END_PACKET()
 
 BEGIN_PACKET(GU_TS_UPDATE_SYNC_NFY)
-BYTE				byTsType; // 트리거 타입
-WORD			tId;
-BYTE		tcId;
-NTL_TS_TA_ID		taId;
+	BYTE TsType;
+	WORD tId;
+	BYTE tcId;
+	unsigned char taId;
 END_PACKET()
 
 BEGIN_PACKET(GU_TS_UPDATE_STATE)
-BYTE				byTsType; // 트리거 타입
-WORD			tId;
-BYTE				byType;
-WORD				wTSState;
-DWORD				dwParam;
+	BYTE TsType;
+	WORD tId;
+	BYTE Type;
+	WORD TSState;
+	DWORD Param;
 END_PACKET()
 
 BEGIN_PACKET(GU_TS_UPDATE_EVENT_NFY)
-BYTE				byTsType; // 트리거 타입
-NTL_TS_EVENT_ID		teid;
+	BYTE TsType;
+	unsigned int teid;
 END_PACKET()
 
 BEGIN_PACKET(GU_TS_EXCUTE_TRIGGER)
-BYTE				byTsType; // 트리거 타입
-WORD			tId; // 트리거 아이디
+	BYTE TsType;
+	WORD tId;
 END_PACKET()
 
 BEGIN_PACKET(GU_TS_EXCUTE_TRIGGER_OBJECT_RES)
-WORD				wResultCode;
-unsigned int				hTriggerObject;
+	WORD ResultCode;
+	unsigned int TriggerObject;
 END_PACKET()
 
 BEGIN_PACKET(GU_TS_TRIGGER_OBJECT_DIALOG_NFY)
-unsigned int				hTriggerObject;
-BYTE				byDialogType;		// eNPCCONV_TYPE
-unsigned int				textTblidx;			// text
+	unsigned int TriggerObject;
+	BYTE DialogType;
+	unsigned int textTblidx;
 END_PACKET()
 
 BEGIN_PACKET(GU_TS_PC_DIALOG_NFY)
-unsigned int				textTblidx;			// text
+	unsigned int textTblidx;
 END_PACKET()
 
 BEGIN_PACKET(GU_TS_SKIP_CONTAINER)
-WORD			tId;
-BYTE		tcId;
+	WORD tId;
+	BYTE tcId;
 END_PACKET()
 
 BEGIN_PACKET(GU_QUEST_ITEM_CREATE_NFY)
-BYTE				byPos;
-unsigned int				qItemTblidx;
-BYTE				byCurCount;			// 현재 카운트
+	BYTE Pos;
+	unsigned int qItemTblidx;
+	BYTE CurCount;
 END_PACKET()
 
 BEGIN_PACKET(GU_QUEST_ITEM_DELETE_NFY)
-BYTE				byDeletePos;		// 삭제한 아이템의 위치
+	BYTE DeletePos;
 END_PACKET()
 
 BEGIN_PACKET(GU_QUEST_ITEM_UPDATE_NFY)
-BYTE				byPos;
-BYTE				byCurCount;			// 현재 카운트
+	BYTE Pos;
+	BYTE CurCount;
 END_PACKET()
 
 BEGIN_PACKET(GU_QUEST_ITEM_MOVE_RES)
-WORD				wResultCode;
-BYTE				bySrcPos;
-unsigned int				dwSrcTblidx;
-BYTE				byDestPos;
-unsigned int				dwDestTblidx;
+	WORD ResultCode;
+	BYTE SrcPos;
+	unsigned int SrcTblidx;
+	BYTE DestPos;
+	unsigned int DestTblidx;
 END_PACKET()
 
 BEGIN_PACKET(GU_QUEST_ITEM_DELETE_RES)
-WORD				wResultCode;
-BYTE				byDeletePos;		// 삭제한 아이템의 위치
+	WORD ResultCode;
+	BYTE DeletePos;
 END_PACKET()
 
 BEGIN_PACKET(GU_QUEST_SVREVT_START_NFY)
-WORD				tId;
-BYTE			tcId;
-NTL_TS_TA_ID			taId;
+	WORD tId;
+	BYTE tcId;
+	unsigned char taId;
 END_PACKET()
 
 BEGIN_PACKET(GU_QUEST_SVREVT_END_NFY)
-WORD				tId;
-BYTE			tcId;
-NTL_TS_TA_ID			taId;
+	WORD tId;
+	BYTE tcId;
+	unsigned char taId;
 END_PACKET()
 
 BEGIN_PACKET(GU_QUEST_SVREVT_UPDATE_NFY)
-WORD				tId;
-BYTE			tcId;
-NTL_TS_TA_ID			taId;
-BYTE					bySvrEvtType;		// eSTOC_EVT_DATA_TYPE
-BYTE					bySlot;
-uSTOC_EVT_UPDATE_DATA	uEvtData;
+	WORD tId;
+	BYTE tcId;
+	unsigned char taId;
+	BYTE bySvrEvtType;
+	BYTE bySlot;
+	STOC_EVT_UPDATE_DATA EvtData;
 END_PACKET()
 
 BEGIN_PACKET(GU_QUEST_GIVEUP_RES)
-WORD			tId;
-WORD				wResultCode;
+	WORD tId;
+	WORD ResultCode;
 END_PACKET()
 
-BEGIN_PACKET(GU_QUEST_SHARE_NFY)				// 퀘스트 공유
-WORD				wResultCode;
-WORD			tId;
-unsigned int				hActor;
+BEGIN_PACKET(GU_QUEST_SHARE_NFY)
+	WORD ResultCode;
+	WORD tId;
+	unsigned int Actor;
 END_PACKET()
 
-BEGIN_PACKET(GU_QUEST_RESET_NFY)			// 퀘스트의 지정된 범위만큼 진행 정보와 완료 정보를 삭제한다.
-WORD				startResetQID;		// 범위 지정
-WORD				endResetQID;		// 범위 지정
+BEGIN_PACKET(GU_QUEST_RESET_NFY)
+	WORD startResetQID;
+	WORD endResetQID;
 END_PACKET()
 
 BEGIN_PACKET(GU_QUEST_OBJECT_VISIT_RES)
-WORD				wResultCode;
-
-WORD				qId;
-unsigned int				worldId;
-BYTE				byObjType;
-unsigned int				objectTblidx;
+	WORD ResultCode;
+	WORD qId;
+	unsigned int worldId;
+	BYTE ObjType;
+	unsigned int objectTblidx;
 END_PACKET()
 
 BEGIN_PACKET(GU_QUEST_FORCED_COMPLETION_NFY)
-WORD				questId;
+	WORD questId;
 END_PACKET()
 
 BEGIN_PACKET(GU_FREEBATTLE_CHALLENGE_RES)
-unsigned int				hTarget; // 대전을 요청했던 타겟의 핸들
-WORD				wResultCode; // 응답 코드
+	unsigned int Target;
+	WORD ResultCode;
 END_PACKET()
 
 BEGIN_PACKET(GU_FREEBATTLE_ACCEPT_REQ)
-unsigned int				hChallenger; // 대전을 요청한 캐릭터의 핸들
+	unsigned int Challenger;
 END_PACKET()
 
 BEGIN_PACKET(GU_FREEBATTLE_CANCEL_NFY)
-WORD				wResultCode; // 대전취소에 대한 이유
+	WORD ResultCode;
 END_PACKET()
 
 BEGIN_PACKET(GU_FREEBATTLE_START_NFY)
-unsigned int				hTarget; // 대전상대 핸들
-VECTORXYZ			vRefreeLoc;	// 심판 위치
+	unsigned int Target;
+	VECTORXYZ RefreeLoc;
 END_PACKET()
 
 BEGIN_PACKET(GU_FREEBATTLE_OUTSIDE_NFY)
-
 END_PACKET()
 
 BEGIN_PACKET(GU_FREEBATTLE_INSIDE_NFY)
-
 END_PACKET()
 
 BEGIN_PACKET(GU_FREEBATTLE_END_NFY)
-BYTE				byFreeBattleResult; // eFREEBATTLE_RESULT
+	BYTE FreeBattleResult;
 END_PACKET()
 
 BEGIN_PACKET(GU_QUICK_SLOT_UPDATE_RES)
-WORD				wResultCode;
-unsigned int				tblidx;
-BYTE				bySlotID;
-BYTE				byType;
-BYTE				byPlace;
-BYTE				byPos;
+	WORD ResultCode;
+	unsigned int tblidx;
+	BYTE SlotID;
+	BYTE Type;
+	BYTE Place;
+	BYTE Pos;
 END_PACKET()
 
 BEGIN_PACKET(GU_QUICK_SLOT_DEL_NFY)
-BYTE				bySlotID;
+	BYTE SlotID;
 END_PACKET()
 
 BEGIN_PACKET(GU_QUICK_SLOT_INFO)
-BYTE				byQuickSlotCount;
-sQUICK_SLOT_PROFILE	asQuickSlotData[NTL_CHAR_QUICK_SLOT_MAX_COUNT];
+	BYTE QuickSlotCount;
+	QUICK_SLOT_PROFILE QuickSlotData[CHAR_QUICK_SLOT_MAX_COUNT];
 END_PACKET()
 
 BEGIN_PACKET(GU_PET_CHAR_INFO)
-unsigned int				handle;
-BYTE				byObjectType;		// eOBJTYPE
-union
-{
-	sSUMMON_PET_PROFILE		sSummonPetProfile;
-	sITEM_PET_PROFILE		sItemPetProfile;
-};
-WORD				wCharStateSize; //-[9/7/2006 zeroera] : 설명 : 클라이언트를 위한 캐릭터상태 사이즈 정보
-sCHARSTATE			sCharState;
+	unsigned int handle;
+	BYTE ObjectType;
+	union
+	{
+		SUMMON_PET_PROFILE SummonPetProfile;
+		ITEM_PET_PROFILE ItemPetProfile;
+	};
+	WORD CharStateSize;
+	CHARSTATE CharState;
 END_PACKET()
 
 BEGIN_PACKET(GU_PET_SKILL_INFO)
-BYTE				bySkillCount;
-sSKILL_INFO_PET		aSkillInfo[NTL_MAX_NPC_HAVE_SKILL];
+	BYTE SkillCount;
+	SKILL_INFO_PET SkillInfo[MAX_NPC_HAVE_SKILL];
 END_PACKET()
 
 BEGIN_PACKET(GU_PET_INFO_END)
 END_PACKET()
 
 BEGIN_PACKET(GU_PET_DESPAWNED_NFY)
-BYTE				byAvatarType;
+	BYTE AvatarType;
 END_PACKET()
 
 BEGIN_PACKET(GU_PET_DISMISS_PET_RES)
-WORD				wResultCode;
-BYTE				byAvatarType;
+	WORD ResultCode;
+	BYTE AvatarType;
 END_PACKET()
 
 BEGIN_PACKET(GU_ACTION_REPORT_MESSAGE)
-WORD				wResultCode;
+	WORD ResultCode;
 END_PACKET()
 
 BEGIN_PACKET(GU_TRADE_START_NFY)
-unsigned int				handle;			// 요청자 핸들
-unsigned int				hTarget;		// 타겟 핸들  (자기 자신)
-WORD				wResultCode;	// 타겟의 응답및 가능 유무 에 따른 여러가지 결과값
-BYTE				byEmptyInven;	// 상대의 인벤의 빈공간	(만약 최대칸보다 작으면 비활성칸수 표시)	
+	unsigned int handle;
+	unsigned int Target;
+	WORD ResultCode;
+	BYTE EmptyInven;	
 END_PACKET()
 
 BEGIN_PACKET(GU_TRADE_START_RES)
-unsigned int				handle;			// 요청자 핸들 (자기 자신)
-unsigned int				hTarget;		// 타겟 핸들
-WORD				wResultCode;	// 타겟의 응답및 가능 유무 에 따른 여러가지 결과값
-BYTE				byEmptyInven;	// 상대의 인벤의 빈공간	(만약 최대칸보다 작으면 비활성칸수 표시)
+	unsigned int handle;
+	unsigned int Target;
+	WORD ResultCode;
+	BYTE EmptyInven;
 END_PACKET()
 
 BEGIN_PACKET(GU_TRADE_OK_REQ)
-unsigned int				handle;			// 요청자의 핸들
+	unsigned int handle;
 END_PACKET()
 
-BEGIN_PACKET(GU_TRADE_ADD_NFY)			// 성공일 때만
-//unsigned int				hTarget;			// 타겟 핸들
-unsigned int				hItem;				// 상대 아이템 핸들
-sITEM_DATA			sItem;				// 상대가 올려 놓을 아이템의 정보
-BYTE				byCount;			// 겹쳐있는 아이템중 몇개인가? Default 1개
+BEGIN_PACKET(GU_TRADE_ADD_NFY)
+	unsigned int ItemObj;
+	ITEM_DATA Item;
+	BYTE Count;
 END_PACKET()
 
 BEGIN_PACKET(GU_TRADE_ADD_RES)
-//unsigned int				hTarget;			// 타겟 핸들
-unsigned int				hItem;				// 내 아이템 핸들
-BYTE				byCount;			// 겹쳐있는 아이템중 몇개인가? Default 1개
-WORD				wResultCode;		// 타겟의 응답및 가능 유무 에 따른 여러가지 결과값
+	unsigned int Item;
+	BYTE Count;	
+	WORD ResultCode;
 END_PACKET()
 
-BEGIN_PACKET(GU_TRADE_DEL_NFY)			// 성공일 때만
-//unsigned int				hTarget;			// 타겟 핸들
-unsigned int				hItem;				// 상대 아이템 핸들
+BEGIN_PACKET(GU_TRADE_DEL_NFY)
+	unsigned int Item;
 END_PACKET()
 
 BEGIN_PACKET(GU_TRADE_DEL_RES)
-//unsigned int				hTarget;			// 타겟 핸들
-unsigned int				hItem;				// 내 아이템 핸들
-WORD				wResultCode;		// 타겟의 응답및 가능 유무 에 따른 여러가지 결과값
+	unsigned int Item;
+	WORD ResultCode;
 END_PACKET()
 
 BEGIN_PACKET(GU_TRADE_MODIFY_NFY)
-unsigned int				hTarget;			// 타겟 핸들
-unsigned int				hItem;				// 내 아이템 핸들
-BYTE				byCount;			// 겹쳐있는 아이템중 몇개인가? Default 1개
+	unsigned int Target;
+	unsigned int Item;
+	BYTE Count;
 END_PACKET()
 
 BEGIN_PACKET(GU_TRADE_MODIFY_RES)
-unsigned int				hTarget;			// 타겟 핸들
-unsigned int				hItem;				// 내 아이템 핸들
-BYTE				byCount;			// 겹쳐있는 아이템중 몇개인가? Default 1개
-WORD				wResultCode;		// 타겟의 응답및 가능 유무 에 따른 여러가지 결과값
+	unsigned int Target;
+	unsigned int Item;
+	BYTE Count;
+	WORD ResultCode;
 END_PACKET()
 
 BEGIN_PACKET(GU_TRADE_ZENNY_UPDATE_NFY)	// 성공일 때만
-unsigned int				hTarget;			// 타겟 핸들
-DWORD				dwZenny;			// 옮길 만큼의 제니 (자기가 갖고 있는 제니 한도 내)
+	unsigned int Target;
+	DWORD Zenny;
 END_PACKET()
 
 BEGIN_PACKET(GU_TRADE_ZENNY_UPDATE_RES)
-unsigned int				hTarget;			// 타겟 핸들
-DWORD				dwZenny;			// 옮길 만큼의 제니 (자기가 갖고 있는 제니 한도 내 상대의 제니가 오버 되면 자동 실패)
-WORD				wResultCode;		// 타겟의 응답및 가능 유무 에 따른 여러가지 결과값
+	unsigned int Target;
+	DWORD Zenny;
+	WORD ResultCode;
 END_PACKET()
 
 BEGIN_PACKET(GU_TRADE_END_NFY)
-unsigned int				hTarget;			// 타겟 핸들
-WORD				wResultCode;		// 타겟의 응답및 가능 유무 에 따른 여러가지 결과값
-bool				bIsSet;				// false: 풀림 true: 잠김
+	unsigned int Target;
+	WORD ResultCode;	
+	bool IsSet;
 END_PACKET()
 
 BEGIN_PACKET(GU_TRADE_END_RES)
-unsigned int				hTarget;			// 타겟 핸들
-DWORD				dwPacketCount;		// 상대방의 변경 카운트 ( 상대방이 물건을 올려놓거나 삭제 혹은 변경 등 패킷받은 개수 )
-WORD				wResultCode;		// 타겟의 응답및 가능 유무 에 따른 여러가지 결과값
-bool				bIsSet;				// false: 풀림 true: 잠김
+	unsigned int Target;
+	DWORD PacketCount;
+	WORD ResultCode;
+	bool IsSet;
 END_PACKET()
 
 BEGIN_PACKET(GU_TRADE_CANCEL_NFY)
-unsigned int				hTarget;			// 타겟 핸들
-WORD				wResultCode;
+	unsigned int Target;
+	WORD ResultCode;
 END_PACKET()
 
 BEGIN_PACKET(GU_TRADE_CANCEL_RES)
-unsigned int				hTarget;			// 타겟 핸들
-WORD				wResultCode;		// 타겟의 응답및 가능 유무 에 따른 여러가지 결과값
+	unsigned int Target; 
+	WORD ResultCode;
 END_PACKET()
 
 BEGIN_PACKET(GU_TRADE_DENY_RES)
-bool				bIsDeny;			// 거절 프레그 
-WORD				wResultCode;		// 만약 교환중이라면 실패한다. 그외 성공 및 결과
+	bool IsDeny;
+	WORD ResultCode;
 END_PACKET()
 
 BEGIN_PACKET(GU_GUILD_NAME_CHANGED_NFY)
-unsigned int				hSubject;
-WCHAR				wszGuildName[MAX_GUILDNAME_USIZE + 1];
+	unsigned int Subject;
+	WCHAR GuildName[MAX_GUILDNAME_USIZE + 1];
 END_PACKET()
 
 BEGIN_PACKET(GU_GUILD_CREATE_RES)
-WORD				wResultCode;
+	WORD ResultCode;
 END_PACKET()
 
 BEGIN_PACKET(GU_GUILD_INVITE_RES)
-WORD				wResultCode;
-WCHAR				wszTargetName[MAX_CHARNAME_SIZE + 1];
+	WORD ResultCode;
+	WCHAR TargetName[MAX_CHARNAME_SIZE + 1];
 END_PACKET()
 
 BEGIN_PACKET(GU_TOBJECT_UPDATE_STATE)
-unsigned int				handle;
-sTOBJECT_BRIEF		tobjectBrief;
-sTOBJECT_STATE		tobjectState;
+	unsigned int handle;
+	TOBJECT_BRIEF tobjectBrief;
+	TOBJECT_STATE tobjectState;
 END_PACKET()
 
 BEGIN_PACKET(GU_TOBJECT_ACTION_ATTACK)
-unsigned int				hSubject;				// 액션 주체 캐릭터 핸들
-unsigned int				hTarget;				// 액션 타겟 캐릭터 핸들
-BYTE				byAttackType;			// 액션 결과 ( eBATTLE_ATTACK_RESULT )
-BYTE				byAttackResult;			// 액션 결과 ( eBATTLE_ATTACK_RESULT )
-WORD				wAttackResultValue;		// 액션의 결과 값 ( 데미지 )
-VECTORXYZ			vShift;					// 어택으로 인한 이동 벡터
+	unsigned int Subject;
+	unsigned int Target;
+	BYTE AttackType;
+	BYTE AttackResult;
+	WORD AttackResultValue;
+	VECTORXYZ Shift;
 END_PACKET()
 
 BEGIN_PACKET(GU_TUTORIAL_HINT_UPDATE_RES)
-WORD				wResultCode;
-DWORD				dwTutorialHint;
+	WORD ResultCode;
+	DWORD TutorialHint;
 END_PACKET()
 
 BEGIN_PACKET(GU_TIMEQUEST_ROOM_LIST_RES)
-WORD					wResultCode;			// 응답코드
-sTIMEQUEST_ROOM_TMQ_INFO	sTMQInfo;
+	WORD ResultCode;
+	TIMEQUEST_ROOM_TMQ_INFO	TMQInfo;
 END_PACKET()
 
 BEGIN_PACKET(GU_TIMEQUEST_ROOM_INFO_RES)
-WORD					wResultCode;			// 응답코드
-BYTE						byRoomState;			// eTIMEQUEST_ROOM_STATE
-uTIMEQUEST_ROOM_ICON_INFO	sIconInfo;
+	WORD ResultCode;
+	BYTE RoomState;
+	TIMEQUEST_ROOM_ICON_INFO IconInfo;
 END_PACKET()
 
 BEGIN_PACKET(GU_TIMEQUEST_ROOM_JOIN_RES)
-WORD					wResultCode;			// 응답코드
-sTIMEQUEST_ROOM_JOIN_INFO	sJoinInfo;
-unsigned int						hTroubleMember;			// join이 실패한 pc의 핸들
+	WORD ResultCode;
+	TIMEQUEST_ROOM_JOIN_INFO JoinInfo;
+	unsigned int TroubleMember;
 END_PACKET()
 
 BEGIN_PACKET(GU_TIMEQUEST_ROOM_JOIN_NFY)
-sTIMEQUEST_ROOM_JOIN_INFO	sJoinInfo;
+	TIMEQUEST_ROOM_JOIN_INFO JoinInfo;
 END_PACKET()
 
 BEGIN_PACKET(GU_TIMEQUEST_ROOM_LEAVE_RES)
-WORD					wResultCode;			// 응답코드
+	WORD ResultCode;
 END_PACKET()
 
 BEGIN_PACKET(GU_TIMEQUEST_ROOM_LEAVE_NFY)
 END_PACKET()
 
 BEGIN_PACKET(GU_TIMEQUEST_ROOM_SELECTION_NFY)
-bool							bIsSecondWinner;
-uTIMEQUEST_ROOM_SELECTION_INFO	uSelectionInfo;
+	bool IsSecondWinner;
+	TIMEQUEST_ROOM_SELECTION_INFO SelectionInfo;
 END_PACKET()
 
 BEGIN_PACKET(GU_TIMEQUEST_ROOM_TELEPORT_RES)
-WORD					wResultCode;
+	WORD ResultCode;
 END_PACKET()
 
 BEGIN_PACKET(GU_TIMEQUEST_START_NFY)
-WORD					wResultCode;			// 결과 코드 ( 실패 할 수도 있음, 반드시 확인할 것)
+	WORD ResultCode;
 END_PACKET()
 
 BEGIN_PACKET(GU_TIMEQUEST_START_EXCEPTION_NFY)
-WORD					wResultCode;			// 결과 코드
+	WORD ResultCode;
 END_PACKET()
 
 BEGIN_PACKET(GU_TIMEQUEST_LEAVE_NFY)
-unsigned int					handle;					// 퇴장한 멤버의 핸들
-WORD					wResultCode;			// 이유를 나타내는 응답 코드
+	unsigned int handle;
+	WORD ResultCode;
 END_PACKET()
 
 BEGIN_PACKET(GU_TIMEQUEST_COUNTDOWN_NFY)
-bool					bCountDown;
+	bool CountDown;
 END_PACKET()
 
 BEGIN_PACKET(GU_TIMEQUEST_REWARD_NFY)
-BYTE					byTriggerType;			// 보상 관련 ts타입 정보
-NTL_TS_EVENT_ID			teid;					// 보상 관련 ts이벤트 정보
-DWORD					dwWaitTime;				// Reward Wait 시간
-DWORD					dwClearTime;			// 클리어 시간
-DWORD					dwBonusTime;			// 보너스 시간
-bool					bIsDayRecord : 1;			// DayRecord를 세웠을 경우 true
-bool					bIsBestRecord : 1;			// 베스트 레코드를 세웠을 경우에는 true
+	BYTE TriggerType;
+	unsigned int teid;	
+	DWORD WaitTime;
+	DWORD ClearTime;
+	DWORD BonusTime;
+	bool IsDayRecord : 1;
+	bool IsBestRecord : 1;
 END_PACKET()
 
 BEGIN_PACKET(GU_TIMEQUEST_INFORMATION_NFY)
-BYTE					byInfoType;				// 정보 타입 eTIMEQUEST_INFORMATION_TYPE
+	BYTE InfoType;
 END_PACKET()
 
 BEGIN_PACKET(GU_TELECAST_MESSAGE_BEG_NFY)
-unsigned int					npcTblidx;				// 방송을 하는 NPC 테이블 인덱스
-BYTE					byTelecastType;			// 방송 타입 eTELECAST_MESSAGE_TYPE
-unsigned int					speechTblidx;			// 방송내용을 담은 Speech 테이블 인덱스
-DWORD					dwDisplayTime;			// 방송시간을 나타내는 millisec ( INVALID_DWORD 이면 telecast를 계속 띄우고, 아니면 이 시간이 지나면 없앨 것 )
+	unsigned int npcTblidx;
+	BYTE TelecastType;
+	unsigned int speechTblidx;	
+	DWORD DisplayTime;
 END_PACKET()
 
 BEGIN_PACKET(GU_TELECAST_MESSAGE_END_NFY)
-
 END_PACKET()
 
 BEGIN_PACKET(GU_BROAD_MESSAGE_BEG_NFY)
-BYTE byUIDirType;			// eBROAD_MSG_UI_DIR_TYPE
-BYTE byUIShowHideTypel;		// eBROAD_MSG_UI_SHOWHIDE_DIR_TYPE
-BYTE byUIBalloonShapeType;	// eBROAD_MSG_UI_BALLOON_SHAPE_TYPE
-BYTE byUISpeechDirType;		// eBROAD_MSG_UI_SPEECH_DIR_TYPE
-BYTE byOwnerCondition;		// eBROAD_MSG_OWNER_CONDITION
-BYTE byOwnerType;			// eBROAD_MSG_OWNER_TYPE
-unsigned int uiOwnerTblIdx;
-unsigned int uiQuestTextTblidx;
-float fDisplayTime;
+	BYTE byUIDirType;			// eBROAD_MSG_UI_DIR_TYPE
+	BYTE byUIShowHideTypel;		// eBROAD_MSG_UI_SHOWHIDE_DIR_TYPE
+	BYTE byUIBalloonShapeType;	// eBROAD_MSG_UI_BALLOON_SHAPE_TYPE
+	BYTE byUISpeechDirType;		// eBROAD_MSG_UI_SPEECH_DIR_TYPE
+	BYTE byOwnerCondition;		// eBROAD_MSG_OWNER_CONDITION
+	BYTE byOwnerType;			// eBROAD_MSG_OWNER_TYPE
+	unsigned int uiOwnerTblIdx;
+	unsigned int uiQuestTextTblidx;
+	float fDisplayTime;
 END_PACKET()
 
 BEGIN_PACKET(GU_BROAD_MESSAGE_END_NFY)
 END_PACKET()
 
 BEGIN_PACKET(GU_MINI_NARRATION_NFY)
-unsigned int uiNarrtionTblidx;
+	unsigned int uiNarrtionTblidx;
 END_PACKET()
 
 BEGIN_PACKET(GU_PROGRESS_MESSAGE_NFY)
-BYTE					byProgressType;			// 진행 타입 ePROGRESS_MESSAGE_TYPE
-BYTE					byMessageType;			// 메시지 타입 eTIMEQUEST_MESSAGE_TYPE
-BYTE					byMessageValue;			// 메시지의 값 
+	BYTE ProgressType;
+	BYTE MessageType;
+	BYTE MessageValue;
 END_PACKET()
 
 BEGIN_PACKET(GU_DIRECTION_INDICATE_NFY)
-bool					bIndicate;				// true : Arrow On, false : Arrow Off
-VECTORXYZ				vLoc;					// 지정위치 ( Off 일경우 Access하지 말것 )
+	bool Indicate;
+	VECTORXYZ Loc;
 END_PACKET()
 
 BEGIN_PACKET(GU_TIMEQUEST_UPDATE_GAME_STATE)
-sTIMEQUEST_STATE		sTimeQuestState;
+	TIMEQUEST_STATE TimeQuestState;
 END_PACKET()
 
 BEGIN_PACKET(GU_TIMEQUEST_UPDATE_KILL_COUNT)
-unsigned int					handle;					// 타임 퀘스트 중에 기절한 
-BYTE					byKillCount;			// 
+	unsigned int handle; 
+	BYTE KillCount;
 END_PACKET()
 
 BEGIN_PACKET(GU_TIMEQUEST_UPDATE_COUPON_COUNT)
-BYTE					byCouponCount;			// 타임 퀘스트 쿠폰 개수
+	BYTE CouponCount;
 END_PACKET()
 
 BEGIN_PACKET(GU_TIMEQUEST_UPDATE_TMQ_POINT)
-WORD					wTmqPoint;				// 타임 퀘스트 TMQ 포인트
+	WORD TmqPoint;
 END_PACKET()
 
 BEGIN_PACKET(GU_TIMEQUEST_UPDATE_GAME_TIME)
-DWORD					dwClearTime;			// 타임 퀘스트 클리어 시간 ( 증가되는 시간 )
-DWORD					dwBonusTime;			// 타임 퀘스트 보너스 시간
+	DWORD ClearTime;
+	DWORD BonusTime;
 END_PACKET()
 
 BEGIN_PACKET(GU_RANKBATTLE_INFO_RES)
-WORD					wResultCode;
-
-BYTE					byBattleMode;		// eRANKBATTLE_MODE
-DWORD					dwRemainTime;		// 남은 시간
-BYTE					byArenaCount;
-sRANKBATTLE_ARENA_INFO	asArenaInfo[1];
+	WORD ResultCode;
+	BYTE BattleMode;
+	DWORD RemainTime;
+	BYTE ArenaCount;
+	RANKBATTLE_ARENA_INFO	ArenaInfo[1];
 END_PACKET()
 
 BEGIN_PACKET(GU_RANKBATTLE_JOIN_RES)
-WORD					wResultCode;
-
-unsigned int					hBoardObject;
-unsigned int					rankBattleTblidx;
-DWORD					dwRemainTime;		// 남은 시간
-BYTE					byArenaCount;
-sRANKBATTLE_ARENA_INFO	asArenaInfo[1];
+	WORD ResultCode;
+	unsigned int BoardObject;
+	unsigned int rankBattleTblidx;
+	DWORD RemainTime;		// 남은 시간
+	BYTE ArenaCount;
+	RANKBATTLE_ARENA_INFO ArenaInfo[1];
 END_PACKET()
 
 BEGIN_PACKET(GU_RANKBATTLE_JOIN_NFY)
-unsigned int					rankBattleTblidx;
+	unsigned int rankBattleTblidx;
 END_PACKET()
 
 BEGIN_PACKET(GU_RANKBATTLE_LEAVE_RES)
-WORD					wResultCode;
+	WORD ResultCode;
 END_PACKET()
 
 BEGIN_PACKET(GU_RANKBATTLE_LEAVE_NFY)
 END_PACKET()
 
 BEGIN_PACKET(GU_RANKBATTLE_MATCH_START_NFY)
-WORD					wResultCode;
+	WORD ResultCode;
 END_PACKET()
 
 BEGIN_PACKET(GU_RANKBATTLE_MATCH_CANCELED_NFY)
 END_PACKET()
 
 BEGIN_PACKET(GU_RANKBATTLE_ROOM_LIST_RES)
-WORD					wResultCode;
-
-unsigned int					rankBattleTblidx;	// RankBattle Tblidx
-
-WORD					wTotalPage;			// 게시판 총 페이지
-WORD					wCurPage;			// 게시판 출력 Page
-
-BYTE					byRoomMode;			// RankBattle 모드 : eRANKBATTLE_MODE
-BYTE					byRoomCount;		// 전송하는 Room의 갯수
-
-uRANKBATTLE_ROOMINFO_LIST	uRoomList;		// Room List
+	WORD ResultCode;
+	unsigned int rankBattleTblidx;
+	WORD TotalPage;
+	WORD CurPage;
+	BYTE RoomMode;
+	BYTE RoomCount;
+	RANKBATTLE_ROOMINFO_LIST RoomList;
 END_PACKET()
 
 BEGIN_PACKET(GU_RANKBATTLE_ROOM_INFO_RES)
-WORD						wResultCode;
-
-// 패킷 사이즈 계산에 주의한다.
-// if( RANKBATTLE_MODE_INDIVIDUAL == byBattleMode )
-// {
-//		wMsgSize = sizeof(sGU_RANKBATTLE_ROOM_INFO_RES) - sizeof(uRANKBATTLE_ROOMINFO) + sizeof(sRANKBATTLE_ROOMINFO_INDIVIDUAL);
-// }
-// else if (RANKBATTLE_MODE_PARTY == byBattleMode )
-// {
-//		wMsgSize = sizeof(sGU_RANKBATTLE_ROOM_INFO_RES) - sizeof(uRANKBATTLE_ROOMINFO) + sizeof(sRANKBATTLE_ROOMINFO_PARTY) + sizeof(sRANKBATTLE_ROOMINFO_MEMBER) * (msg->uRoom.sParty.byMemberCount - 1);
-// }
-
-BYTE						byRoomMode;		// eRANKBATTLE_MODE
-uRANKBATTLE_ROOMINFO		uRoom;
+	WORD ResultCode;
+	BYTE RoomMode;
+	RANKBATTLE_ROOMINFO Room;
 END_PACKET()
 
 BEGIN_PACKET(GU_RANKBATTLE_ROOM_CREATE_RES)
-WORD						wResultCode;
-unsigned int						rankBattleTblidx;	// RankBattle Tblidx
-unsigned int						roomId;
-BYTE						byTroubleCount;		// 문제를 가지는 멤버의 수
-sRANKBATTLE_MEMBER_RESULT	asTroublePc[1];		// 문제를 가지는 멤버 정보
+	WORD ResultCode;
+	unsigned int rankBattleTblidx;
+	unsigned int roomId;
+	BYTE TroubleCount;
+	RANKBATTLE_MEMBER_RESULT TroublePc[1];
 END_PACKET()
 
 BEGIN_PACKET(GU_RANKBATTLE_ROOM_CREATE_NFY)
-WORD				wResultCode;
-unsigned int				rankBattleTblidx;	// RankBattle Tblidx
-unsigned int				roomId;
+	WORD ResultCode;
+	unsigned int rankBattleTblidx;
+	unsigned int roomId;
 END_PACKET()
 
 BEGIN_PACKET(GU_RANKBATTLE_ROOM_LEAVE_RES)
-WORD				wResultCode;
+	WORD ResultCode;
 END_PACKET()
 
 BEGIN_PACKET(GU_RANKBATTLE_ROOM_LEAVE_NFY)
 END_PACKET()
 
 BEGIN_PACKET(GU_RANKBATTLE_ROOM_JOIN_INFO_NFY)
-unsigned int				rankBattleTblidx;	// RankBattle Tblidx
-unsigned int				roomId;
-BYTE				byTeamType;			// eRANKBATTLE_TEAM_TYPE
+	unsigned int rankBattleTblidx;
+	unsigned int roomId;
+	BYTE TeamType;
 END_PACKET()
 
 BEGIN_PACKET(GU_RANKBATTLE_ROOM_CHALLENGE_RES)
-WORD						wResultCode;
-unsigned int						rankBattleTblidx;	// RankBattle Tblidx
-unsigned int						roomId;				// 방 번호
-BYTE						byTroubleCount;		// 문제를 가지는 멤버의 수
-sRANKBATTLE_MEMBER_RESULT	asTroublePc[1];		// 문제를 가지는 멤버 정보
+	WORD ResultCode;
+	unsigned int rankBattleTblidx;
+	unsigned int roomId;
+	BYTE TroubleCount;
+	RANKBATTLE_MEMBER_RESULT TroublePc[1];
 END_PACKET()
 
 BEGIN_PACKET(GU_RANKBATTLE_ROOM_CHALLENGE_NFY)
-WORD				wResultCode;
-unsigned int				rankBattleTblidx;	// RankBattle Tblidx
-unsigned int				roomId;
+	WORD ResultCode;
+	unsigned int rankBattleTblidx;
+	unsigned int roomId;
 END_PACKET()
 
 BEGIN_PACKET(GU_RANKBATTLE_ROOM_MATCH_READY_NFY)
-WORD						wResultCode;
-BYTE						byMemberCount;		// 멤버 수
-sRANKBATTLE_MEMBER_RESULT	asMemberResult[1];	// 멤버 정보
+	WORD ResultCode;
+	BYTE MemberCount;
+	RANKBATTLE_MEMBER_RESULT MemberResult[1];
 END_PACKET()
 
 BEGIN_PACKET(GU_RANKBATTLE_ROOM_MATCH_START_NFY)
-WORD				wResultCode;
+	WORD ResultCode;
 END_PACKET()
 
 BEGIN_PACKET(GU_RANKBATTLE_ROOM_MATCH_CANCEL_RES)
-WORD				wResultCode;
+	WORD ResultCode;
 END_PACKET()
 
 BEGIN_PACKET(GU_RANKBATTLE_ROOM_MATCH_CANCELED_NFY)
 END_PACKET()
 
 BEGIN_PACKET(GU_RANKBATTLE_BATTLE_STATE_UPDATE_NFY)
-BYTE				byBattleState;
-BYTE				byStage;
+	BYTE BattleState;
+	BYTE Stage;
 END_PACKET()
 
 BEGIN_PACKET(GU_RANKBATTLE_BATTLE_TEAM_INFO_NFY)
-WORD				wStraightWinCount;		// 연승 카운트
-WORD				wStraightKOWinCount;	// KO 연승 카운트
-BYTE				byCount;				// 인원
-WORD				wMemberInfo;			// sRANKBATTLE_MATCH_MEMBER_INFO [byCount]
-WORD				wOwnerPartyName;		// WCHAR [NTL_MAX_SIZE_PARTY_NAME_IN_UNICODE]
-WORD				wChallengerPartyName;	// WCHAR [NTL_MAX_SIZE_PARTY_NAME_IN_UNICODE]
-sVARIABLE_DATA		sData;
+	WORD StraightWinCount;
+	WORD StraightKOWinCount;
+	BYTE Count;
+	WORD MemberInfo;
+	WORD OwnerPartyName;
+	WORD ChallengerPartyName;
+	sVARIABLE_DATA sData;
 END_PACKET()
 
 BEGIN_PACKET(GU_RANKBATTLE_BATTLE_PLAYER_STATE_NFY)
-unsigned int				hPc;
-BYTE				byPCState;	// eRANKBATTLE_MEMBER_STATE
+	unsigned int Pc;
+	BYTE PCState;
 END_PACKET()
 
 BEGIN_PACKET(GU_RANKBATTLE_BATTLE_KILLSCORE_UPDATE_NFY)
@@ -3858,1117 +3820,1079 @@ BYTE				byChallengerKillScore;
 END_PACKET()
 
 BEGIN_PACKET(GU_RANKBATTLE_BATTLE_STAGE_FINISH_NFY)
-BYTE				byBattleResult;			// eRANKBATTLE_MATCH_RESULT
-sRANKBATTLE_SCORE	sStageScore;
+	BYTE BattleResult;
+	RANKBATTLE_SCORE StageScore;
 END_PACKET()
 
 BEGIN_PACKET(GU_RANKBATTLE_BATTLE_MATCH_FINISH_NFY)
-sRANKBATTLE_MATCH_FINISH_INFO	sMatchResult;
+	RANKBATTLE_MATCH_FINISH_INFO MatchResult;
 END_PACKET()
 
 BEGIN_PACKET(GU_RANKBATTLE_BATTLE_END_NFY)
-BYTE					byMatchWinner;		// eRANKBATTLE_MATCH_RESULT
+	BYTE MatchWinner;
 END_PACKET()
 
 BEGIN_PACKET(GU_RANKBATTLE_BATTLE_FORCED_LEAVE_NFY)
 END_PACKET()
 
 BEGIN_PACKET(GU_RANKBATTLE_TOTAL_SCORE_UPDATE_NFY)
-BYTE					byBattlemode;
-sRANKBATTLE_SCORE_INFO	sTotalScore;
+	BYTE Battlemode;
+	RANKBATTLE_SCORE_INFO TotalScore;
 END_PACKET()
 
-BEGIN_PACKET(GU_DRAGONBALL_CHECK_RES)// 드래곤볼 UI 7개 배치OK
-unsigned int Object;			// TS Object 제단	
-WORD				wResultCode;
+BEGIN_PACKET(GU_DRAGONBALL_CHECK_RES)
+	unsigned int Object;	
+	WORD ResultCode;
 END_PACKET()
 
-BEGIN_PACKET(GU_DRAGONBALL_REWARD_RES)// 드래곤볼 다 모음에 대한 보상 선택 요청
-unsigned int Object;			// TS Object 제단
-WORD				wResultCode;
+BEGIN_PACKET(GU_DRAGONBALL_REWARD_RES)
+	unsigned int Object;
+	WORD ResultCode;
 END_PACKET()
 
-BEGIN_PACKET(GU_DRAGONBALL_COLLECT_NFY) // 서버의 일방적인 통보
-unsigned int Object;			// TS Object 제단
-WORD				wResultCode;
+BEGIN_PACKET(GU_DRAGONBALL_COLLECT_NFY)
+	unsigned int Object;
+	WORD ResultCode;
 END_PACKET()
 
 BEGIN_PACKET(GU_DRAGONBALL_SCHEDULE_INFO)
-bool						bIsAlive;			// 기간 유무 false: 기간이 아니다
-BYTE						byEventType;		// eSCHEDULE_EVENT_TYPE
-__int64						nStartTime;			// 최초기간 시작
-__int64						nEndTime;           // 마지막 기간 끝나는 시간
-DWORD						dwMainTerm;			// 기간 단위 (달은 시작일 나머지는 초) 
-DWORD						dwSubTerm;			// 기간 단위 (달은 만료일 나머지는 초) 
-BYTE						byTermType;			// 0: 달 1: 일 2: 시
+	bool IsAlive;
+	BYTE EventType;	
+	__int64 StartTime;
+	__int64	 EndTime;
+	DWORD MainTerm;	
+	DWORD SubTerm;	
+	BYTE TermType;
 END_PACKET()
 
 BEGIN_PACKET(GU_PRIVATESHOP_CREATE_RES)
-WORD		 				wResultCode;
-sPACKET_PRIVATESHOP_SHOP_DATA		sPrivateShopData;
-//Private Shop Item들은 GU_PRIVATESHOP_ITEM_DATA_INFO로 보낸다
+	WORD ResultCode;
+	PACKET_PRIVATESHOP_SHOP_DATA PrivateShopData;
 END_PACKET()
 
 BEGIN_PACKET(GU_PRIVATESHOP_CREATE_NFY)
-unsigned int							hOwner;
-sSUMMARY_PRIVATESHOP_SHOP_DATA	sSummaryPrivateShopData;
+	unsigned int Owner;
+	SUMMARY_PRIVATESHOP_SHOP_DATA SummaryPrivateShopData;
 END_PACKET()
 
 BEGIN_PACKET(GU_PRIVATESHOP_EXIT_RES)
-WORD						wResultCode;
+	WORD ResultCode;
 END_PACKET()
 
 BEGIN_PACKET(GU_PRIVATESHOP_OPEN_RES)
-WORD						wResultCode;
-sSUMMARY_PRIVATESHOP_SHOP_DATA	sSummaryPrivateShopData;
-BYTE							byNoticeSize;
-WCHAR							wcNotice[MAX_PRIVATESHOPNOTICE_USIZE + 1];
-//wcNotice가 가변이기 때문에 wcNotice 밑에다 새로운 변수를 설정하면 절대로 안된다.
-//반드시 byNoticeSize위에 변수 선언을 할것.[10/2/2007 SGpro]
+	WORD ResultCode;
+	SUMMARY_PRIVATESHOP_SHOP_DATA SummaryPrivateShopData;
+	BYTE NoticeSize;
+	WCHAR Notice[MAX_PRIVATESHOPNOTICE_USIZE + 1];
 END_PACKET()
 
 BEGIN_PACKET(GU_PRIVATESHOP_OPEN_NFY)
-unsigned int							hOwner;//상점 주인 CharacterID
-sSUMMARY_PRIVATESHOP_SHOP_DATA	sSummaryPrivateShopData;
+	unsigned int Owner;
+	SUMMARY_PRIVATESHOP_SHOP_DATA SummaryPrivateShopData;
 END_PACKET()
 
 BEGIN_PACKET(GU_PRIVATESHOP_CLOSE_RES)
-WORD						wResultCode;
+	WORD ResultCode;
 END_PACKET()
 
 BEGIN_PACKET(GU_PRIVATESHOP_CLOSE_NFY)
-unsigned int						hOwner;
+	unsigned int Owner;
 END_PACKET()
 
 BEGIN_PACKET(GU_PRIVATESHOP_ITEM_INSERT_RES)
-WORD						wResultCode;
-sPRIVATESHOP_ITEM_DATA		sPrivateShopItemData;
+	WORD ResultCode;
+	PRIVATESHOP_ITEM_DATA PrivateShopItemData;
 END_PACKET()
 
 BEGIN_PACKET(GU_PRIVATESHOP_ITEM_UPDATE_RES)
-WORD						wResultCode;
-DWORD						dwZenny;
-BYTE						byPrivateShopInventorySlotPos;
+	WORD ResultCode;
+	DWORD Zenny;
+	BYTE PrivateShopInventorySlotPos;
 END_PACKET()
 
 BEGIN_PACKET(GU_PRIVATESHOP_ITEM_DELETE_RES)
-WORD						wResultCode;
-sPRIVATESHOP_ITEM_DATA		sPrivateShopItemData;
+	WORD ResultCode;
+	PRIVATESHOP_ITEM_DATA PrivateShopItemData;
 END_PACKET()
 
 BEGIN_PACKET(GU_PRIVATESHOP_ITEM_BUYING_RES)
-WORD						wResultCode;
-sPRIVATESHOP_ITEM_DATA		sPrivateShopItemData[MAX_SHOPCART];
-BYTE						byBuyItemCount;
+	WORD ResultCode;
+	PRIVATESHOP_ITEM_DATA PrivateShopItemData[MAX_SHOPCART];
+	BYTE BuyItemCount;
 END_PACKET()
 
 BEGIN_PACKET(GU_PRIVATESHOP_ITEM_BUYING_NFY)
-unsigned int						hPrivateShopOwner;
-sPRIVATESHOP_ITEM_DATA		sPrivateShopItemData[MAX_SHOPCART];
-BYTE						byBuyItemCount;
+	unsigned int PrivateShopOwner;
+	PRIVATESHOP_ITEM_DATA PrivateShopItemData[MAX_SHOPCART];
+	BYTE BuyItemCount;
 END_PACKET()
 
 BEGIN_PACKET(GU_PRIVATESHOP_ENTER_RES)
-WORD						wResultCode;
-sPACKET_PRIVATESHOP_SHOP_DATA		sPrivateShopData;
-//Private Shop Item들은 GU_PRIVATESHOP_ITEM_DATA_INFO로 보낸다
+	WORD ResultCode;
+	PACKET_PRIVATESHOP_SHOP_DATA PrivateShopData;
 END_PACKET()
 
 BEGIN_PACKET(GU_PRIVATESHOP_LEAVE_RES)
-WORD						wResultCode;
+	WORD ResultCode;
 END_PACKET()
 
 BEGIN_PACKET(GU_PRIVATESHOP_ITEM_DATA_INFO)
-WORD						wResultCode;
-unsigned int						hOwnerID;
-sPRIVATESHOP_ITEM_DATA		sPrivateShopItemData;
+	WORD ResultCode;
+	unsigned int OwnerID;
+	PRIVATESHOP_ITEM_DATA PrivateShopItemData;
 END_PACKET()
 
 BEGIN_PACKET(GU_PRIVATESHOP_ITEM_SELECT_RES)
-WORD				wResultCode;
-//unsigned int				hOwner;
-BYTE				byPrivateShopInventorySlotPos;
-BYTE				byItemState;//eITEMSTATE 값을 갖는다
+	WORD ResultCode;
+	BYTE PrivateShopInventorySlotPos;
+	BYTE ItemState;
 END_PACKET()
 
 BEGIN_PACKET(GU_PRIVATESHOP_ITEM_SELECT_NFY)
-//unsigned int				hOwner;
-BYTE				byPrivateShopInventorySlotPos;
-BYTE				byItemState;//eITEMSTATE 값을 갖는다
+	BYTE				byPrivateShopInventorySlotPos;
+	BYTE				byItemState;
 END_PACKET()
 
 BEGIN_PACKET(GU_PRIVATESHOP_ITEM_STATE_NFY)
-//unsigned int				hOwner;
-BYTE				abyPrivateShopItemState[NTL_MAX_PRIVATESHOP_INVENTORY];
-int					nPrivateShopItemStateCount;
+	BYTE PrivateShopItemState[MAX_PRIVATESHOP_INVENTORY];
+	int PrivateShopItemStateCount;
 END_PACKET()
 
 BEGIN_PACKET(GU_PRIVATESHOP_LEAVE_NFY)
 END_PACKET()
 
 BEGIN_PACKET(GU_PRIVATESHOP_BUSINESS_REQUEST_RES)
-WORD						wResultCode;
-BYTE						byPrivateShopInventorySlotPos;
-BYTE						byItemState;//eITEMSTATE 값을 갖는다
+	WORD ResultCode;
+	BYTE PrivateShopInventorySlotPos;
+	BYTE ItemState;
 END_PACKET()
 
 BEGIN_PACKET(GU_PRIVATESHOP_BUSINESS_REQUEST_NFY)
-unsigned int						hOwner;
-BYTE						byPrivateShopInventorySlotPos;
-BYTE						byItemState;//eITEMSTATE 값을 갖는다
+	unsigned int Owner;
+	BYTE PrivateShopInventorySlotPos;
+	BYTE ItemState;
 END_PACKET()
 
 BEGIN_PACKET(GU_PRIVATESHOP_BUSINESS_CONSENT_REQ)
-unsigned int						hVisitorID;
-BYTE						byPrivateShopInventorySlotPos;
+	unsigned int VisitorID;
+	BYTE PrivateShopInventorySlotPos;
 END_PACKET()
 
 BEGIN_PACKET(GU_PRIVATESHOP_BUSINESS_CONSENT_NFY)
-unsigned int						hOwner;
-BYTE						byPrivateShopInventorySlotPos;
+	unsigned int Owner;
+	BYTE PrivateShopInventorySlotPos;
 END_PACKET()
 
 BEGIN_PACKET(GU_PRIVATESHOP_BUSINESS_WAITTIMEOUT_NFY)
-unsigned int						hOwner;
-BYTE						byPrivateShopInventorySlotPos;
+	unsigned int Owner;
+	BYTE PrivateShopInventorySlotPos;
 END_PACKET()
 
 BEGIN_PACKET(GU_PRIVATESHOP_BUSINESS_PRICEFLUCTUATIONS_RES)
-WORD						wResultCode;
-BYTE						byPrivateShopInventorySlotPos;
-DWORD						dwBeforeZenny;
-DWORD						dwAfterZenny;
+	WORD ResultCode;
+	BYTE PrivateShopInventorySlotPos;
+	DWORD BeforeZenny;
+	DWORD AfterZenny;
 END_PACKET()
 
 BEGIN_PACKET(GU_PRIVATESHOP_BUSINESS_PRICEFLUCTUATIONS_NFY)
-unsigned int						hOwner;
-BYTE						byPrivateShopInventorySlotPos;
-DWORD						dwBeforeZenny;
-DWORD						dwAfterZenny;
+	unsigned int Owner;
+	BYTE PrivateShopInventorySlotPos;
+	DWORD BeforeZenny;
+	DWORD AfterZenny;
 END_PACKET()
 
 BEGIN_PACKET(GU_PRIVATESHOP_BUSINESS_IMMEDIATE_ITEM_BUYING_RES)
-WORD						wResultCode;
-sPRIVATESHOP_ITEM_DATA		sPrivateShopItemData;
+	WORD ResultCode;
+	PRIVATESHOP_ITEM_DATA PrivateShopItemData;
 END_PACKET()
 
 BEGIN_PACKET(GU_PRIVATESHOP_BUSINESS_IMMEDIATE_ITEM_BUYING_NFY)
-unsigned int						hPrivateShopOwner;
-sPRIVATESHOP_ITEM_DATA		sPrivateShopItemData;
+	unsigned int PrivateShopOwner;
+	PRIVATESHOP_ITEM_DATA PrivateShopItemData;
 END_PACKET()
 
 BEGIN_PACKET(GU_PRIVATESHOP_BUSINESS_WINDOWCLOSE_NFY)
-unsigned int						hPrivateShopOwner;
+	unsigned int PrivateShopOwner;
 END_PACKET()
 
 BEGIN_PACKET(GU_PRIVATESHOP_BUSINESS_CANCEL_RES)
-WORD				wResultCode;
-BYTE				byCancelType;
-BYTE				byPrivateShopInventorySlotPos;
+	WORD ResultCode;
+	BYTE CancelType;
+	BYTE PrivateShopInventorySlotPos;
 END_PACKET()
 
 BEGIN_PACKET(GU_PRIVATESHOP_BUSINESS_CANCEL_NFY)
-unsigned int						hOwner;
-BYTE						byCancelType;//1: 흥정대기때 취소, 2: 흥정때 취소
-BYTE						byPrivateShopInventorySlotPos;
+	unsigned int Owner;
+	BYTE CancelType;
+	BYTE PrivateShopInventorySlotPos;
 END_PACKET()
 
 BEGIN_PACKET(GU_TUTORIAL_WAIT_NFY)
-WORD						wWaitingCount; // 현재 자신앞의 대기수
+	WORD WaitingCount;
 END_PACKET()
 
 BEGIN_PACKET(GU_TUTORIAL_WAIT_CANCEL_RES)
-WORD						wResultCode;
+	WORD ResultCode;
 END_PACKET()
 
 BEGIN_PACKET(GU_TUTORIAL_PLAY_QUIT_RES)
-WORD						wResultCode;
+	WORD ResultCode;
 END_PACKET()
 
 BEGIN_PACKET(GU_MAIL_START_RES)
-unsigned int Object;	// 메일송수신탑 오브젝트 (스카우트파츠 착용시 INVALID_OBJECT )
-WORD 	wResultCode;	// 결과
-bool	bIsAway;
+	unsigned int Object;
+	WORD ResultCode;
+	bool IsAway;
 END_PACKET()
 
 BEGIN_PACKET(GU_MAIL_SEND_RES)
-unsigned int Object;	// 메일송수신탑 오브젝트 (스카우트파츠 착용시 INVALID_OBJECT )
-WCHAR wszTargetName[MAX_CHARNAME_SIZE + 1];	// 받을 캐릭 이름
-WORD wResultCode;	// 성공유무
+	unsigned int Object;
+	WCHAR TargetName[MAX_CHARNAME_SIZE + 1];
+	WORD ResultCode;
 END_PACKET()
 
 BEGIN_PACKET(GU_MAIL_READ_RES)
-unsigned int Object;	// 메일송수신탑 오브젝트 (스카우트파츠 착용시 INVALID_OBJECT )
-unsigned int	mailID;	// 메일 아이디
-WORD	wResultCode;	// 메일이 이미 삭제 되었을 때는 실패 
-BYTE	byRemainDay;
-time_t endTime;
+	unsigned int Object;
+	unsigned int mailID;
+	WORD ResultCode;
+	BYTE RemainDay;
+	time_t endTime;
 END_PACKET()
 
 BEGIN_PACKET(GU_MAIL_DEL_RES)
-unsigned int Object;	// 메일송수신탑 오브젝트 (스카우트파츠 착용시 INVALID_OBJECT )
-unsigned int	mailID;	// 메일 아이디
-WORD	wResultCode;	// 메일이 이미 삭제 되었을 때는 실패 
+	unsigned int Object;
+	unsigned int mailID;
+	WORD	wResultCode;
 END_PACKET()
 
 BEGIN_PACKET(GU_MAIL_RETURN_RES)
-unsigned int Object;	// 메일송수신탑 오브젝트 (스카우트파츠 착용시 INVALID_OBJECT )
-unsigned int	mailID;	// 메일 아이디
-WORD	wResultCode;	// 메일이 이미 삭제 되었을 때는 실패 
+	unsigned int Object;
+	unsigned int mailID;
+	WORD ResultCode;
 END_PACKET()
 
 BEGIN_PACKET(GU_MAIL_RELOAD_RES)
-unsigned int Object;	// 메일송수신탑 오브젝트 (스카우트파츠 착용시 INVALID_OBJECT )
-WORD wResultCode;	// 성공유무
-BYTE	byMailCount;		// 현재 전체메일 카운트 
-BYTE	byManagerCount;		// 읽지 않은 매니져 메일 카운트
-BYTE	byNormalCount;		// 읽지 않은 노멀 메일 카운트
-unsigned int   aMailID[MAX_MAILSLOT_COUNT];	// 카운트에 해당하는 저장된 메일 아이디 
+	unsigned int Object;
+	WORD ResultCode;
+	BYTE MailCount;
+	BYTE ManagerCount;
+	BYTE NormalCount;
+	unsigned int aMailID[MAX_MAILSLOT_COUNT]; 
 END_PACKET()
 
-BEGIN_PACKET(GU_MAIL_RELOAD_NFY)		// 스케줄에 의해 일정시간에 따라 자동 송신
-BYTE	byMailCount;		// 현재 전체메일 카운트 
-BYTE	byManagerCount;		// 읽지 않은 매니져 메일 카운트
-BYTE	byNormalCount;		// 읽지 않은 노멀 메일 카운트
-unsigned int  aMailID[MAX_MAILSLOT_COUNT];	// 카운트에 해당하는 저장된 메일 아이디 
+BEGIN_PACKET(GU_MAIL_RELOAD_NFY)
+	BYTE MailCount;
+	BYTE ManagerCount;
+	BYTE NormalCount;
+	unsigned int MailID[MAX_MAILSLOT_COUNT];
 END_PACKET()
 
 BEGIN_PACKET(GU_MAIL_LOAD_RES)
-unsigned int Object;		// 메일송수신탑 오브젝트 (스카우트파츠 착용시 INVALID_OBJECT )
-WORD	wResultCode;	// 성공유무
+	unsigned int Object;
+	WORD	wResultCode;
 END_PACKET()
 
 BEGIN_PACKET(GU_MAIL_LOAD_DATA)
-sMAIL_NEW_PROFILE sData;
-BYTE	byTextSize;
-WCHAR	wszText[MAX_MAILMESSAGE_SIZE_IN_UNICODE + 1];
+	MAIL_NEW_PROFILE Data;
+	BYTE TextSize;
+	WCHAR Text[MAX_MAILMESSAGE_SIZE + 1];
 END_PACKET()
 
 BEGIN_PACKET(GU_MAIL_LOAD_INFO)
-sMAIL_NEW_PROFILE sData;
-BYTE	byTextSize;
-WCHAR	wszText[MAX_MAILMESSAGE_SIZE_IN_UNICODE + 1];
+	MAIL_NEW_PROFILE Data;
+	BYTE TextSize;
+	WCHAR Text[MAX_MAILMESSAGE_SIZE + 1];
 END_PACKET()
 
 BEGIN_PACKET(GU_MAIL_ITEM_RECEIVE_RES)
-unsigned int Object;	// 메일송수신탑 오브젝트 (스카우트파츠 착용시 INVALID_OBJECT )
-WORD wResultCode;	// 성공유무
-unsigned int	mailID;	// 메일 아이디
+	unsigned int Object;
+	WORD ResultCode;
+	unsigned int mailID;
 END_PACKET()
 
 BEGIN_PACKET(GU_MAIL_LOCK_RES)
-unsigned int Object;	// 메일송수신탑 오브젝트 (스카우트파츠 착용시 INVALID_OBJECT )
-unsigned int	mailID;	// 메일 아이디
-bool	bIsLock;		// Lock 1: Unlock: 0
-WORD 	wResultCode;	// 메일이 이미 삭제 되었을 때는 실패
-BYTE	byExpiredDay;	// 남은날짜
-time_t	endTime;
+	unsigned int Object;
+	unsigned int mailID;
+	bool IsLock;
+	WORD ResultCode;
+	BYTE ExpiredDay;
+	time_t endTime;
 END_PACKET()
 
 BEGIN_PACKET(GU_MAIL_CLOSE_NFY)
 END_PACKET()
 
 BEGIN_PACKET(GU_MAIL_MULTI_DEL_RES)
-unsigned int Object;		// 메일송수신탑 오브젝트 (스카우트파츠 착용시 INVALID_OBJECT )
-WORD	wResultCode;	// 메일이 이미 삭제 되었을 때는 실패
-BYTE	byCount;
-unsigned int	aMailID[MAX_MULTIDEL_COUNT];	// 메일 아이디
+	unsigned int Object;
+	WORD ResultCode;
+	BYTE Count;
+	unsigned int MailID[MAX_MULTIDEL_COUNT];
 END_PACKET()
 
 BEGIN_PACKET(GU_PORTAL_START_RES)
-WORD						wResultCode;
-unsigned int			hNpcHandle;
+	WORD ResultCode;
+	unsigned int NpcHandle;
 END_PACKET()
 
 BEGIN_PACKET(GU_PORTAL_INFO)
-BYTE			byCount;
-PORTALID		aPortalID[NTL_PORTAL_MAX_COUNT];
+	BYTE Count;
+	BYTE PortalID[PORTAL_MAX_COUNT];
 END_PACKET()
 
 BEGIN_PACKET(GU_PORTAL_ADD_RES)
-WORD						wResultCode;
-unsigned int			hNpcHandle;
-PORTALID		PortalID;
+	WORD ResultCode;
+	unsigned int NpcHandle;
+	BYTE PortalID;
 END_PACKET()
 
 BEGIN_PACKET(GU_PORTAL_RES)
-WORD				wResultCode;
-unsigned int			hNpcHandle;
-BYTE			byPoint;		// 0~7까지 선택된 인덱스
-CNtlVector		vLoc;
-CNtlVector		vDir;
-unsigned int			worldID;
+	WORD ResultCode;
+	unsigned int NpcHandle;
+	BYTE Point;
+	CVector Loc;
+	CVector Dir;
+	unsigned int worldID;
 END_PACKET()
 
 BEGIN_PACKET(GU_WAR_FOG_INFO)
-BYTE			abyWarFogInfo[NTL_MAX_SIZE_WAR_FOG];
+	BYTE WarFogInfo[MAX_SIZE_WAR_FOG];
 END_PACKET()
 
 BEGIN_PACKET(GU_WAR_FOG_UPDATE_RES)
-WORD			wResultCode;
-unsigned int			handle;
+	WORD ResultCode;
+	unsigned int handle;
 END_PACKET()
 
 BEGIN_PACKET(GU_MOB_LUCKY_DROP_NFY)
-unsigned int			hMobhandle;
+	unsigned int Mobhandle;
 END_PACKET()
 
 BEGIN_PACKET(GU_ITEM_UPGRADE_ALL_NFY)
-BYTE			abyGrade[NTL_ITEM_UPGRADE_EQUIP_COUNT];  // 배열 인덱스는 해당 Pos, Value는 해당 결과 그레이드( 255 INVALID는 아이템이 없는 경우)
+	BYTE Grade[ITEM_UPGRADE_EQUIP_COUNT];
 END_PACKET()
 
-BEGIN_PACKET(GU_BOT_BOTCAUTION_NFY)		//  [2/20/2008 SGpro]
-unsigned int			hBot;
+BEGIN_PACKET(GU_BOT_BOTCAUTION_NFY)
+	unsigned int Bot;
 END_PACKET()
 
 BEGIN_PACKET(GU_UPDATE_CHAR_REPUTATION)
-unsigned int			handle;
-DWORD			dwReputation;
+	unsigned int handle;
+	DWORD Reputation;
 END_PACKET()
-//-----------------------------------------------------------------
+
 BEGIN_PACKET(GU_GUILD_FUNCTION_ADD_RES)
-WORD				wResultCode;
+	WORD ResultCode;
 END_PACKET()
 
 BEGIN_PACKET(GU_GUILD_GIVE_ZENNY_RES)
-WORD				wResultCode;
+	WORD ResultCode;
 END_PACKET()
 
 BEGIN_PACKET(GU_GUILD_BANK_START_RES)
-unsigned int			handle;			// Npc handle
-WORD			wResultCode;
+	unsigned int handle;
+	WORD ResultCode;
 END_PACKET()
 
 BEGIN_PACKET(GU_GUILD_BANK_MOVE_RES)
-unsigned int			handle;
-unsigned int			hSrcItem;
-unsigned int			hDstItem;
-BYTE			bySrcPlace;
-BYTE			bySrcPos;
-BYTE			byDestPlace;
-BYTE			byDestPos;
-WORD			wResultCode;
+	unsigned int handle;
+	unsigned int SrcItem;
+	unsigned int DstItem;
+	BYTE SrcPlace;
+	BYTE SrcPos;
+	BYTE DestPlace;
+	BYTE DestPos;
+	WORD ResultCode;
 END_PACKET()
 
 BEGIN_PACKET(GU_GUILD_BANK_MOVE_STACK_RES)
-unsigned int			handle;
-unsigned int			hSrcItem;
-unsigned int			hDestItem;
-BYTE			bySrcPlace;
-BYTE			bySrcPos;
-BYTE			byDestPlace;
-BYTE			byDestPos;
-BYTE			byStackCount1;
-BYTE			byStackCount2;
-ITEMID			splitItemId;
-WORD			wResultCode;
+	unsigned int handle;
+	unsigned int SrcItem;
+	unsigned int DestItem;
+	BYTE SrcPlace;
+	BYTE SrcPos;
+	BYTE DestPlace;
+	BYTE DestPos;
+	BYTE StackCount1;
+	BYTE StackCount2;
+	unsigned int splitItemId;
+	WORD ResultCode;
 END_PACKET()
 
 BEGIN_PACKET(GU_GUILD_BANK_END_RES)
-WORD			wResultCode;
+	WORD ResultCode;
 END_PACKET()
 
 BEGIN_PACKET(GU_GUILD_BANK_ZENNY_INFO)
-DWORD			dwZenny;
+	DWORD Zenny;
 END_PACKET()
 
 BEGIN_PACKET(GU_GUILD_BANK_ITEM_INFO)
-BYTE            byPlace;
-BYTE			byItemCount;
-sITEM_PROFILE	aItemProfile[NTL_MAX_BANK_ITEM_SLOT];
+	BYTE Place;
+	BYTE ItemCount;
+	ITEM_PROFILE ItemProfile[MAX_BANK_ITEM_SLOT];
 END_PACKET()
 
 BEGIN_PACKET(GU_GUILD_BANK_ZENNY_RES)
-unsigned int			handle;
-WORD			wResultCode;
-DWORD			dwZenny;
-bool			bIsSave;		// 1: 저금 0: 인출
+	unsigned int handle;
+	WORD ResultCode;
+	DWORD Zenny;
+	bool IsSave;
 END_PACKET()
 
 BEGIN_PACKET(GU_CROSSFIRE_RES)
-unsigned int			hTarget;
+	unsigned int Target;
 END_PACKET()
 
 BEGIN_PACKET(GU_GUILD_CREATE_MARK_RES)
-WORD				wResultCode;
+	WORD ResultCode;
 END_PACKET()
 
 BEGIN_PACKET(GU_GUILD_CHANGE_MARK_RES)
-WORD				wResultCode;
+	WORD ResultCode;
 END_PACKET()
 
 BEGIN_PACKET(GU_GUILD_MARK_CHANGED_NFY)
-unsigned int				hSubject;
-GUILD_MARK		sMark;
+	unsigned int Subject;
+	GUILD_MARK Mark;
 END_PACKET()
 
 BEGIN_PACKET(GU_BANK_LOAD_RES)
-unsigned int				handle;			// Npc handle
-WORD				wResultCode;
+	unsigned int handle;
+	WORD ResultCode;
 END_PACKET()
 
 BEGIN_PACKET(GU_GUILD_CHANGE_NAME_RES)
-WORD				wResultCode;
+	WORD ResultCode;
 END_PACKET()
 
 BEGIN_PACKET(GU_PARTY_SHARETARGET_RES)
-WORD				wResultCode;
+	WORD ResultCode;
 END_PACKET()
 
 BEGIN_PACKET(GU_PARTY_SHARETARGET_NFY)
-sSHARETARGET_INFO		sharetargetInfo[NTL_MAX_SHARETARGET_COUNT];
+	SHARETARGET_INFO sharetargetInfo[MAX_SHARETARGET_COUNT];
 END_PACKET()
 
 BEGIN_PACKET(GU_RIDE_ON_BUS_RES)
-unsigned int				hTarget;			// Npc handle
-WORD				wResultCode;
+	unsigned int Target;
+	WORD ResultCode;
 END_PACKET()
 
 BEGIN_PACKET(GU_RIDE_OFF_BUS_RES)
-WORD				wResultCode;
+	WORD ResultCode;
 END_PACKET()
 
 BEGIN_PACKET(GU_TRANSFORM_CANCEL_RES)
-WORD			wResultCode;
+	WORD ResultCode;
 END_PACKET()
 
 BEGIN_PACKET(GU_SHOP_ITEM_IDENTIFY_RES)
-WORD			wResultCode;
-unsigned int			hNpchandle;		// NpcHandle
-BYTE			byPlace;
-BYTE			byPos;
-sITEM_DATA      sItemData;			// 성공시에만 세팅
+	WORD ResultCode;
+	unsigned int Npchandle;
+	BYTE Place;
+	BYTE Pos;
+	ITEM_DATA ItemData;
 END_PACKET()
 
 BEGIN_PACKET(GU_MATCH_MINORMATCH_STATE_UPDATE_NFY)
-BYTE			byMatchState;		// eBUDOKAI_MAJORMATCH_STATE
-bool			bIsEnter;			// true : Enter, false : exit
-BYTE			byStage;
-DWORD			dwRemainTime;		// 밀리세컨드 단위
+	BYTE MatchState;
+	bool IsEnter;
+	BYTE Stage;
+	DWORD RemainTime;
 END_PACKET()
 
 BEGIN_PACKET(GU_MATCH_MINORMATCH_TEAM_INFO_NFY)
-BYTE			byMatchIndex;		// 몇번째 경기인지?[개인:0~31, 팀:0~15]
-BYTE			byTeamCount;
-WORD			wTeamInfo_var;		// sMATCH_MINORMATCH_TEAM_INFO_VAR [NTL_MAX_MINORMATCH_TEAM_COUNT];
-sVARIABLE_DATA	sData;
+	BYTE MatchIndex;
+	BYTE TeamCount;
+	WORD TeamInfo_var;
+	sVARIABLE_DATA sData;
 END_PACKET()
 
 BEGIN_PACKET(GU_MATCH_MINORMATCH_PLAYER_STATE_NFY)
-unsigned int			hPc;
-BYTE			byPcState;			// eMATCH_MEMBER_STATE
+	unsigned int Pc;
+	BYTE PcState;
 END_PACKET()
 
 BEGIN_PACKET(GU_MATCH_MINORMATCH_UPDATE_SCORE_NFY)
-TEAMTYPE		wTeamType;
-BYTE			byScore;
-unsigned int			hSlayer;			// 기절시킨 character
-unsigned int			hFainter;			// 기절한 character
+	WORD TeamType;
+	BYTE Score;
+	unsigned int Slayer;
+	unsigned int Fainter;
 END_PACKET()
 
 BEGIN_PACKET(GU_MATCH_MINORMATCH_TEAM_SCORE_NFY)
-BYTE							byCount;
-sMATCH_MINORMATCH_TEAM_SCORE	aTeamScore[BUDOKAI_MAX_MINORMATCH_TEAM_COUNT];
+	BYTE Count;
+	MATCH_MINORMATCH_TEAM_SCORE	TeamScore[BUDOKAI_MAX_MINORMATCH_TEAM_COUNT];
 END_PACKET()
 
 BEGIN_PACKET(GU_MATCH_MINORMATCH_SELECTION_NFY)
-TEAMTYPE		teamWinner;
-BYTE			byTeamCount;
-sMINORMATCH_SELECTION_DATA	aSelection[BUDOKAI_MAX_MINORMATCH_TEAM_COUNT];
+	WORD teamWinner;
+	BYTE TeamCount;
+	MINORMATCH_SELECTION_DATA	aSelection[BUDOKAI_MAX_MINORMATCH_TEAM_COUNT];
 END_PACKET()
 
 BEGIN_PACKET(GU_MATCH_MINORMATCH_STAGE_FINISH_NFY)
-BYTE			byStageResult;		// eMATCH_RESULT
-WORD			wStageWinner;		// Stage Winner TeamType
+	BYTE StageResult;
+	WORD StageWinner;
 END_PACKET()
 
 BEGIN_PACKET(GU_MATCH_MINORMATCH_MATCH_FINISH_NFY)
-BYTE			byMatchResult;
-WORD			wMatchWinner;
-BYTE			byKillCount;
+	BYTE MatchResult;
+	WORD MatchWinner;
+	BYTE KillCount;
 END_PACKET()
 
 BEGIN_PACKET(GU_MATCH_MAJORMATCH_STATE_UPDATE_NFY)
-BYTE			byMatchState;		// eBUDOKAI_MAJORMATCH_STATE
-bool			bIsEnter;			// true : Enter, false : exit
-BYTE			byStage;
-DWORD			dwRemainTime;		// 밀리세컨드 단위
+	BYTE MatchState;
+	bool IsEnter;
+	BYTE Stage;
+	DWORD RemainTime;
 END_PACKET()
 
 BEGIN_PACKET(GU_MATCH_MAJORMATCH_TEAM_INFO_NFY)
-BYTE			byMatchDepth;	// 개인[8강~32강] 팀[8강~16강]
-BYTE			byMatchIndex;	// depth에 따른 경기 위치
-
-BYTE			byTeamCount;
-WORD			wTeamInfo_var;		// sMATCH_MINORMATCH_TEAM_INFO_VAR [2];
-sVARIABLE_DATA	sData;
+	BYTE MatchDepth;
+	BYTE MatchIndex;
+	BYTE TeamCount;
+	WORD TeamInfo_var;
+	sVARIABLE_DATA sData;
 END_PACKET()
 
 BEGIN_PACKET(GU_MATCH_MAJORMATCH_PLAYER_STATE_NFY)
-unsigned int			hPc;
-BYTE			byPcState;			// eMATCH_MEMBER_STATE
+	unsigned int Pc;
+	BYTE PcState;
 END_PACKET()
 
 BEGIN_PACKET(GU_MATCH_MAJORMATCH_UPDATE_SCORE_NFY)
-sMATCH_SCORE	sStageScore;		// 스테이지 스코어
+	MATCH_SCORE	StageScore;
 END_PACKET()
 
 BEGIN_PACKET(GU_MATCH_MAJORMATCH_STAGE_FINISH_NFY)
-BYTE			byStageResult;		// eMATCH_RESULT
-WORD			wStageWinner;		// Stage Winner TeamType
-sMATCH_SCORE	sMatchScore;		// 경기 스코어
-bool			bIsObserver;		// 옵져버 모드에서 사용
+	BYTE StageResult;
+	WORD StageWinner;
+	MATCH_SCORE	MatchScore;
+	bool IsObserver;
 END_PACKET()
 
 BEGIN_PACKET(GU_MATCH_MAJORMATCH_MATCH_FINISH_NFY)
-BYTE			byMatchResult;		// eMATCH_RESULT
-WORD			wMatchWinner;		// Match Winner TeamType
-sMATCH_SCORE	sMatchScore;		// 경기 스코어
+	BYTE MatchResult;
+	WORD MatchWinner;
+	MATCH_SCORE MatchScore;
 END_PACKET()
 
 BEGIN_PACKET(GU_MATCH_FINALMATCH_STATE_UPDATE_NFY)
-BYTE			byMatchState;		// eBUDOKAI_MAJORMATCH_STATE
-bool			bIsEnter;			// true : Enter, false : exit
-BYTE			byStage;
-DWORD			dwRemainTime;		// 밀리세컨드 단위
+	BYTE MatchState;
+	bool IsEnter;
+	BYTE Stage;
+	DWORD	 RemainTime;
 END_PACKET()
 
 BEGIN_PACKET(GU_MATCH_FINALMATCH_TEAM_INFO_NFY)
-BYTE			byMatchDepth;
-BYTE			byMatchIndex;
-
-BYTE			byTeamCount;
-WORD			wTeamInfo_var;		// sMATCH_FINALMATCH_TEAM_INFO_VAR [4];
-sVARIABLE_DATA	sData;
+	BYTE MatchDepth;
+	BYTE MatchIndex;
+	BYTE TeamCount;
+	WORD TeamInfo_var;
+	sVARIABLE_DATA sData;
 END_PACKET()
 
 BEGIN_PACKET(GU_MATCH_FINALMATCH_PLAYER_STATE_NFY)
-unsigned int			hPc;
-BYTE			byPcState;			// eMATCH_MEMBER_STATE
+	unsigned int Pc;
+	BYTE PcState;
 END_PACKET()
 
 BEGIN_PACKET(GU_MATCH_FINALMATCH_UPDATE_SCORE_NFY)
-sMATCH_SCORE	sStageScore;		// 스테이지 스코어
+	MATCH_SCORE StageScore;
 END_PACKET()
 
 BEGIN_PACKET(GU_MATCH_FINALMATCH_STAGE_FINISH_NFY)
-BYTE			byStageResult;		// eMATCH_RESULT
-WORD			wStageWinner;		// Stage Winner TeamType
-sMATCH_SCORE	sMatchScore;		// 경기 스코어
-bool			bIsObserver;		// 옵져버 모드에서 사용
+	BYTE StageResult;
+	WORD StageWinner;
+	MATCH_SCORE MatchScore;
+	bool IsObserver;
 END_PACKET()
 
 BEGIN_PACKET(GU_MATCH_FINALMATCH_MATCH_FINISH_NFY)
-BYTE			byMatchResult;		// eMATCH_RESULT
-WORD			wMatchWinner;		// Match Winner TeamType
-sMATCH_SCORE	sMatchScore;		// 경기 스코어
+	BYTE MatchResult;
+	WORD MatchWinner;
+	MATCH_SCORE MatchScore;
 END_PACKET()
 
 BEGIN_PACKET(GU_MATCH_AWARDING_NFY)
-WORD			awTeamName[MAX_FINALMATCH_RESULT];
-sVARIABLE_DATA	sData;	// WCHAR wszTeamName[MAX_BUDOKAITEAMNAME_USIZE + 1]; : 저장된 값은 NULL을 포함하지 않는다.
+	WORD TeamName[MAX_FINALMATCH_RESULT];
+	sVARIABLE_DATA sData;
 END_PACKET()
 
 BEGIN_PACKET(GU_SKILL_CONFUSE_TARGET_NFY)
-unsigned int			hSubject;
-unsigned int			hTarget;
+	unsigned int Subject;
+	unsigned int Target;
 END_PACKET()
 
 BEGIN_PACKET(GU_SKILL_TERROR_COURSE_CHANGE_NFY)
-unsigned int			hSubject;
-unsigned int			hAttacker;
+	unsigned int Subject;
+	unsigned int Attacker;
 END_PACKET()
 
 BEGIN_PACKET(GU_DICE_ROLL_RES)
-WORD			wResultCode;
-WORD			wDiceResult;
+	WORD ResultCode;
+	WORD DiceResult;
 END_PACKET()
 
 BEGIN_PACKET(GU_DICE_ROLLED_NFY)
-unsigned int			hSubject;
-WORD			wDiceResult;
+	unsigned int Subject;
+	WORD DiceResult;
 END_PACKET()
 
 BEGIN_PACKET(GU_BUDOKAI_STATE_INFO_NFY)
-BUDOKAITIME							tmDefaultOpenTime;
-bool								bRankbattleAllow;
-
-sBUDOKAI_UPDATE_STATE_INFO			sStateInfo;
-sBUDOKAI_UPDATE_MATCH_STATE_INFO	aMatchStateInfo[MAX_BUDOKAI_MATCH_TYPE];
-
-sBUDOKAI_JOIN_INFO					sJoinInfo;
+	DWORD DefaultOpenTime;
+	bool RankbattleAllow;
+	BUDOKAI_UPDATE_STATE_INFO StateInfo;
+	BUDOKAI_UPDATE_MATCH_STATE_INFO MatchStateInfo[MAX_BUDOKAI_MATCH_TYPE];
+	BUDOKAI_JOIN_INFO JoinInfo;
 END_PACKET()
 
 BEGIN_PACKET(GU_BUDOKAI_UPDATE_STATE_NFY)
-sBUDOKAI_UPDATE_STATE_INFO			sStateInfo;
-bool								bRankbattleAllow;
+	BUDOKAI_UPDATE_STATE_INFO StateInfo;
+	bool RankbattleAllow;
 END_PACKET()
 
 BEGIN_PACKET(GU_BUDOKAI_UPDATE_MATCH_STATE_NFY)
-BYTE								byMatchType;	// eBUDOKAI_MATCH_TYPE
-sBUDOKAI_UPDATE_MATCH_STATE_INFO	sStateInfo;
+	BYTE MatchType;
+	BUDOKAI_UPDATE_MATCH_STATE_INFO StateInfo;
 END_PACKET()
 
 BEGIN_PACKET(GU_BUDOKAI_JOIN_INDIVIDUAL_RES)
-WORD			wResultCode;
-WORD			wJoinId;			// 참가 번호
-bool			bDojoRecommender;	// 도장추천자인지?
+	WORD ResultCode;
+	WORD JoinId;
+	bool DojoRecommender;
 END_PACKET()
 
 BEGIN_PACKET(GU_BUDOKAI_LEAVE_INDIVIDUAL_RES)
-WORD			wResultCode;
+	WORD ResultCode;
 END_PACKET()
 
 BEGIN_PACKET(GU_BUDOKAI_JOIN_TEAM_INFO_RES)
-WORD						wResultCode;
-
-BYTE						byMemberCount;
-sBUDOKAI_TEAM_POINT_INFO	asPointInfo[1];
+	WORD ResultCode;
+	BYTE MemberCount;
+	BUDOKAI_TEAM_POINT_INFO PointInfo[1];
 END_PACKET()
 
 BEGIN_PACKET(GU_BUDOKAI_JOIN_TEAM_RES)
-WORD			wResultCode;
-unsigned int			hTroublePc;
-float			fTotalRankPoint;
-WORD			wJoinId;
-WCHAR			wszTeamName[MAX_BUDOKAITEAMNAME_USIZE + 1];
-
-// 
-BYTE						byMemberCount;
-sBUDOKAI_TEAM_POINT_INFO	aTeamInfo[NTL_MAX_MEMBER_IN_PARTY];
+	WORD ResultCode;
+	unsigned int TroublePc;
+	float TotalRankPoint;
+	WORD JoinId;
+	WCHAR TeamName[MAX_BUDOKAITEAMNAME_USIZE + 1];
+	BYTE MemberCount;
+	BUDOKAI_TEAM_POINT_INFO TeamInfo[MAX_MEMBER_IN_PARTY];
 END_PACKET()
 
 BEGIN_PACKET(GU_BUDOKAI_JOIN_TEAM_NFY)
-float			fTotalRankPoint;
-WORD			wJoinId;
-WCHAR			wszTeamName[MAX_BUDOKAITEAMNAME_USIZE + 1];
-
-// 
-BYTE						byMemberCount;
-sBUDOKAI_TEAM_POINT_INFO	aTeamInfo[NTL_MAX_MEMBER_IN_PARTY];
+	float TotalRankPoint;
+	WORD JoinId;
+	WCHAR TeamName[MAX_BUDOKAITEAMNAME_USIZE + 1];
+	BYTE MemberCount;
+	BUDOKAI_TEAM_POINT_INFO TeamInfo[MAX_MEMBER_IN_PARTY];
 END_PACKET()
 
 BEGIN_PACKET(GU_BUDOKAI_LEAVE_TEAM_RES)
-WORD			wResultCode;
+	WORD ResultCode;
 END_PACKET()
 
 BEGIN_PACKET(GU_BUDOKAI_LEAVE_TEAM_NFY)
 END_PACKET()
 
 BEGIN_PACKET(GU_BUDOKAI_LEAVE_TEAM_MEMBER_RES)
-WORD			wResultCode;
+	WORD ResultCode;
 END_PACKET()
 
 BEGIN_PACKET(GU_BUDOKAI_LEAVE_TEAM_MEMBER_NFY)
-WCHAR			wszMemberName[MAX_CHARNAME_SIZE + 1];
+	WCHAR MemberName[MAX_CHARNAME_SIZE + 1];
 END_PACKET()
 
 BEGIN_PACKET(GU_BUDOKAI_JOIN_INFO_RES)
-WORD					wResultCode;
-
-BYTE					byMatchType;		// eBUDOKAI_MATCH_TYPE
-
-// 추후 다음 데이터 압축 필요
-union
-{
-	sBUDOKAI_REGISTER_INDIVIDUAL_INFO	sIndividualInfo;
-	sBUDOKAI_REGISTER_TEAM_INFO			sTeamInfo;
-};
+	WORD ResultCode;
+	BYTE MatchType;
+	union
+	{
+		BUDOKAI_REGISTER_INDIVIDUAL_INFO IndividualInfo;
+		BUDOKAI_REGISTER_TEAM_INFO TeamInfo;
+	};
 END_PACKET()
 
 BEGIN_PACKET(GU_BUDOKAI_JOIN_STATE_RES)
-WORD			wResultCode;
-BYTE			byMatchType;		// eBUDOKAI_MATCH_TYPE
-BYTE			byJoinState;		// eBUDOKAI_JOIN_STATE
-BYTE			byJoinResult;		// 참가 결과
-
-// 정보가 없을 경우
-// byMatchType = INVALID_BUDOKAI_MATCH_TYPE
-// byJoinState = INVALID_BUDOKAI_JOIN_STATE
-// byJoinResult = INVALID_BUDOKAI_JOIN_RESULT
+	WORD ResultCode;
+	BYTE MatchType;
+	BYTE JoinState;
+	BYTE JoinResult;
 END_PACKET()
 
 BEGIN_PACKET(GU_BUDOKAI_JOIN_STATE_NFY)
-BYTE			byMatchType;		// eBUDOKAI_MATCH_TYPE
-BYTE			byJoinState;		// eBUDOKAI_JOIN_STATE
-BYTE			byJoinResult;		// eBUDOKAI_JOIN_RESULT
+	BYTE MatchType;
+	BYTE JoinState;
+	BYTE JoinResult;
 END_PACKET()
 
 BEGIN_PACKET(GU_DISCONNECTED_NFY)
-WORD			wResultCode;
+	WORD ResultCode;
 END_PACKET()
 
 BEGIN_PACKET(GU_BOT_BOTCAUTION_HELPME_NFY)
-unsigned int			hBot;
-bool			bIsRequester; // true : SOS를 요청한 자
+	unsigned int Bot;
+	bool IsRequester;
 END_PACKET()
 
 BEGIN_PACKET(GU_BUDOKAI_MUDOSA_INFO_RES)
-WORD					wResultCode;
-BYTE					byMudosaCount;
-sBUDOKAI_MUDOSA_INFO	aMudosaInfo[BUDOKAI_MAX_MUDOSA_INFO_COUNT];
+	WORD ResultCode;
+	BYTE MudosaCount;
+	BUDOKAI_MUDOSA_INFO	aMudosaInfo[BUDOKAI_MAX_MUDOSA_INFO_COUNT];
 END_PACKET()
 
 BEGIN_PACKET(GU_BUDOKAI_MUDOSA_TELEPORT_RES)
-WORD					wResultCode;
+	WORD ResultCode;
 END_PACKET()
 
 BEGIN_PACKET(GU_BUDOKAI_PROGRESS_MESSAGE_NFY)
-BYTE					byMsgId;			// eBUDOKAI_PROGRESS_MESSAGE
+	BYTE MsgId;
 END_PACKET()
 
 BEGIN_PACKET(GU_BUDOKAI_SOCIAL_ACTION_NFY)
-unsigned int				hSubject;
-WORD			socialAction;
+	unsigned int Subject;
+	WORD socialAction;
 END_PACKET()
 
 BEGIN_PACKET(GU_BUDOKAI_PRIZEWINNER_NAME_RES)
-WORD				wResultCode;
-
-// BUDOKAI_MATCH_TYPE_INDIVIDUAL
-//- WCHAR		wszName[MAX_CHARNAME_SIZE + 1];
-WORD				wWinner;
-WORD				wSecondWinner;
-
-sVARIABLE_DATA		sData;
+	WORD ResultCode;
+	WORD Winner;
+	WORD SecondWinner;
+	sVARIABLE_DATA sData;
 END_PACKET()
 
 BEGIN_PACKET(GU_BUDOKAI_PRIZEWINNER_TEAM_NAME_RES)
-WORD				wResultCode;
-
-// BUDOKAI_MATCH_TYPE_TEAM
-//- WCHAR		wszTeamName[MAX_BUDOKAITEAMNAME_USIZE + 1];
-WORD				wWinner;
-WORD				wSecondWinner;
-
-sVARIABLE_DATA		sData;
+WORD ResultCode;
+WORD Winner;
+WORD SecondWinner;
+sVARIABLE_DATA sData;
 END_PACKET()
 
 BEGIN_PACKET(GU_BUDOKAI_GM_BUDOKAI_SERVER_ENTER_RES)
-WORD					wResultCode;
+	WORD ResultCode;
 END_PACKET()
 
 BEGIN_PACKET(GU_BUDOKAI_GM_BUDOKAI_SERVER_LEAVE_RES)
-WORD					wResultCode;
+	WORD ResultCode;
 END_PACKET()
 
 BEGIN_PACKET(GU_BUDOKAI_GM_MATCH_PROGRESS_INFO_RES)
-WORD								wResultCode;
-
-BYTE								byMatchType;		// eBUDOKAI_MATCH_TYPE
-BYTE								byMatchWorldType;	// eMATCHWORLD_TYPE;
-BYTE								byMatchDepth;		// eBUDOKAI_MATCH_DEPTH
-
-BYTE								byStateCount;
-sBUDOKAI_GM_MATCH_PROGRESS_STATE	aStateList[BUDOKAI_MAX_MATCH_COUNT];	// 가변
+	WORD ResultCode;
+	BYTE MatchType;
+	BYTE MatchWorldType;
+	BYTE MatchDepth;
+	BYTE StateCount;
+	BUDOKAI_GM_MATCH_PROGRESS_STATE StateList[BUDOKAI_MAX_MATCH_COUNT];
 END_PACKET()
 
 BEGIN_PACKET(GU_BUDOKAI_GM_MATCH_ARENA_ENTER_RES)
-WORD								wResultCode;
-
-BYTE								byMatchType;		// eBUDOKAI_MATCH_TYPE
-BYTE								byMatchWorldType;	// eMATCHWORLD_TYPE
-BYTE								byMatchDepth;		// eBUDOKAI_MATCH_DEPTH
-BYTE								byMatchIndex;
+	WORD ResultCode;
+	BYTE MatchType;
+	BYTE MatchWorldType;	
+	BYTE MatchDepth;
+	BYTE MatchIndex;
 END_PACKET()
 
 BEGIN_PACKET(GU_BUDOKAI_GM_MATCH_ARENA_LEAVE_RES)
-WORD								wResultCode;
+	WORD ResultCode;
 END_PACKET()
 
 BEGIN_PACKET(GU_SCOUTER_TURN_ON_NFY)
-unsigned int			hSubject;
+	unsigned int Subject;
 END_PACKET()
 
 BEGIN_PACKET(GU_SCOUTER_TURN_OFF_NFY)
-unsigned int			hSubject;
+	unsigned int Subject;
 END_PACKET()
 
 BEGIN_PACKET(GU_SCOUTER_BROKEN_NFY)
-unsigned int			hSubject;
+	unsigned int Subject;
 END_PACKET()
 
 BEGIN_PACKET(GU_SCOUTER_ITEM_SELL_RES)
-unsigned int				itemTblidx;
-BYTE				byPlace;
-BYTE				byPos;
-WORD				wResultCode;
+	unsigned int itemTblidx;
+	BYTE Place;
+	BYTE Pos;
+	WORD ResultCode;
 END_PACKET()
 
 BEGIN_PACKET(GU_SHOP_EVENTITEM_START_RES)
-unsigned int			handle;
-BYTE			byType; //	0: 기본  1:한정수량 판매 이벤트 NPC 
-WORD			wResultCode;
+	unsigned int handle;
+	BYTE Type; 
+	WORD ResultCode;
 END_PACKET()
 
 BEGIN_PACKET(GU_SHOP_EVENTITEM_BUY_RES)
-unsigned int			handle;
-WORD			wResultCode;
+	unsigned int handle;
+	WORD ResultCode;
 END_PACKET()
 
 BEGIN_PACKET(GU_SHOP_EVENTITEM_END_RES)
-WORD			wResultCode;
+	WORD ResultCode;
 END_PACKET()
 
 BEGIN_PACKET(GU_ITEM_REPLACE)
-unsigned int			hDeleteItem;
-unsigned int			hCreateItem;
-BYTE			byDeleteItemPlace;
-BYTE			byDeleteItemPos;
-sITEM_DATA      sCreateItemData;
-bool			bIsNew;		// Effect 추가 
+	unsigned int DeleteItem;
+	unsigned int CreateItem;
+	BYTE DeleteItemPlace;
+	BYTE DeleteItemPos;
+	ITEM_DATA CreateItemData;
+	bool IsNew;
 END_PACKET()
 
 BEGIN_PACKET(GU_SHOP_GAMBLE_BUY_RES)
-WORD			wResultCode;
-unsigned int			handle;
-unsigned int			hItem;
+	WORD ResultCode;
+	unsigned int handle;
+	unsigned int Item;
 END_PACKET()
 
 BEGIN_PACKET(GU_PARTY_DUNGEON_DIFF_NFY)
-PARTYDUNGEON_STATE eDiff;
+	PARTYDUNGEON_STATE Diff;
 END_PACKET()
 
 BEGIN_PACKET(GU_PARTY_DUNGEON_DIFF_RES)
-WORD			wResultCode;
-PARTYDUNGEON_STATE		eDiff;
+	WORD ResultCode;
+	PARTYDUNGEON_STATE Diff;
 END_PACKET()
 
 BEGIN_PACKET(GU_PARTY_DUNGEON_INIT_NFY)
 END_PACKET()
 
 BEGIN_PACKET(GU_PARTY_DUNGEON_INIT_RES)
-WORD			wResultCode;
+	WORD ResultCode;
 END_PACKET()
 
 BEGIN_PACKET(GU_UPDATE_CHAR_SP)
-DWORD			dwSpPoint;
+	DWORD SpPoint;
 END_PACKET()
 
 BEGIN_PACKET(GU_SKILL_INIT_RES)
-WORD			wResultCode;
+	WORD ResultCode;
 END_PACKET()
 
 BEGIN_PACKET(GU_SKILL_REMOVE_NFY)
-unsigned int			skillId;
-BYTE			bySlot;
+	unsigned int skillId;
+	BYTE Slot;
 END_PACKET()
 
 BEGIN_PACKET(GU_HTB_REMOVE_NFY)
-unsigned int			skillId;
-BYTE			bySlot;
+	unsigned int skillId;
+	BYTE Slot;
 END_PACKET()
 
 BEGIN_PACKET(GU_CHAR_MARKING_NFY)
-unsigned int			handle;
-sMARKING		sMarking;
+	unsigned int handle;
+	MARKING Marking;
 END_PACKET()
 
 BEGIN_PACKET(GU_PARTY_CHARM_DICE_START_NFY)
-DWORD			dwWaitTick;		//ms
+	DWORD WaitTick;
 END_PACKET()
 
 BEGIN_PACKET(GU_PARTY_CHARM_DICE_ROLLED_NFY)
-unsigned int			handle;	// 해당 캐릭터 핸들
-DWORD			dwRet;	// 결과값
+	unsigned int handle;
+	DWORD Ret;
 END_PACKET()
 
 BEGIN_PACKET(GU_PARTY_CHARM_DICE_ROLLED_RES)
-DWORD			dwRet;	// 결과값
+	DWORD Ret;
 END_PACKET()
 
 BEGIN_PACKET(GU_PARTY_CHARM_DICE_END_NFY)
-bool			bIsSuccess;
+	bool IsSuccess;
 END_PACKET()
 
 BEGIN_PACKET(GU_PARTY_INVEN_ITEM_RANK_SET_RES)
-WORD			wResultCode;
-BYTE			byItemRank; // eITEM_RANK 
+	WORD ResultCode;
+	BYTE ItemRank;
 END_PACKET()
 
 BEGIN_PACKET(GU_PARTY_INVEN_ITEM_RANK_SET_NFY)
-BYTE			byItemRank; // eITEM_RANK 
+	BYTE ItemRank;
 END_PACKET()
 
 BEGIN_PACKET(GU_PARTY_INVEN_LOCK_NFY)
-bool				bIsOpen;	// 1: Open 0:Close
+	bool IsOpen;
 END_PACKET()
 
 BEGIN_PACKET(GU_PARTY_INVEN_LOCK_RES)
-WORD				wResultCode;
-bool				bIsOpen;	// 1: Open 0:Close
+	WORD ResultCode;
+	bool IsOpen;
 END_PACKET()
 
 BEGIN_PACKET(GU_PARTY_INVEN_RESET_RES)
-WORD				wResultCode;
+	WORD ResultCode;
 END_PACKET()
 
 BEGIN_PACKET(GU_PARTY_INVEN_RESET_NFY)
 END_PACKET()
 
 BEGIN_PACKET(GU_PARTY_INVEN_ACCEPTED_RES)
-BYTE				byItemSlot;	// 파티인벤 해당 슬롯 아이템 낙찰
-WORD				wResultCode;
-unsigned int				hTarget;
+	BYTE ItemSlot;
+	WORD ResultCode;
+	unsigned int Target;
 END_PACKET()
 
 BEGIN_PACKET(GU_PARTY_INVEN_ACCEPTED_NFY)
-BYTE				byItemSlot;	// 파티인벤 해당 슬롯 아이템 낙찰
-unsigned int				hTarget;
+	BYTE ItemSlot;
+	unsigned int Target;
 END_PACKET()
 
 BEGIN_PACKET(GU_PARTY_INVEN_GIVE_RES)
-WORD				wResultCode;
-BYTE				byItemSlot;		// 파티인벤 해당 슬롯 아이템 
-unsigned int				hTarget;
+	WORD ResultCode;
+	BYTE ItemSlot; 
+	unsigned int Target;
 END_PACKET()
 
 BEGIN_PACKET(GU_PARTY_INVEN_GIVE_NFY)
-BYTE				byItemSlot;		// 파티인벤 해당 슬롯 아이템 
-unsigned int				hTarget;
+	BYTE ItemSlot;
+	unsigned int Target;
 END_PACKET()
 
 BEGIN_PACKET(GU_PARTY_INVEN_DICE_START_RES)
-WORD				wResultCode;
-BYTE				byItemSlot;		// 파티인벤 해당 슬롯 아이템	
+	WORD ResultCode;
+	BYTE ItemSlot;
 END_PACKET()
 
 BEGIN_PACKET(GU_PARTY_INVEN_DICE_START_NFY)
-BYTE				byItemSlot;		// 파티인벤 해당 슬롯 아이템	
+	BYTE ItemSlot;	
 END_PACKET()
 
 BEGIN_PACKET(GU_PARTY_INVEN_DICE_ROLL_RES)
-WORD				wResultCode;
-BYTE				byRet;		// 주사위결과전송	
+	WORD ResultCode;
+	BYTE Ret;
 END_PACKET()
 
 BEGIN_PACKET(GU_PARTY_INVEN_DICE_ROLL_NFY)
-unsigned int				handle;			// 주사위주체
-BYTE				byRet;			// 주사위결과전송	
+	unsigned int handle;
+	BYTE Ret;	
 END_PACKET()
 
 BEGIN_PACKET(GU_PARTY_INVEN_DICE_END_NFY)
-unsigned int				hTarget;
+	unsigned int Target;
 END_PACKET()
 
 BEGIN_PACKET(GU_TELEPORT_PROPOSAL_NFY)
-BYTE				byTeleportType;
-BYTE				byInfoIndex;		// 서버에서 텔레포트 정보를 참조하기위한 인덱스
-WORD				wWaitTime;
-unsigned int				worldTblidx;		// 월드 테이블 인덱스 : 정보를 좀더 상세하게 출력하기 위한 용도.
-
-union
-{
-	DWORD			dwReserve;
-	BYTE			byBudokaiMatchDepth;	// 천하제일무도회 XX강
-};
-
-BYTE				bySummonerNameLength;
-WCHAR				wszSummonnerName[MAX_CHARNAME_SIZE + 1];	// 가변
+	BYTE TeleportType;
+	BYTE InfoIndex;
+	WORD WaitTime;
+	unsigned int worldTblidx;
+	union
+	{
+		DWORD Reserve;
+		BYTE BudokaiMatchDepth;	
+	};
+	BYTE SummonerNameLength;
+	WCHAR SummonnerName[MAX_CHARNAME_SIZE + 1];
 END_PACKET()
 
 BEGIN_PACKET(GU_TELEPORT_CONFIRM_RES)
-WORD				wResultCode;
-
-BYTE				byTeleportIndex;
-bool				bTeleport;			// 클라이언트에서 받은 값
-bool				bClearInterface;
+	WORD ResultCode;
+	BYTE TeleportIndex;
+	bool Teleport;
+	bool ClearInterface;
 END_PACKET()
 
 BEGIN_PACKET(GU_AVATAR_PETITION_INFO)
-PETITIONID			petitionID;
-WCHAR				awchQuestionContent[NTL_MAX_SIZE_QUESTION_CONTENT_UNICODE + 1];
-PETITIONCATEGORY	nCategory1;//ePETITIONSYSTEM_CATEGORY_1
-PETITIONCATEGORY	nCategory2;//ePETITIONSYSTEM_CATEGORY_2
+	unsigned int petitionID;
+	WCHAR QuestionContent[MAX_SIZE_QUESTION_CONTENT_UNICODE + 1];
+	int	Category1;
+	int Category2;
 END_PACKET()
 
 BEGIN_PACKET(GU_GAME_COMMON_MSG_NFY)
-WORD				wResultCode;
+	WORD ResultCode;
 END_PACKET()
 
 BEGIN_PACKET(GU_CHAR_NICKNAME_CHANGED_NFY)
-unsigned int				hSubject;
-unsigned int				nicknameTblidx;
+	unsigned int Subject;
+	unsigned int nicknameTblidx;
 END_PACKET()
 
-BEGIN_PACKET(GU_HOIPOIMIX_RECIPE_REG_NFY)			// 레시피등록
-unsigned int				recipeTblidx;
+BEGIN_PACKET(GU_HOIPOIMIX_RECIPE_REG_NFY)
+	unsigned int recipeTblidx;
 END_PACKET()
 
-BEGIN_PACKET(GU_HOIPOIMIX_ITEM_CHECK_RES)			// 만들아이템 선택 (필요한 아이템 수량 체크)
-WORD				wResultCode;
-unsigned int				objHandle;
-unsigned int				recipeTblidx;
+BEGIN_PACKET(GU_HOIPOIMIX_ITEM_CHECK_RES)
+	WORD ResultCode;
+	unsigned int objHandle;
+	unsigned int recipeTblidx;
 END_PACKET()
 
-BEGIN_PACKET(GU_HOIPOIMIX_ITEM_MAKE_RES)			// 아이템 만들기
-WORD				wResultCode;
-BYTE				bySuccessResult;			// eITEM_MIX_RESULT_TYPE
-unsigned int				objHandle;
-unsigned int				recipeTblidx;
-unsigned int				itemHandle;
+BEGIN_PACKET(GU_HOIPOIMIX_ITEM_MAKE_RES)
+	WORD ResultCode;
+	BYTE SuccessResult;
+	unsigned int objHandle;
+	unsigned int recipeTblidx;
+	unsigned int itemHandle;
 END_PACKET()
 			
-BEGIN_PACKET(GU_HOIPOIMIX_ITEM_MAKE_EP_RES)		// 아이템 만들기 중 EP 넣기
-WORD				wResultCode;
+BEGIN_PACKET(GU_HOIPOIMIX_ITEM_MAKE_EP_RES)
+	WORD ResultCode;
 END_PACKET()
 	
 BEGIN_PACKET(GU_HOIPOIMIX_ITEM_RECIPE_INFO)
-BYTE				byCount;
-sRECIPE_DATA		asRecipeData[NTL_ITEM_RECIPE_MAX_COUNT];
+	BYTE Count;
+	RECIPE_DATA RecipeData[ITEM_RECIPE_MAX_COUNT];
 END_PACKET()
 
 BEGIN_PACKET(GU_DYNAMIC_OBJECT_UPDATE_STATE)
-unsigned int				handle;
-sDYNAMIC_OBJECT_BRIEF		dynamicObjBrief;
-sDYNAMIC_OBJECT_STATE		dynamicObjState;
+	unsigned int handle;
+	DYNAMIC_OBJECT_BRIEF dynamicObjBrief;
+	DYNAMIC_OBJECT_STATE dynamicObjState;
 END_PACKET()
 
-BEGIN_PACKET(GU_HOIPOIMIX_ITEM_MACHINE_MAKE_RES)			// 머신 필드 등록
-WORD				wResultCode;
-BYTE				byPlace;
-BYTE				byPos;
+BEGIN_PACKET(GU_HOIPOIMIX_ITEM_MACHINE_MAKE_RES)
+	WORD ResultCode;
+	BYTE Place;
+	BYTE Pos;
 END_PACKET()
 
-BEGIN_PACKET(GU_HOIPOIMIX_ITEM_MACHINE_DEL_RES)			// 머신 필드 삭제
-WORD				wResultCode;
+BEGIN_PACKET(GU_HOIPOIMIX_ITEM_MACHINE_DEL_RES)
+	WORD ResultCode;
 END_PACKET()
 
 BEGIN_PACKET(GU_HOIPOIMIX_ITEM_MAKE_EXP_NFY)
-DWORD				dwCurExp;
-BYTE				byCurLevel;
-bool				bIsNormal; // recipe type이 eRECIPE_NORMAL 인가 아닌가.
+	DWORD CurExp;
+	BYTE CurLevel;
+	bool IsNormal;
 END_PACKET()
 
 BEGIN_PACKET(GU_CHAR_TARGET_LOST_NFY)
-unsigned int						hSubject;
+	unsigned int Subject;
 END_PACKET()
 
 BEGIN_PACKET(GU_CHAR_GUARD_CRASHED_NFY)
-unsigned int						hSubject;
+	unsigned int Subject;
 END_PACKET()
 
 BEGIN_PACKET(GU_UPDATE_CHAR_RP_BALL)
-unsigned int			handle;
-BYTE			byCurRPBall;
-bool			bDropByTime;
+	unsigned int handle;
+	BYTE CurRPBall;
+	bool DropByTime;
 END_PACKET()
 
 BEGIN_PACKET(GU_UPDATE_CHAR_RP_BALL_MAX)
-unsigned int			handle;
-BYTE			byMaxRPBall;
+	unsigned int handle;
+	BYTE MaxRPBall;
 END_PACKET()
 
 BEGIN_PACKET(GU_HOIPOIMIX_JOB_SET_RES)
-WORD				wResultCode;
-unsigned int				hNpchandle;
-BYTE				byRecipeType;
+	WORD ResultCode;
+	unsigned int Npchandle;
+	BYTE RecipeType;
 END_PACKET()
 
 BEGIN_PACKET(GU_HOIPOIMIX_JOB_RESET_RES)
-WORD				wResultCode;
-unsigned int				hNpchandle;
-BYTE				byRecipeType;
+	WORD ResultCode;
+	unsigned int Npchandle;
+	BYTE RecipeType;
 END_PACKET()
 
 BEGIN_PACKET(GU_AVATAR_RP_INCREASE_START_NFY)
@@ -4981,226 +4905,226 @@ BEGIN_PACKET(GU_AVATAR_RP_INCREASE_STOP_NFY)
 END_PACKET()
 
 BEGIN_PACKET(GU_HTB_LAST_STEP_CHANGED_NFY)
-unsigned int			hSubject;
-BYTE			byLastStep;
+	unsigned int Subject;
+	BYTE LastStep;
 END_PACKET()
 
 BEGIN_PACKET(GU_CHAR_CHARGE_CANCELED_NFY)
-unsigned int			hSubject;
+	unsigned int Subject;
 END_PACKET()
 
 BEGIN_PACKET(GU_CHAR_REFRESH_LP_EP)
-unsigned int			hSubject;
-WORD			wCurLp;
-WORD			wMaxLp;
-WORD			wCurEp;
-WORD			wMaxEp;
+	unsigned int Subject;
+	WORD CurLp;
+	WORD MaxLp;
+	WORD CurEp;
+	WORD MaxEp;
 END_PACKET()
 
 BEGIN_PACKET(GU_CHAR_NONBATTLEACTIONPATTERNSET_UNITIDX_NFY)
-unsigned int				hBotHandle;
-ACTIONPATTERN_FIELD unitIdx;
+	unsigned int BotHandle;
+	BYTE unitIdx;
 END_PACKET()
 
 BEGIN_PACKET(GU_VEHICLE_START_NFY)
-unsigned int				hDriverHandle;
-VECTORXYZ			vStartPosition;
-unsigned int				idFuelItemTblidx;
-unsigned int				hVehicleItem;
-unsigned int				idVehicleItemTblidx;
+	unsigned int DriverHandle;
+	VECTORXYZ StartPosition;
+	unsigned int idFuelItemTblidx;
+	unsigned int VehicleItem;
+	unsigned int idVehicleItemTblidx;
 END_PACKET()
 
 BEGIN_PACKET(GU_VEHICLE_ENGINE_START_RES)
-WORD				wResultCode;
+	WORD ResultCode;
 END_PACKET()
 
 BEGIN_PACKET(GU_VEHICLE_ENGINE_START_NFY)
-unsigned int				hDriverHandle;
+	unsigned int DriverHandle;
 END_PACKET()
 
 BEGIN_PACKET(GU_VEHICLE_ENGINE_STOP_RES)
-WORD				wResultCode;
+	WORD ResultCode;
 END_PACKET()
 
 BEGIN_PACKET(GU_VEHICLE_ENGINE_STOP_NFY)
-unsigned int				hDriverHandle;
-DWORD				dwFuelRemain;
+	unsigned int hDriverHandle;
+	DWORD FuelRemain;
 END_PACKET()
 
 BEGIN_PACKET(GU_VEHICLE_FUEL_UPDATE_NFY)
-WORD				wResultCode;
+	WORD ResultCode;
 END_PACKET()
 
 BEGIN_PACKET(GU_VEHICLE_END_NFY)
-unsigned int				hDriverHandle;
-WORD				wResultCode;
+	unsigned int DriverHandle;
+	WORD ResultCode;
 END_PACKET()
 
 BEGIN_PACKET(GU_VEHICLE_END_RES)
-WORD				wResultCode;
+	WORD ResultCode;
 END_PACKET()
 
 BEGIN_PACKET(GU_VEHICLE_STUNT_NFY)
-unsigned int			hDriverHandle;
+	unsigned int DriverHandle;
 END_PACKET()
 
 BEGIN_PACKET(GU_SKILL_PASSIVE_EFFECT_APPLIED_NFY)
-unsigned int			skillTblidx;
-BYTE			bySlotIndex;
-sDBO_UPDATED_SKILL_DATA		sUpdatedSkillData;
+	unsigned int skillTblidx;
+	BYTE SlotIndex;
+	UPDATED_SKILL_DATA UpdatedSkillData;
 END_PACKET()
 
 BEGIN_PACKET(GU_AVATAR_UPDATED_SKILL_DATA_INFO)
-unsigned int			skillTblidx;
-BYTE			bySlotIndex;
-sDBO_UPDATED_SKILL_DATA		sUpdatedSkillData;
+	unsigned int skillTblidx;
+	BYTE SlotIndex;
+	UPDATED_SKILL_DATA UpdatedSkillData;
 END_PACKET()
 
 BEGIN_PACKET(GU_MONSTER_TRANSFORMED_NFY)
-unsigned int			hSubject;
-unsigned int			newTblidx;
+	unsigned int Subject;
+	unsigned int newTblidx;
 END_PACKET()
 
 BEGIN_PACKET(GU_DOJO_CREATE_RES)
-WORD				wResultCode;
+	WORD ResultCode;
 END_PACKET()
 
 BEGIN_PACKET(GU_DOJO_DELETE_RES)
-WORD				wResultCode;
+	WORD ResultCode;
 END_PACKET()
 
 BEGIN_PACKET(GU_DOJO_FUNCTION_ADD_RES)
-WORD				wResultCode;
-BYTE				byFunction;
+	WORD ResultCode;
+	BYTE Function;
 END_PACKET()
 
 BEGIN_PACKET(GU_DOJO_BANK_HISTORY_RES)
-WORD				wResultCode;
-DWORD				dwBalance;
-BYTE				byCount;
-sDBO_DOJO_BANK_HISTORY_INFO asData[DBO_MAX_COUNT_DOJO_BANK_HISTORY];
+	WORD ResultCode;
+	DWORD Balance;
+	BYTE Count;
+	DOJO_BANK_HISTORY_INFO asData[MAX_COUNT_DOJO_BANK_HISTORY];
 END_PACKET()
 
 BEGIN_PACKET(GU_DOGI_CREATE_RES)
-WORD				wResultCode;
+	WORD ResultCode;
 END_PACKET()
 
 BEGIN_PACKET(GU_DOGI_CHANGE_RES)
-WORD				wResultCode;
+	WORD ResultCode;
 END_PACKET()
 
 BEGIN_PACKET(GU_DOGI_UPDATE_NFY)
-unsigned int				handle;
-DOGIDATA		sData;
+	unsigned int handle;
+	DOGIDATA Data;
 END_PACKET()
 
 BEGIN_PACKET(GU_GUILD_DOGI_CREATE_RES)
-WORD				wResultCode;
+	WORD ResultCode;
 END_PACKET()
 
 BEGIN_PACKET(GU_GUILD_DOGI_CHANGE_RES)
-WORD				wResultCode;
+	WORD ResultCode;
 END_PACKET()
 
 BEGIN_PACKET(GU_CHILD_ADULT_SWITCHED_NFY)
-unsigned int				hSubject;
-bool				bIsAdult;
+	unsigned int Subject;
+	bool IsAdult;
 END_PACKET()
 
 BEGIN_PACKET(GU_CHANGE_CLASS_AUTHORITY_CHANGED_NFY)
-bool				bCanChangeClass;
+	bool CanChangeClass;
 END_PACKET()
 
 BEGIN_PACKET(GU_PLAY_BGM)
-bool				bPlay;
-bool				bLoop;
-DWORD				dwDelay;
-BYTE				byLength;
-char				szName[1];		// null 을 포함해서 보낸다.
+	bool Play;
+	bool Loop;
+	DWORD Delay;
+	BYTE Length;
+	char Name[1];
 END_PACKET()
 
 BEGIN_PACKET(GU_DOJO_MARK_CHANGED_NFY)
-unsigned int				dojoTblidx;
-GUILDID				guildId;
-GUILD_MARK		sMark;
+	unsigned int dojoTblidx;
+	unsigned int guildId;
+	GUILD_MARK Mark;
 END_PACKET()
 
 BEGIN_PACKET(GU_DOJO_LEVEL_CHANGED_NFY)
-unsigned int				dojoTblidx;
-BYTE				byLevel;
+	unsigned int dojoTblidx;
+	BYTE byLevel;
 END_PACKET()
 
 BEGIN_PACKET(GU_UPDATE_CHAR_NETP)
-WORD				wResultCode;
-NETP				netP;
-NETP				dwBonusNetP;
-NETP				dwAccumulationNetP;
-DWORD				timeNextGainTime;
+	WORD ResultCode;
+	DWORD netP;
+	DWORD BonusNetP;
+	DWORD AccumulationNetP;
+	DWORD timeNextGainTime;
 END_PACKET()
 
-BEGIN_PACKET(GU_DOJO_SCRAMBLE_RES)			// 도장쟁탈전 신청에 대한 응답 (도전자)
-WORD				wResultCode;
+BEGIN_PACKET(GU_DOJO_SCRAMBLE_RES)
+	WORD ResultCode;
 END_PACKET()
 
 BEGIN_PACKET(GU_DOJO_SCRAMBLE_RESPONSE_RES)
-WORD				wResultCode;
-WCHAR				wszGuildName[MAX_GUILDNAME_USIZE + 1];
-bool				bIsRetry; // true면 다시 확인해야한다
+	WORD ResultCode;
+	WCHAR GuildName[MAX_GUILDNAME_USIZE + 1];
+	bool IsRetry;
 END_PACKET()
 
 BEGIN_PACKET(GU_NETMARBLEMEMBERIP_NFY)
 END_PACKET()
 
 BEGIN_PACKET(GU_BUS_LOCATION_NFY)
-unsigned int				hSubject;
-unsigned int				busTblidx;
-VECTORXY			vCurLoc;
-VECTORXY			vCurDir;
+	unsigned int Subject;
+	unsigned int busTblidx;
+	VECTORXY CurLoc;
+	VECTORXY CurDir;
 END_PACKET()
 
 BEGIN_PACKET(GU_BUS_LOCATION_ERASED_NFY)
-unsigned int				hSubject;
+	unsigned int Subject;
 END_PACKET()
 
 BEGIN_PACKET(GU_BUS_LOCATION_RESET_ALL_NFY)
 END_PACKET()
 
 BEGIN_PACKET(GU_ITEM_EXPIRED_NFY)
-unsigned int				hItem;
-BYTE				byPlace;
-BYTE				byPos;
+	unsigned int Item;
+	BYTE Place;
+	BYTE Pos;
 END_PACKET()
 
 BEGIN_PACKET(GU_SHOP_NETPYITEM_START_RES)
-BYTE			byType; //	0: 기본  1:한정수량 판매 이벤트 NPC 
-WORD			wResultCode;
+	BYTE Type;
+	WORD ResultCode;
 END_PACKET()
 
 BEGIN_PACKET(GU_SHOP_NETPYITEM_BUY_RES)
-WORD			wResultCode;
+	WORD ResultCode;
 END_PACKET()
 
 BEGIN_PACKET(GU_SHOP_NETPYITEM_END_RES)
-WORD			wResultCode;
+	WORD ResultCode;
 END_PACKET()
 
 BEGIN_PACKET(GU_CHAR_REFRESH_BATTLE_ATTRIBUTE_MODIFIER)
-unsigned int				hSubject;
-float				fHonestOffenceModifier;
-float				fHonestDefenceModifier;
-float				fStrangeOffenceModifier;
-float				fStrangeDefenceModifier;
-float				fWildOffenceModifier;
-float				fWildDefenceModifier;
-float				fEleganceOffenceModifier;
-float				fEleganceDefenceModifier;
-float				fFunnyOffenceModifier;
-float				fFunnyDefenceModifier;
+	unsigned int Subject;
+	float HonestOffenceModifier;
+	float HonestDefenceModifier;
+	float StrangeOffenceModifier;
+	float StrangeDefenceModifier;
+	float WildOffenceModifier;
+	float WildDefenceModifier;
+	float EleganceOffenceModifier;
+	float EleganceDefenceModifier;
+	float FunnyOffenceModifier;
+	float FunnyDefenceModifier;
 END_PACKET()
 
 BEGIN_PACKET(GU_CHAR_RANKBATTLE_ALLOW_NFY)
-bool				bAllow;
-WORD				wReasonCode;
+	bool Allow;
+	WORD ReasonCode;
 END_PACKET()
 
 
@@ -5208,102 +5132,102 @@ BEGIN_PACKET(GU_CHAR_RANKPOINT_RESET_NFY)
 END_PACKET()
 
 BEGIN_PACKET(GU_DOJO_NPC_INFO_RES)
-WORD					wResultCode;
-sDBO_DOJO_NPC_INFO		sData;
+	WORD ResultCode;
+	DOJO_NPC_INFO Data;
 END_PACKET()
 
 BEGIN_PACKET(GU_GAMEGUARD_AUTH_ANSWER_REQ)
-BYTE				byDataSize;
-BYTE				abyData[UCHAR_MAX];
+	BYTE DataSize;
+	BYTE Data[UCHAR_MAX];
 END_PACKET()
 
 BEGIN_PACKET(GU_DOJO_SEAL_ATTACK_BEGIN_NFY)
-unsigned int				sealObjectTblidx;
-bool				bIsBeingStolen;
-VECTORXY			vLoc;
+	unsigned int sealObjectTblidx;
+	bool IsBeingStolen;
+	VECTORXY Loc;
 END_PACKET()
 
 BEGIN_PACKET(GU_DOJO_SEAL_ATTACK_END_NFY)
-unsigned int				sealObjectTblidx;
+	unsigned int sealObjectTblidx;
 END_PACKET()
 
 BEGIN_PACKET(GU_DOJO_SEAL_CURRENT_STATE_NFY)
-unsigned int				sealObjectTblidx;
-BYTE				byState;		// eTOBJECT_STATE_TYPE_C
-VECTORXY			vLoc;
+	unsigned int sealObjectTblidx;
+	BYTE State;
+	VECTORXY Loc;
 END_PACKET()
 
 BEGIN_PACKET(GU_INVENTORY_CAPSULE_UNLOCK_NFY)
 END_PACKET()
 
 BEGIN_PACKET(GU_DOJO_SCRAMBLE_SHIFT_SEAL_STATE_NFY)
-unsigned int						dojoTblidx;
-unsigned int						objectTblidx;
-GUILDID						guildId;
-WCHAR						wszName[MAX_CHARNAME_SIZE + 1];
+	unsigned int dojoTblidx;
+	unsigned int objectTblidx;
+	unsigned int guildId;
+	WCHAR Name[MAX_CHARNAME_SIZE + 1];
 END_PACKET()
 
 BEGIN_PACKET(GU_UPDATE_CHAR_LP_STATUS_NFY)
-unsigned int			handle;
-bool			bEmergency;	// true: Emergency false: General
+	unsigned int handle;
+	bool Emergency;
 END_PACKET()
 
 BEGIN_PACKET(GU_DURATION_ITEM_BUY_RES)
-unsigned int				merchantTblidx;
-BYTE				byPos;
-WORD				wResultCode;
+	unsigned int merchantTblidx;
+	BYTE Pos;
+	WORD ResultCode;
 END_PACKET()
 
 BEGIN_PACKET(GU_DURATION_RENEW_RES)
-unsigned int				hItemHandle;
-WORD				wResultCode;
+	unsigned int ItemHandle;
+	WORD ResultCode;
 END_PACKET()
 
 BEGIN_PACKET(GU_CASHITEM_START_RES)
-WORD				wResultCode;
+	WORD ResultCode;
 END_PACKET()
 
 BEGIN_PACKET(GU_CASHITEM_INFO_NFY)
-BYTE				byCount;
-sCASHITEM_BRIEF		aInfo[1];
+	BYTE Count;
+	CASHITEM_BRIEF Info[1];
 END_PACKET()
 
 BEGIN_PACKET(GU_CASHITEM_END_RES)
-WORD				wResultCode;
+	WORD ResultCode;
 END_PACKET()
 
 BEGIN_PACKET(GU_CASHITEM_MOVE_RES)
-WORD				wResultCode;
-DWORD				dwProductId;
+	WORD ResultCode;
+	DWORD ProductId;
 END_PACKET()
 
 BEGIN_PACKET(GU_CASHITEM_USE_RES)
-WORD				wResultCode;
-DWORD				dwProductId;
+	WORD ResultCode;
+	DWORD ProductId;
 END_PACKET()
 
 BEGIN_PACKET(GU_CASHITEM_HLSHOP_START_RES)
-WORD				wResultCode;
-DWORD				dwRemainAmount;							// 현재잔액
+	WORD ResultCode;
+	DWORD RemainAmount;
 END_PACKET()
 
 BEGIN_PACKET(GU_CASHITEM_HLSHOP_END_RES)
-WORD				wResultCode;
+	WORD ResultCode;
 END_PACKET()
 
 BEGIN_PACKET(GU_CASHITEM_BUY_RES)
-WORD			wResultCode;
+	WORD ResultCode;
 END_PACKET()
 
 BEGIN_PACKET(GU_GMT_INFO_NFY)
-BYTE					byGMTResetCount;
-GAMEMANIA_TIME_DATA	sCurrent;
-GAMEMANIA_TIME_DATA	sNext;
+	BYTE GMTResetCount;
+	GAMEMANIA_TIME_DATA	Current;
+	GAMEMANIA_TIME_DATA	Next;
 END_PACKET()
 
 BEGIN_PACKET(GU_GMT_UPDATE_RES)
-WORD				wResultCode;
-GAMEMANIA_TIME	sNext;
+	WORD ResultCode;
+	GAMEMANIA_TIME Next;
 END_PACKET()
 
 BEGIN_PACKET(GU_GMT_CHANGED_NFY)
@@ -5311,27 +5235,27 @@ GAMEMANIA_TIME	sCurrent;
 END_PACKET()
 
 BEGIN_PACKET(GU_CASHITEM_ADD_NFY)
-sCASHITEM_BRIEF		sInfo;
+	CASHITEM_BRIEF Info;
 END_PACKET()
 
 BEGIN_PACKET(GU_CASHITEM_DEL_NFY)
-DWORD				dwProductId;
+	DWORD ProductId;
 END_PACKET()
 
 BEGIN_PACKET(GU_UPDATE_CHAR_MAX_LP)
-unsigned int			hSubject;
-WORD			wMaxLp;
+	unsigned int Subject;
+	WORD MaxLp;
 END_PACKET()
 
 BEGIN_PACKET(GU_UPDATE_CHAR_MAX_EP)
-unsigned int			hSubject;
-WORD			wMaxEp;
+	unsigned int Subject;
+	WORD MaxEp;
 END_PACKET()
 
 BEGIN_PACKET(GU_UPDATE_CHAR_MAX_RP)
-unsigned int			hSubject;
-WORD			wMaxRp;
-END_PACKET()*/
+	unsigned int Subject;
+	WORD MaxRp;
+END_PACKET()
 
 #pragma pack()
 

@@ -34,7 +34,7 @@
     <Filter Include="Source Files\Table">
       <UniqueIdentifier>{471f2889-8ffe-40ed-9c17-ef2b09124b4a}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Table">
+    <Filter Include="Header Files\Table">
       <UniqueIdentifier>{48abbf43-ddd8-4852-9c6c-dfa4467174c2}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
@@ -96,13 +96,16 @@
       <Filter>Header Files\Network</Filter>
     </ClInclude>
     <ClInclude Include="NewbieTable.h">
-      <Filter>Table</Filter>
+      <Filter>Header Files\Table</Filter>
     </ClInclude>
     <ClInclude Include="Table.h">
-      <Filter>Table</Filter>
+      <Filter>Header Files\Table</Filter>
     </ClInclude>
     <ClInclude Include="PCTable.h">
-      <Filter>Table</Filter>
+      <Filter>Header Files\Table</Filter>
+    </ClInclude>
+    <ClInclude Include="Vector.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

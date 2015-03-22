@@ -13,7 +13,6 @@ CharServer::CharServer()
 	this->sPort = ServerConfig->GetInt("Port");
 	nbTblData = new NewbieTable();
 	if (nbTblData->Load("..\\Tables\\table_newbie_data.edf") != 0) Logger::Log("Failed to load Newbie Table!\n");
-	NewbieData nbdata = nbTblData->GetData(0, 1);
 	if (!Start()) Logger::Log("Server ERROR!\n");
 }
 

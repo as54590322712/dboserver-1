@@ -107,8 +107,8 @@ void CharClient::SendCharCreateRes(sUC_CHARACTER_ADD_REQ* data)
 	Res.ResultCode = CheckUsedName(data->CharName);
 	if (Res.ResultCode == CHARACTER_SUCCESS)
 	{
+		NewbieData nbdata = pServer->nbTblData->GetData(data->Race, data->Class);
 		memcpy(Res.CharData.Name, data->CharName, MAX_CHARNAME_SIZE);
-		Res.CharData.charId = rand();
 		Res.CharData.Class = data->Class;
 		Res.CharData.Face = data->Face;
 		Res.CharData.Gender = data->Gender;
@@ -117,18 +117,25 @@ void CharClient::SendCharCreateRes(sUC_CHARACTER_ADD_REQ* data)
 		Res.CharData.Race = data->Race;
 		Res.CharData.SkinColor = data->SkinColor;
 		Res.CharData.Level = 1;
-		Res.CharData.MapInfoId = 1;
-		Res.CharData.worldId = 1;
-		Res.CharData.worldTblidx = 1;
-		Res.CharData.PositionX = 4583.0f;
-		Res.CharData.PositionY = 0.0f;
-		Res.CharData.PositionZ = 4070.0f;
+		Res.CharData.MapInfoId = nbdata.mapNameTblId;
+		Res.CharData.worldId = nbdata.worldId;
+		Res.CharData.worldTblidx = nbdata.worldId;
+		Res.CharData.PositionX = nbdata.spawnLoc.x;
+		Res.CharData.PositionY = nbdata.spawnLoc.y;
+		Res.CharData.PositionZ = nbdata.spawnLoc.z;
 		Res.CharData.TutorialFlag = false;
 		Res.CharData.Money = 10000;
 		Res.CharData.MoneyBank = 100000;
 		Res.CharData.IsAdult = false;
 		Res.CharData.NeedNameChange = false;
-		DBInsertCharData(Res.CharData);
+		for (int i = 0; i < NEWBIE_ITEM_MAX; i++)
+		{
+			int slot = nbdata.itemSlot[i];
+			if ((slot >= 0) && (slot <= 12)) { 
+				Res.CharData.Item[slot].tblidx = nbdata.itemId[i];
+			}
+		}
+		Res.CharData.charId = DBInsertCharData(Res.CharData, nbdata);
 	}
 	Send((unsigned char*)&Res, sizeof(Res));
 }

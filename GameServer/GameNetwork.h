@@ -14,11 +14,19 @@ public:
 	PCHAR_PROFILE PcProfile;
 	CHARSTATE CharState;
 	WORLD_INFO worldInfo;
+	ITEM_PROFILE ItemProfile[MAX_INVEN_ITEMCOUNT];
+	SKILL_INFO SkillInfo[MAX_PCHARSKILLS_COUNT];
+	QUICK_SLOT_PROFILE QuickSlotData[CHAR_QUICK_SLOT_MAX_COUNT];
+	bool TutorialMode;
 
 	// FUNCTIONS
 	void LoadCharacterData();
 	void LoadWorldInfoData();
 	unsigned int GetPCTblidx(BYTE Race, BYTE Gender, BYTE Class);
+	void UpdatePositions(VECTORXY Dir, VECTORXYZ Loc);
+	int LoadItemData();
+	int LoadSkillData();
+	int LoadQuickslotData();
 
 	// PROTOCOL
 	void SendGameEnterRes(sUG_GAME_ENTER_REQ* data);
@@ -27,6 +35,9 @@ public:
 	void SendCharWorldInfo();
 	void SendCharWorldInfoEnd();
 	void SendCharMove(sUG_CHAR_MOVE* data);
+	void SendCharItemInfo();
+	void SendCharSkillInfo();
+	void SendCharQuickSlotInfo();
 };
 
 class GameServer : public Server

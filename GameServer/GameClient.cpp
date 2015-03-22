@@ -8,6 +8,78 @@ GameClient::~GameClient()
 {
 }
 
+int GameClient::LoadQuickslotData()
+{
+	int count = 0;
+	if (pServer->ServerDB->ExecuteSelect("SELECT * FROM `quickslot` WHERE `CharID`='%u';", this->CurrCharID))
+	{
+		while (pServer->ServerDB->Fetch())
+		{
+			QuickSlotData[count].tblidx = pServer->ServerDB->getInt("TblID");
+			QuickSlotData[count].Slot = pServer->ServerDB->getInt("Slot");
+			QuickSlotData[count].Type = pServer->ServerDB->getInt("Type");
+			QuickSlotData[count].Item = pServer->ServerDB->getInt("Item");
+			count++;
+		}
+	}
+	return count;
+}
+
+int GameClient::LoadSkillData()
+{
+	int count = 0;
+	if (pServer->ServerDB->ExecuteSelect("SELECT * FROM `skills` WHERE `CharID`='%u';", this->CurrCharID))
+	{
+		while (pServer->ServerDB->Fetch())
+		{
+			SkillInfo[count].tblidx = pServer->ServerDB->getInt("SkillID");
+			SkillInfo[count].SlotId = pServer->ServerDB->getInt("Slot");
+			SkillInfo[count].IsRpBonusAuto = pServer->ServerDB->getBoolean("IsRpBonusAuto");
+			SkillInfo[count].RpBonusType = pServer->ServerDB->getInt("RpBonusType");
+			SkillInfo[count].TimeRemaining = pServer->ServerDB->getInt("RemainSec");
+			SkillInfo[count].Exp = pServer->ServerDB->getInt("Exp");
+			count++;
+		}
+	}
+	return count;
+}
+
+int GameClient::LoadItemData()
+{
+	int count = 0;
+	if (pServer->ServerDB->ExecuteSelect("SELECT * FROM `inventory` WHERE `CharID`='%u';", this->CurrCharID))
+	{
+		while (pServer->ServerDB->Fetch())
+		{
+			ItemProfile[count].handle = pServer->ServerDB->getInt("ID");
+			ItemProfile[count].tblidx = pServer->ServerDB->getInt("ItemID");
+			ItemProfile[count].Place = pServer->ServerDB->getInt("Place");
+			ItemProfile[count].Pos = pServer->ServerDB->getInt("Slot");
+			ItemProfile[count].Stackcount = pServer->ServerDB->getInt("Stack");
+			ItemProfile[count].Rank = pServer->ServerDB->getInt("Rank");
+			ItemProfile[count].CurDur = pServer->ServerDB->getInt("CurDur");
+			ItemProfile[count].NeedToIdentify = pServer->ServerDB->getBoolean("NeedToIdentify");
+			ItemProfile[count].Grade = pServer->ServerDB->getInt("Grade");
+			ItemProfile[count].BattleAttribute = pServer->ServerDB->getInt("BattleAttribute");
+			ItemProfile[count].RestrictType = pServer->ServerDB->getInt("RestrictType");
+			memcpy(ItemProfile[count].Maker, charToWChar(pServer->ServerDB->getString("Maker")), MAX_CHARNAME_SIZE);
+			ItemProfile[count].OptionTblidx[0] = pServer->ServerDB->getInt("Opt1");
+			ItemProfile[count].OptionTblidx[1] = pServer->ServerDB->getInt("Opt2");
+			ItemProfile[count].DurationType = pServer->ServerDB->getInt("DurationType");
+			ItemProfile[count].UseStartTime = pServer->ServerDB->getInt("UseStartTime");
+			ItemProfile[count].UseEndTime = pServer->ServerDB->getInt("UseEndTime");
+			count++;
+		}
+	}
+	return count;
+}
+
+void GameClient::UpdatePositions(VECTORXY Dir, VECTORXYZ Loc)
+{
+	pServer->ServerDB->ExecuteQuery("CALL `spUpdatePosition`('%u', '%f', '%f', '%f');", this->CurrCharID, Loc.x, Loc.y, Loc.z);
+	pServer->ServerDB->ExecuteQuery("CALL `spUpdateDirection`('%u', '%f', '%f', '%f');", this->CurrCharID, Dir.x, 0.0f, Dir.z);
+}
+
 void GameClient::LoadWorldInfoData()
 {
 	if (pServer->ServerDB->ExecuteSelect("SELECT * FROM `character` WHERE `AccID`='%d' AND `ID`='%d';", this->AccountID, this->CurrCharID))
@@ -17,18 +89,19 @@ void GameClient::LoadWorldInfoData()
 		worldInfo.worldID = pServer->ServerDB->getInt("worldId");
 		worldInfo.TriggerObjectOffset = 100000; // WHAT IS THIS??
 		worldInfo.RuleInfo.RuleType = GAMERULE_NORMAL;
-		//data->CurLoc.x = pServer->ServerDB->getDouble("PositionX") + (float)(rand() % 5);
-		//data->CurLoc.y = pServer->ServerDB->getDouble("PositionY") + (float)(rand() % 5);
-		//data->CurLoc.z = pServer->ServerDB->getDouble("positionZ") + (float)(rand() % 5);
 	}
 }
 
 void GameClient::LoadCharacterData()
 {
-	if (pServer->ServerDB->ExecuteSelect("SELECT * FROM `character` WHERE `AccID`='%d' AND `ID`='%d';", AccountID, CurrCharID))
+	if (pServer->ServerDB->ExecuteSelect("SELECT * FROM `character` WHERE `AccID`='%u' AND `ID`='%u';", AccountID, CurrCharID))
 	{
 		pServer->ServerDB->Fetch();
-		PCData pcdata = pServer->pcTblData->GetData(pServer->ServerDB->getInt("Race"), pServer->ServerDB->getInt("Gender"), pServer->ServerDB->getInt("Class"));
+		int Race = pServer->ServerDB->getInt("Race");
+		int Class = pServer->ServerDB->getInt("Class");
+		int Gender = pServer->ServerDB->getInt("Gender");
+		PCData pcdata = pServer->pcTblData->GetData(Race,Class,Gender);
+		Logger::Log("Loaded PC TblInfo: Idx(%u) Race(%u) Class(%u) Gender(%u)\n", pcdata.TblIndex, pcdata.Race, pcdata.Class, pcdata.Gender);
 		memset(&PcProfile, 0, sizeof(PcProfile));
 		memcpy(PcProfile.Name, charToWChar(pServer->ServerDB->getString("Name")), MAX_CHARNAME_SIZE);
 		PcProfile.tblidx = pcdata.TblIndex;
@@ -38,7 +111,7 @@ void GameClient::LoadCharacterData()
 		PcProfile.CurExp = pServer->ServerDB->getInt("Exp");
 		PcProfile.IsAdult = pServer->ServerDB->getBoolean("Adult");
 		PcProfile.MaxExpInThisLevel = 100;
-		PcProfile.TutorialHint = 1;
+		PcProfile.TutorialHint = 0xFFFFFFFF;
 		PcProfile.CurEP = 1000;
 		PcProfile.CurLP = 1000;
 		PcProfile.CurRP = 100;
@@ -155,7 +228,7 @@ void GameClient::LoadCharacterData()
 		CharState.CharStateBase.FightMode = 0;
 		CharState.CharStateBase.StateID = 0;
 		CharState.CharStateBase.StateTime = 0;
-		CharState.CharStateBase.aspectState.AspectStateBase.AspectStateId = 255;
+		CharState.CharStateBase.aspectState.AspectStateBase.AspectStateId = 0;
 		CharState.CharStateBase.aspectState.AspectStateDetail.GreatNamek.SourceGrade = 0;
 		CharState.CharStateBase.aspectState.AspectStateDetail.Kaioken.RepeatingCount = 0;
 		CharState.CharStateBase.aspectState.AspectStateDetail.Kaioken.SourceGrade = 0;

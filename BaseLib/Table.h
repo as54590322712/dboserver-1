@@ -8,6 +8,7 @@
 #include <fstream>
 #include <vector>
 #include <valarray>
+#include <Crypto.h>
 #include "Def.h"
 #include "Logger.h"
 

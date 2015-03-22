@@ -34,6 +34,7 @@
     <ClInclude Include="PCTable.h" />
     <ClInclude Include="Protocol.h" />
     <ClInclude Include="Table.h" />
+    <ClInclude Include="Vector.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{A0D9B4BD-FBB1-427D-AFD6-EF330F7E4915}</ProjectGuid>
@@ -87,6 +88,9 @@
     <PostBuildEvent>
       <Command>copy "$(SolutionDir)Deps\bin\pthreadVC2.dll" "$(OutDir)"</Command>
     </PostBuildEvent>
+    <Lib>
+      <AdditionalDependencies>Crypto.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -106,6 +110,9 @@
     <PostBuildEvent>
       <Command>copy "$(SolutionDir)Deps\bin\pthreadVC2.dll" "$(OutDir)"</Command>
     </PostBuildEvent>
+    <Lib>
+      <AdditionalDependencies>Crypto.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Lib>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

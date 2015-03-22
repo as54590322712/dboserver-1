@@ -60,7 +60,7 @@ void GameServer::PacketControl(GameClient* client, Packet* pData)
 
 	switch (data->wOpCode)
 	{
-		case UG_CHAR_MOVE: break;
+		case UG_CHAR_MOVE: client->SendCharMove((sUG_CHAR_MOVE*)data); break;
 		case UG_CHAR_DEST_MOVE: break;
 		case UG_ENTER_WORLD: { 
 			client->SendCharWorldInfo();
@@ -70,7 +70,9 @@ void GameServer::PacketControl(GameClient* client, Packet* pData)
 		case UG_GAME_ENTER_REQ: {
 			client->SendGameEnterRes((sUG_GAME_ENTER_REQ*)data);
 			client->SendCharInfo();
-			// TO DO LOAD ITEMS ETC
+			client->SendCharItemInfo();
+			client->SendCharSkillInfo();
+			client->SendCharQuickSlotInfo();
 			client->SendCharInfoEnd();
 		} break;
 		case UG_PING: break;

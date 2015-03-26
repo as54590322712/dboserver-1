@@ -2,7 +2,7 @@
 <GameServer>
   <!-- Server Configuration -->
   <ID value="0" />
-  <Port value="50400" />
+  <Server IP="127.0.0.1" Port="50400" />
   <MySQL Host="127.0.0.1" Port="3306" Database="DBO" User="root" Password="" />
   <!-- Chat Server Config -->
   <ChatServer IP="127.0.0.1" Port="50100" />

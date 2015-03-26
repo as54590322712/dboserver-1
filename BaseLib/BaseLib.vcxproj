@@ -11,29 +11,67 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Client.cpp" />
+    <ClCompile Include="Acceptor.cpp" />
     <ClCompile Include="Config.cpp" />
+    <ClCompile Include="Connections.cpp" />
+    <ClCompile Include="Connector.cpp" />
     <ClCompile Include="Database.cpp" />
-    <ClCompile Include="Encryption.cpp" />
+    <ClCompile Include="Encoder.cpp" />
+    <ClCompile Include="Event.cpp" />
+    <ClCompile Include="GameString.cpp" />
+    <ClCompile Include="Iocp.cpp" />
     <ClCompile Include="Logger.cpp" />
+    <ClCompile Include="Network.cpp" />
+    <ClCompile Include="NetworkProcessor.cpp" />
     <ClCompile Include="NewbieTable.cpp" />
     <ClCompile Include="Packet.cpp" />
     <ClCompile Include="PCTable.cpp" />
-    <ClCompile Include="Server.cpp" />
+    <ClCompile Include="ServerApp.cpp" />
+    <ClCompile Include="Session.cpp" />
+    <ClCompile Include="SessionList.cpp" />
+    <ClCompile Include="Socket.cpp" />
+    <ClCompile Include="stdafx.cpp" />
     <ClCompile Include="Table.cpp" />
+    <ClCompile Include="Thread.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Acceptor.h" />
+    <ClInclude Include="Base.h" />
+    <ClInclude Include="CircularQueue.h" />
     <ClInclude Include="Config.h" />
+    <ClInclude Include="Connections.h" />
+    <ClInclude Include="Connector.h" />
     <ClInclude Include="Database.h" />
     <ClInclude Include="Def.h" />
-    <ClInclude Include="Encryption.h" />
+    <ClInclude Include="Encoder.h" />
+    <ClInclude Include="Exception.h" />
+    <ClInclude Include="GameString.h" />
+    <ClInclude Include="Event.h" />
+    <ClInclude Include="Iocp.h" />
+    <ClInclude Include="LinkArray.h" />
+    <ClInclude Include="LinkList.h" />
     <ClInclude Include="Logger.h" />
+    <ClInclude Include="Mutex.h" />
+    <ClInclude Include="NetBuffer.h" />
     <ClInclude Include="Network.h" />
+    <ClInclude Include="NetworkProcessor.h" />
     <ClInclude Include="NewbieTable.h" />
     <ClInclude Include="Packet.h" />
     <ClInclude Include="PCTable.h" />
     <ClInclude Include="Protocol.h" />
+    <ClInclude Include="Queue.h" />
+    <ClInclude Include="ServerApp.h" />
+    <ClInclude Include="Session.h" />
+    <ClInclude Include="SessionFactory.h" />
+    <ClInclude Include="SessionList.h" />
+    <ClInclude Include="SessionMap.h" />
+    <ClInclude Include="Singleton.h" />
+    <ClInclude Include="Socket.h" />
+    <ClInclude Include="SocketAddr.h" />
+    <ClInclude Include="stdafx.h" />
     <ClInclude Include="Table.h" />
+    <ClInclude Include="Thread.h" />
+    <ClInclude Include="ThreadException.h" />
     <ClInclude Include="Vector.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
@@ -79,8 +117,8 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>false</SDLCheck>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
-      <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;LIBXML_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PrecompiledHeader>Create</PrecompiledHeader>
+      <PreprocessorDefinitions>WIN32;_WINSOCK_DEPRECATED_NO_WARNINGS;_DEBUG;_LIB;LIBXML_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -100,7 +138,8 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>false</SDLCheck>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;LIBXML_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_WINSOCK_DEPRECATED_NO_WARNINGS;NDEBUG;_LIB;LIBXML_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>

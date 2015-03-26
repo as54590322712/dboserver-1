@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include "Table.h"
 
 using namespace std;

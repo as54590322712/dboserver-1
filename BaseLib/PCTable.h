@@ -1,6 +1,9 @@
 #ifndef _PCTABLE
 #define _PCTABLE
 
+#pragma once
+
+#include "Base.h"
 #include "Table.h"
 
 #pragma pack(push, 4)

@@ -1,16 +1,80 @@
 #ifndef _CHARNETWORK_H
 #define _CHARNETWORK_H
 
+#include <iostream>
+#include <fstream>
 #include <Network.h>
+#include <Acceptor.h>
+#include <Connector.h>
+#include <Session.h>
+#include <SessionFactory.h>
+#include <Packet.h>
 #include <Config.h>
+#include <ServerApp.h>
+#include <Database.h>
+#include <Encoder.h>
+#include <NewbieTable.h>
 #include "CharProtocol.h"
 
-class CharClient : public Client
+enum CHAR_SESSION
+{
+	SESSION_CLIENT,
+	SESSION_SERVER_ACTIVE,
+};
+
+const DWORD	MAX_NUMOF_GAME_CLIENT = 3;
+const DWORD	MAX_NUMOF_SERVER = 1;
+const DWORD	MAX_NUMOF_SESSION = MAX_NUMOF_GAME_CLIENT + MAX_NUMOF_SERVER;
+
+class CharServer : public ServerApp
 {
 public:
-	CharClient();
+	int	OnInitApp();
+	int	OnCreate();
+	void OnDestroy() {}
+	int	OnConfiguration(const char* ConfigFile);
+	int OnCommandArgument(int argc, _TCHAR* argv[]) { return 0; }
+	int	OnAppStart();
+	void Run()
+	{
+		DWORD TickCur, TickOld = ::GetTickCount();
+
+		while (IsRunnable())
+		{
+			TickCur = ::GetTickCount();
+			if (TickCur - TickOld >= 10000)
+			{
+				TickOld = TickCur;
+			}
+		}
+	}
+
+private:
+	Acceptor _clientAcceptor;
+
+public:
+	Config* ServerCfg;
+	Database* ServerDB;
+	int ServerID;
+	NewbieTable* nbTblData;
+};
+
+class CharClient : public Session
+{
+	friend class CharClientFactory;
+public:
+	CharClient(bool IsAliveCheck = false, bool IsOpcodeCheck = false);
 	~CharClient();
 
+	int	OnAccept();
+	void OnClose();
+	int	OnDispatch(Packet* pPacket);
+	void Send(void* pData, int nSize);
+
+	// Opcode Control
+	bool PacketControl(Packet* pPacket);
+
+	// DATA FUNCTIONS
 	int GetDBAccCharListData(sCU_CHARACTER_INFO* outdata);
 	int DBInsertCharData(CHARDATA data, NewbieData nbdata);
 	ResultCodes CheckUsedName(WCHAR* Name);
@@ -30,21 +94,42 @@ public:
 	void SendCharSelectRes(sUC_CHARACTER_SELECT_REQ* data);
 	void SendCharRenameRes(sUC_CHARACTER_RENAME_REQ* data);
 	void SendCancelWaitReq(sUC_CONNECT_WAIT_CANCEL_REQ* data);
+
+private:
+	PacketEncoder _packetEncoder;
+	CharServer* pServer;
+
+	WCHAR userName[MAX_USERNAME_SIZE + 1];
+	WCHAR passWord[MAX_PASSWORD_SIZE + 1];
+	BYTE AuthKey[MAX_AUTHKEY_SIZE];
+	int AccountID;
+	BYTE LastServerID;
+	DWORD AcLevel;
+	BYTE CurrServerID;
+	BYTE CurrChannelID;
+	unsigned int CurrCharID;
+	bool goGameServer;
 };
 
-class CharServer : public Server
+class CharClientFactory : public SessionFactory
 {
 public:
-	CharServer();
-	~CharServer();
+	Session* CreateSession(unsigned short sessionType)
+	{
+		Session* pSession = NULL;
+		switch (sessionType)
+		{
+		case SESSION_CLIENT:
+		{
+			pSession = new CharClient;
+		}
+		break;
 
-	void OnReady();
-	bool OnConnect(Client* client);
-	void OnDisconnect(Client* client);
-	bool OnDataReceived(Client* client, Packet* pData);
-	CharClient* CreateClient();
-	void DeleteClient(Client* client);
-	void PacketControl(CharClient* client, Packet* pData);
+		default:
+			break;
+		}
+		return pSession;
+	}
 };
 
 #endif

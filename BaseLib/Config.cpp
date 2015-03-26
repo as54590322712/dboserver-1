@@ -1,11 +1,12 @@
+#include "stdafx.h"
 #include "Config.h"
 
-Config::Config(char* rname)
+Config::Config(const char* rname)
 {
 	char filename[MAX_PATH];
 	sprintf_s(filename, MAX_PATH, "%sConfig.xml", rname);
 	doc = xmlParseFile(filename);
-	rootname = rname;
+	rootname = _strdup(rname);
 }
 
 Config::~Config()

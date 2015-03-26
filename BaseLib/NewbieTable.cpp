@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include "NewbieTable.h"
 
 int NewbieTable::Load(char* file)

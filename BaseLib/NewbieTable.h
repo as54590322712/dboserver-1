@@ -1,6 +1,9 @@
 #ifndef _NEWBIETABLE
 #define _NEWBIETABLE
 
+#pragma once
+
+#include "Base.h"
 #include "Table.h"
 
 #pragma pack(push, 4)

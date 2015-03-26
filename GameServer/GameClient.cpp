@@ -1,11 +1,53 @@
 #include "GameNetwork.h"
 
-GameClient::GameClient()
+GameClient::GameClient(bool IsAliveCheck, bool IsOpcodeCheck)
+	:Session(SESSION_CLIENT)
 {
+	SetControlFlag(CONTROL_FLAG_USE_SEND_QUEUE);
+
+	if (IsAliveCheck)
+	{
+		SetControlFlag(CONTROL_FLAG_CHECK_ALIVE);
+	}
+	if (IsOpcodeCheck)
+	{
+		SetControlFlag(CONTROL_FLAG_CHECK_OPCODE);
+	}
+
+	SetPacketEncoder(&_packetEncoder);
+	pServer = (GameServer*)_GetApp();
 }
 
 GameClient::~GameClient()
 {
+}
+
+int	GameClient::OnAccept()
+{
+	return 0;
+}
+
+void GameClient::OnClose()
+{
+	if (goCharServer) pServer->ServerDB->ExecuteQuery("UPDATE `account` SET `State` = '2' WHERE `ID` = '%d';", AccountID);
+	else pServer->ServerDB->ExecuteQuery("UPDATE `account` SET `State` = '0' WHERE `ID` = '%d';", AccountID);
+}
+
+int GameClient::OnDispatch(Packet* pPacket)
+{
+	PacketControl(pPacket);
+	//	return OnDispatch(pPacket);
+	return 0;
+}
+
+void GameClient::Send(void* pData, int nSize)
+{
+	Packet* packet = new Packet((unsigned char*)pData, nSize);
+	int rc = pServer->Send(this->GetHandle(), packet);
+	if (0 != rc)
+	{
+		Logger::Log("Failed to send packet %d\n", rc);
+	}
 }
 
 int GameClient::LoadQuickslotData()

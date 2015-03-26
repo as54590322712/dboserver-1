@@ -1,6 +1,8 @@
 #ifndef _TABLE
 #define _TABLE
 
+#pragma once
+
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -9,6 +11,8 @@
 #include <vector>
 #include <valarray>
 #include <Crypto.h>
+
+#include "Base.h"
 #include "Def.h"
 #include "Logger.h"
 

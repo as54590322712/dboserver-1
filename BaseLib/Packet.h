@@ -1,11 +1,20 @@
 #ifndef _PACKET_H
 #define _PACKET_H
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <Windows.h>
+#pragma once
+
+#include "Base.h"
 #include "Def.h"
+
+enum OPCODE_SYS
+{
+	SYS_OPCODE_BEG = 0,
+	SYS_ALIVE,
+	SYS_PING,
+
+	SYS_OPCODE_END_DUMMY,
+	SYS_OPCODE_END = SYS_OPCODE_END_DUMMY - 1
+};
 
 typedef struct PACKETHEADER
 {

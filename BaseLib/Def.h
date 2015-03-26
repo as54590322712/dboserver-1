@@ -1,10 +1,10 @@
 #ifndef _DEF_H
 #define _DEF_H
 
-#include "Vector.h"
+#pragma once
 
-#define SAFE_DELETE_ARRAY(p)	if(p) { delete[] p; p = 0; }
-#define SAFE_FREE(p)			if(p) { free(p); p = 0; }
+#include "Base.h"
+#include "Vector.h"
 
 typedef char SBYTE;
 typedef unsigned char BYTE;
@@ -4213,8 +4213,6 @@ struct SUMMARY_PRIVATESHOP_SHOP_DATA
 	WCHAR PrivateShopName[MAX_PRIVATESHOPNAME_USIZE + 1];
 };
 
-
-//-- server & client ³»ºÎ PrivateShop Data --------------------------------------
 struct PRIVATESHOP_SHOP_DATA
 {
 	unsigned int Owner;	

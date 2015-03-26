@@ -1,4 +1,5 @@
-#include "Encryption.h"
+#include "stdafx.h"
+#include "Encoder.h"
 
 const BYTE CHECKSUM_INITIAL_VALUE = 0x7F;
 const DWORD	RX_RANDOM_SEED_HEADER = 0xFFEECCBB;
@@ -152,10 +153,14 @@ int PacketEncoder::RxDecrypt(Packet& rPacket)
 {
 	// Decrypt Header
 	RxDecrypt(rPacket.GetPacketHeader());
+
 	// Decrypt Body
 	BYTE byCheckSum = CHECKSUM_INITIAL_VALUE;
-	if (rPacket.GetPacketDataSize() != Decrypt(rPacket.GetPacketData(), rPacket.GetPacketDataSize(), m_rxBodyKeyGenerator.Generate(), &byCheckSum))
+	int pSize = rPacket.GetPacketDataSize();
+	int dSize = Decrypt(rPacket.GetPacketData(), rPacket.GetPacketDataSize(), m_rxBodyKeyGenerator.Generate(), &byCheckSum);
+	if (pSize != dSize)
 	{
+		Logger::Log("RxDecrypt Error: [%u != %u]\n", pSize, dSize);
 		return 1;
 	}
 	// Checksum
@@ -171,8 +176,11 @@ int PacketEncoder::TxEncrypt(Packet& rPacket)
 {
 	// Encrypt Body
 	BYTE byCheckSum = CHECKSUM_INITIAL_VALUE;
-	if (rPacket.GetPacketDataSize() != Encrypt(rPacket.GetPacketData(), rPacket.GetPacketDataSize(), m_txBodyKeyGenerator.Generate(), &byCheckSum))
+	int pSize = rPacket.GetPacketDataSize();
+	int dSize = Encrypt(rPacket.GetPacketData(), rPacket.GetPacketDataSize(), m_txBodyKeyGenerator.Generate(), &byCheckSum);
+	if (pSize != dSize)
 	{
+		Logger::Log("TxEncrypt Error: [%u != %u]\n", pSize, dSize);
 		return 1;
 	}
 	// Checksum

@@ -1,6 +1,32 @@
 #include "CharNetwork.h"
 #include "CharProtocol.h"
 
+bool CharClient::PacketControl(Packet* pPacket)
+{
+	LPPACKETDATA data = (LPPACKETDATA)pPacket->GetPacketData();
+	switch (data->wOpCode)
+	{
+	case UC_LOGIN_REQ: SendLoginResult((sUC_LOGIN_REQ*)data); break;
+	case UC_CHARACTER_SERVERLIST_REQ: SendServerlist(false); break;
+	case UC_CHARACTER_SERVERLIST_ONE_REQ: SendServerlist(true); break;
+	case UC_CHARACTER_LOAD_REQ: SendCharLoadResult((sUC_CHARACTER_LOAD_REQ*)data); break;
+	case UC_CHARACTER_EXIT_REQ: SendCharExitRes((sUC_CHARACTER_EXIT_REQ*)data); break;
+	case UC_CHARACTER_ADD_REQ: SendCharCreateRes((sUC_CHARACTER_ADD_REQ*)data); break;
+	case UC_CHARACTER_DEL_REQ: SendCharDelRes((sUC_CHARACTER_DEL_REQ*)data); break;
+	case UC_CHARACTER_DEL_CANCEL_REQ: SendCharDelCancelRes((sUC_CHARACTER_DEL_CANCEL_REQ*)data); break;
+	case UC_CONNECT_WAIT_CHECK_REQ: SendCharConnWaitCheckRes((sUC_CONNECT_WAIT_CHECK_REQ*)data); break;
+	case UC_CHARACTER_SELECT_REQ: SendCharSelectRes((sUC_CHARACTER_SELECT_REQ*)data); break;
+	case UC_CHARACTER_RENAME_REQ: SendCharRenameRes((sUC_CHARACTER_RENAME_REQ*)data); break;
+	case UC_CONNECT_WAIT_CANCEL_REQ: SendCancelWaitReq((sUC_CONNECT_WAIT_CANCEL_REQ*)data); break;
+	case 1: { sPACKETHEADER reply(1); Send(&reply, sizeof(reply)); } break;
+	default:
+		Logger::Log("Received Opcode: %d\n", data->wOpCode);
+		return false;
+		break;
+	}
+	return true;
+}
+
 void CharClient::SendLoginResult(sUC_LOGIN_REQ* data)
 {
 	CurrServerID = data->serverID;
@@ -18,7 +44,7 @@ void CharClient::SendLoginResult(sUC_LOGIN_REQ* data)
 
 void CharClient::SendServerlist(bool one)
 {
-	for (int i = 0; i < pServer->ServerConfig->GetInt("ServerCount"); i++)
+	for (int i = 0; i < pServer->ServerCfg->GetInt("ServerCount"); i++)
 	{
 		char snode[20];
 		sprintf_s(snode, "Server%d", i + 1);
@@ -26,10 +52,10 @@ void CharClient::SendServerlist(bool one)
 		memset(&sinfo, 0, sizeof(sCU_SERVER_FARM_INFO));
 		sinfo.OpCode = CU_SERVER_FARM_INFO;
 		sinfo.serverInfo.serverId = i;
-		memcpy(sinfo.serverInfo.ServerName, charToWChar(pServer->ServerConfig->GetStr(snode, "Name")), MAX_SERVERNAME_SIZE);
+		memcpy(sinfo.serverInfo.ServerName, charToWChar(pServer->ServerCfg->GetStr(snode, "Name")), MAX_SERVERNAME_SIZE);
 		sinfo.serverInfo.ServerStatus = SERVERSTATUS_UP;
 		sinfo.serverInfo.Load = 0;
-		sinfo.serverInfo.MaxLoad = pServer->ServerConfig->GetInt(snode, "MaxLoad");
+		sinfo.serverInfo.MaxLoad = pServer->ServerCfg->GetInt(snode, "MaxLoad");
 		Send((unsigned char*)&sinfo, sizeof(sinfo));
 	}
 
@@ -62,7 +88,7 @@ void CharClient::SendCharLoadResult(sUC_CHARACTER_LOAD_REQ* data)
 	cninfo.OpCode = CU_SERVER_CHANNEL_INFO;
 	char snode[20];
 	sprintf_s(snode, "Server%d", CurrServerID + 1);
-	cninfo.Count = pServer->ServerConfig->GetInt(snode, "Count");
+	cninfo.Count = pServer->ServerCfg->GetInt(snode, "Count");
 	for (int x = 0; x < cninfo.Count; x++)
 	{
 		char cnode[20];
@@ -71,7 +97,7 @@ void CharClient::SendCharLoadResult(sUC_CHARACTER_LOAD_REQ* data)
 		cninfo.channelInfo[x].serverId = CurrServerID;
 		cninfo.channelInfo[x].IsVisible = true;
 		cninfo.channelInfo[x].Load = 0;
-		cninfo.channelInfo[x].MaxLoad = pServer->ServerConfig->GetChildInt(snode, cnode, "MaxLoad");
+		cninfo.channelInfo[x].MaxLoad = pServer->ServerCfg->GetChildInt(snode, cnode, "MaxLoad");
 		cninfo.channelInfo[x].ServerStatus = SERVERSTATUS_UP;
 	}
 	Send((unsigned char*)&cninfo, sizeof(cninfo));
@@ -194,8 +220,8 @@ void CharClient::SendCharSelectRes(sUC_CHARACTER_SELECT_REQ* data)
 	char snode[20], cnode[20];
 	sprintf_s(snode, "Server%d", CurrServerID + 1);
 	sprintf_s(cnode, "Channel%d", CurrChannelID + 1);
-	memcpy(selRes.GameServerIP, pServer->ServerConfig->GetChildStr(snode, cnode, "IP"), MAX_SRVADDR_SIZE);
-	selRes.GameServerPort = pServer->ServerConfig->GetChildInt(snode, cnode, "Port");
+	memcpy(selRes.GameServerIP, pServer->ServerCfg->GetChildStr(snode, cnode, "IP"), MAX_SRVADDR_SIZE);
+	selRes.GameServerPort = pServer->ServerCfg->GetChildInt(snode, cnode, "Port");
 	selRes.ResultCode = CHARACTER_SUCCESS;
 	Send((unsigned char*)&selRes, sizeof(selRes));
 }

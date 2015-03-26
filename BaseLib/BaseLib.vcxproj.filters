@@ -37,17 +37,26 @@
     <Filter Include="Header Files\Table">
       <UniqueIdentifier>{48abbf43-ddd8-4852-9c6c-dfa4467174c2}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Thread">
+      <UniqueIdentifier>{b09d9ca1-6719-411e-b84d-0f8bfdc55654}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Thread">
+      <UniqueIdentifier>{2c21533b-760b-4cd9-adc8-efdb9aae4577}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\System">
+      <UniqueIdentifier>{e7c7d193-4d41-4a19-9cf0-188b23eaf380}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\System">
+      <UniqueIdentifier>{09caee29-04f0-45f6-85fe-9eb63f2cef83}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Network\Session">
+      <UniqueIdentifier>{0d533c2f-9eef-4c93-b8cf-87d06e84d463}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Network\Session">
+      <UniqueIdentifier>{c318a3a8-4335-4de2-bc4d-08d0b041484f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Server.cpp">
-      <Filter>Source Files\Network</Filter>
-    </ClCompile>
-    <ClCompile Include="Client.cpp">
-      <Filter>Source Files\Network</Filter>
-    </ClCompile>
-    <ClCompile Include="Logger.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Packet.cpp">
       <Filter>Source Files\Network</Filter>
     </ClCompile>
@@ -56,9 +65,6 @@
     </ClCompile>
     <ClCompile Include="Database.cpp">
       <Filter>Source Files\Database</Filter>
-    </ClCompile>
-    <ClCompile Include="Encryption.cpp">
-      <Filter>Source Files\Network</Filter>
     </ClCompile>
     <ClCompile Include="NewbieTable.cpp">
       <Filter>Source Files\Table</Filter>
@@ -69,6 +75,54 @@
     <ClCompile Include="PCTable.cpp">
       <Filter>Source Files\Table</Filter>
     </ClCompile>
+    <ClCompile Include="Socket.cpp">
+      <Filter>Source Files\Network</Filter>
+    </ClCompile>
+    <ClCompile Include="GameString.cpp">
+      <Filter>Source Files\System</Filter>
+    </ClCompile>
+    <ClCompile Include="Event.cpp">
+      <Filter>Source Files\Thread</Filter>
+    </ClCompile>
+    <ClCompile Include="Logger.cpp">
+      <Filter>Source Files\System</Filter>
+    </ClCompile>
+    <ClCompile Include="Thread.cpp">
+      <Filter>Source Files\Thread</Filter>
+    </ClCompile>
+    <ClCompile Include="Iocp.cpp">
+      <Filter>Source Files\Network</Filter>
+    </ClCompile>
+    <ClCompile Include="Encoder.cpp">
+      <Filter>Source Files\Network</Filter>
+    </ClCompile>
+    <ClCompile Include="Connections.cpp">
+      <Filter>Source Files\Network</Filter>
+    </ClCompile>
+    <ClCompile Include="Acceptor.cpp">
+      <Filter>Source Files\Network</Filter>
+    </ClCompile>
+    <ClCompile Include="Session.cpp">
+      <Filter>Source Files\Network\Session</Filter>
+    </ClCompile>
+    <ClCompile Include="SessionList.cpp">
+      <Filter>Source Files\Network\Session</Filter>
+    </ClCompile>
+    <ClCompile Include="NetworkProcessor.cpp">
+      <Filter>Source Files\Network</Filter>
+    </ClCompile>
+    <ClCompile Include="Network.cpp">
+      <Filter>Source Files\Network</Filter>
+    </ClCompile>
+    <ClCompile Include="Connector.cpp">
+      <Filter>Source Files\Network</Filter>
+    </ClCompile>
+    <ClCompile Include="ServerApp.cpp">
+      <Filter>Source Files\System</Filter>
+    </ClCompile>
+    <ClCompile Include="stdafx.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Def.h">
@@ -76,9 +130,6 @@
     </ClInclude>
     <ClInclude Include="Network.h">
       <Filter>Header Files\Network</Filter>
-    </ClInclude>
-    <ClInclude Include="Logger.h">
-      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Packet.h">
       <Filter>Header Files\Network</Filter>
@@ -92,9 +143,6 @@
     <ClInclude Include="Database.h">
       <Filter>Header Files\Database</Filter>
     </ClInclude>
-    <ClInclude Include="Encryption.h">
-      <Filter>Header Files\Network</Filter>
-    </ClInclude>
     <ClInclude Include="NewbieTable.h">
       <Filter>Header Files\Table</Filter>
     </ClInclude>
@@ -104,7 +152,91 @@
     <ClInclude Include="PCTable.h">
       <Filter>Header Files\Table</Filter>
     </ClInclude>
+    <ClInclude Include="Socket.h">
+      <Filter>Header Files\Network</Filter>
+    </ClInclude>
+    <ClInclude Include="SocketAddr.h">
+      <Filter>Header Files\Network</Filter>
+    </ClInclude>
+    <ClInclude Include="GameString.h">
+      <Filter>Header Files\System</Filter>
+    </ClInclude>
+    <ClInclude Include="Thread.h">
+      <Filter>Header Files\Thread</Filter>
+    </ClInclude>
+    <ClInclude Include="Event.h">
+      <Filter>Header Files\Thread</Filter>
+    </ClInclude>
+    <ClInclude Include="Logger.h">
+      <Filter>Header Files\System</Filter>
+    </ClInclude>
     <ClInclude Include="Vector.h">
+      <Filter>Header Files\System</Filter>
+    </ClInclude>
+    <ClInclude Include="Exception.h">
+      <Filter>Header Files\System</Filter>
+    </ClInclude>
+    <ClInclude Include="ThreadException.h">
+      <Filter>Header Files\Thread</Filter>
+    </ClInclude>
+    <ClInclude Include="Mutex.h">
+      <Filter>Header Files\System</Filter>
+    </ClInclude>
+    <ClInclude Include="LinkList.h">
+      <Filter>Header Files\System</Filter>
+    </ClInclude>
+    <ClInclude Include="Iocp.h">
+      <Filter>Header Files\Network</Filter>
+    </ClInclude>
+    <ClInclude Include="Encoder.h">
+      <Filter>Header Files\Network</Filter>
+    </ClInclude>
+    <ClInclude Include="CircularQueue.h">
+      <Filter>Header Files\System</Filter>
+    </ClInclude>
+    <ClInclude Include="NetBuffer.h">
+      <Filter>Header Files\Network</Filter>
+    </ClInclude>
+    <ClInclude Include="Queue.h">
+      <Filter>Header Files\System</Filter>
+    </ClInclude>
+    <ClInclude Include="Connections.h">
+      <Filter>Header Files\Network</Filter>
+    </ClInclude>
+    <ClInclude Include="Acceptor.h">
+      <Filter>Header Files\Network</Filter>
+    </ClInclude>
+    <ClInclude Include="Session.h">
+      <Filter>Header Files\Network\Session</Filter>
+    </ClInclude>
+    <ClInclude Include="SessionFactory.h">
+      <Filter>Header Files\Network\Session</Filter>
+    </ClInclude>
+    <ClInclude Include="SessionMap.h">
+      <Filter>Header Files\Network\Session</Filter>
+    </ClInclude>
+    <ClInclude Include="SessionList.h">
+      <Filter>Header Files\Network\Session</Filter>
+    </ClInclude>
+    <ClInclude Include="LinkArray.h">
+      <Filter>Header Files\System</Filter>
+    </ClInclude>
+    <ClInclude Include="NetworkProcessor.h">
+      <Filter>Header Files\Network</Filter>
+    </ClInclude>
+    <ClInclude Include="Connector.h">
+      <Filter>Header Files\Network</Filter>
+    </ClInclude>
+    <ClInclude Include="Singleton.h">
+      <Filter>Header Files\System</Filter>
+    </ClInclude>
+    <ClInclude Include="ServerApp.h">
+      <Filter>Header Files\System</Filter>
+    </ClInclude>
+    <ClInclude Include="stdafx.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Base.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

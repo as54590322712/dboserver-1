@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <AuthServer>
   <!-- Server Configuration -->
-  <Port value="50200" />
+  <Server IP="127.0.0.1" Port="50200" />
   <MySQL Host="127.0.0.1" Port="3306" Database="DBO" User="root" Password="" />
   
   <!-- Server List Configuration -->

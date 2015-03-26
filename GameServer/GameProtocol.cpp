@@ -1,6 +1,39 @@
 #include "GameNetwork.h"
 #include "GameProtocol.h"
 
+bool GameClient::PacketControl(Packet* pPacket)
+{
+	LPPACKETDATA data = (LPPACKETDATA)pPacket->GetPacketData();
+
+	switch (data->wOpCode)
+	{
+	case UG_CHAR_MOVE: SendCharMove((sUG_CHAR_MOVE*)data); break;
+	case UG_CHAR_DEST_MOVE: break;
+	case UG_CHAR_CHANGE_HEADING: break;
+	case UG_CHAR_MOVE_SYNC: break;
+	case UG_ENTER_WORLD: {
+		SendCharWorldInfo();
+		// TO DO WORLD SPAWNS
+		SendCharWorldInfoEnd();
+	} break;
+	case UG_GAME_ENTER_REQ: {
+		SendGameEnterRes((sUG_GAME_ENTER_REQ*)data);
+		SendCharInfo();
+		SendCharItemInfo();
+		SendCharSkillInfo();
+		SendCharQuickSlotInfo();
+		SendCharInfoEnd();
+	} break;
+	case UG_PING: break;
+	case 1: { sPACKETHEADER reply(1); Send(&reply, sizeof(reply)); } break;
+	default:
+		Logger::Log("Received Opcode: %d\n", data->wOpCode);
+		return false;
+		break;
+	}
+	return true;
+}
+
 void GameClient::SendGameEnterRes(sUG_GAME_ENTER_REQ* data)
 {
 	this->AccountID = data->accountId;
@@ -12,8 +45,8 @@ void GameClient::SendGameEnterRes(sUG_GAME_ENTER_REQ* data)
 	sGU_GAME_ENTER_RES geRes;
 	memset(&geRes, 0, sizeof(geRes));
 	geRes.OpCode = GU_GAME_ENTER_RES;
-	memcpy(geRes.CommunityServerIP, pServer->ServerConfig->GetStr("ChatServer", "IP"), MAX_SRVADDR_SIZE);
-	geRes.CommunityServerPort = pServer->ServerConfig->GetInt("ChatServer", "Port");
+	memcpy(geRes.CommunityServerIP, pServer->ServerCfg->GetStr("ChatServer", "IP"), MAX_SRVADDR_SIZE);
+	geRes.CommunityServerPort = pServer->ServerCfg->GetInt("ChatServer", "Port");
 	geRes.EnterTime = time(NULL);
 	geRes.ResultCode = GAME_SUCCESS;
 	Send((unsigned char*)&geRes, sizeof(geRes));

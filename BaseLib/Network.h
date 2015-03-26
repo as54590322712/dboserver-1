@@ -1,113 +1,72 @@
-#ifndef _NETWORK_H
-#define _NETWORK_H
+#ifndef _NETWORK
+#define _NETWORK
 
-#include <winsock2.h>
-#include <thread>
-#include <windows.h>
-#include <winbase.h>
-#include <string>
-#include <process.h>
-#include <cstdio>
-#include <cstdlib>
-#include <iostream>
-#include <vector>
-#include <exception>
-#include <time.h>
-#include <assert.h>
-#include <math.h>
-#include <csignal>
-#include <pthread.h>
-#include <asio.hpp>
-#include "Def.h"
-#include "Packet.h"
-#include "Logger.h"
-#include "Config.h"
-#include "Database.h"
-#include "Encryption.h"
-#include "NewbieTable.h"
-#include "PCTable.h"
+#pragma once
 
-#define close closesocket
-#define MAX_THREADS 65535
+#include "Base.h"
+#include "Iocp.h"
+#include "SessionList.h"
+#include <map>
 
-#pragma comment(lib, "ws2_32.lib")
-#pragma comment(lib, "pthreadVC2.lib")
-
-using namespace asio;
-using namespace asio::ip;
-
-class Base
+enum NETEVENT
 {
+	NETEVENT_ACCEPT = 1,
+	NETEVENT_CONNECT,
+	NETEVENT_CLOSE,
+	NETEVENT_RECV,
+
+	INVALID_NETEVENT,
+	NETEVENT_COUNT,
+};
+
+class Connections;
+class Session;
+class Acceptor;
+class Connector;
+class SessionFactory;
+class NetworkMonitor;
+class NetworkProcessor;
+class Packet;
+
+class Network
+{
+	friend class NetworkMonitor;
+	friend class NetworkProcessor;
+	typedef std::multimap<unsigned short, Acceptor*> AcceptorList;
+	typedef std::multimap<unsigned short, Connector*> ConnectorList;
+
 public:
-	Base() { isActive = false; sock = INVALID_SOCKET; pkt = new Packet(); pEncoder = new PacketEncoder(false); };
-	virtual ~Base() {};
-	SOCKET sock;
-	bool isActive;
-	int Opt = 1;
-	Packet* pkt;
-	PacketEncoder* pEncoder;
+	Network();
+	virtual ~Network();
+
+	int Create(SessionFactory* Factory, int SessionSize, int CreateThreads = 0,	int ConcurrentThreads = 0);
+	void Destroy();
+	int Associate(Connections* pConnection, bool IsAssociate);
+	int Associate(Acceptor* pAcceptor, bool IsAssociate);
+	int Associate(Connector* pConnector, bool IsAssociate);
+	int Send(unsigned int hSession, Packet * pPacket);
+	int Send(Session* pSession, Packet * pPacket);
+	int PostNetEventMessage(WPARAM wParam, LPARAM lParam);
+	SessionList* GetSessionList() { return _SessionList; }
+	SessionFactory* GetSessionFactory() { return _SessionFactoryRef; }
+	Acceptor* GetAcceptor(unsigned short sessionType, const char* Addr, WORD Port);
+	Connector* GetConnector(unsigned short sessionType, const char* Addr, WORD Port);
+
+protected:
+	void Init();
+	int StartUp();
+	int Shutdown();
+	int CreateMonitorThread();
+	int	CreateDispatcherThread();
+
+private:
+	Iocp _iocp;
+	SessionList* _SessionList;
+	AcceptorList* _AcceptorList;
+	ConnectorList* _ConnectorList;
+	SessionFactory* _SessionFactoryRef;
+	NetworkMonitor* _NetworkMonitor;
+	NetworkProcessor*_NetworkProcessor;
 };
-
-class Client : public Base
-{
-public:
-	Client();
-	virtual ~Client() {};
-	bool ReceivingData();
-	void Send(void* pData, int size);
-	bool IsConnected();
-	class Server* pServer;
-	unsigned char pData[MAX_BUFFER_SIZE];
-	unsigned int LastPacketSize;
-	unsigned int RecvCount;
-	unsigned int SendCount;
-	sockaddr_in* addr;
-
-	WCHAR userName[MAX_USERNAME_SIZE + 1];
-	WCHAR passWord[MAX_PASSWORD_SIZE + 1];
-	BYTE AuthKey[MAX_AUTHKEY_SIZE];
-	int AccountID;
-	BYTE LastServerID;
-	DWORD AcLevel;
-	BYTE CurrServerID;
-	BYTE CurrChannelID;
-	unsigned int CurrCharID;
-	bool goCharServer;
-	bool goGameServer;
-};
-
-class Server : public Base
-{
-	public:
-		Server() {};
-		virtual ~Server() {};
-		bool Start();
-		void Loop();
-		void AddClient(SOCKET sock, sockaddr_in* addr);
-		void CheckFDS(fd_set* fds);
-		void HandleClients(fd_set* fds);
-		void Disconnect(Client* cli);
-		
-		virtual Client* CreateClient();
-		virtual void DeleteClient(Client* client);
-		virtual void OnReady() {};
-		virtual void OnServerStep() {};
-		virtual bool OnConnect(Client* client) { return true; };
-		virtual void OnDisconnect(Client* client) {};
-		virtual bool OnDataReceived(Client* client, Packet* pData) { return true; };
-
-		WSADATA wsData;
-		int sPort = SERVER_PORT;
-		sockaddr_in addrServer;
-		std::vector<Client*> Clients;
-		Config* ServerConfig;
-		Database* ServerDB;
-		int ServerID;
-		pthread_t threads[MAX_THREADS];
-		NewbieTable* nbTblData;
-		PCTable* pcTblData;
-};
-
-void* ClientThread(void* _client);
 
 #endif

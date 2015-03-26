@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include "PCTable.h"
 
 int PCTable::Load(char* file)

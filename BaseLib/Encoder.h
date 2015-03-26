@@ -1,6 +1,9 @@
 #ifndef _ENCRYPT_H
 #define _ENCRYPT_H
 
+#pragma once
+
+#include "Base.h"
 #include "Def.h"
 #include "Packet.h"
 #include "Logger.h"

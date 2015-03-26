@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include "Database.h"
 #include "Def.h"
 #include "Logger.h"

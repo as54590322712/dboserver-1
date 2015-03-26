@@ -1,8 +1,11 @@
 #ifndef _DATABASE_H
 #define _DATABASE_H
 
+#pragma once
+
 #define CPPCONN_LIB_BUILD 1
 
+#include "Base.h"
 #include <vector>
 #include <cppconn/connection.h>
 #include <cppconn/driver.h>

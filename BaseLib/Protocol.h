@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include <string>
+#include "Base.h"
 #include "Def.h"
 
 struct sPACKETHEADER

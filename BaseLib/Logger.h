@@ -1,10 +1,12 @@
 #ifndef _LOGGER_H
 #define _LOGGER_H
 
+#pragma once
+
+#include "Base.h"
 #include <cstdlib>
 #include <cstdio>
 #include <iostream>
-#include <Windows.h>
 #include <ctime>
 #include <string>
 

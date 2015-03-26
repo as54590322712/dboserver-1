@@ -1,23 +1,78 @@
 #ifndef _GAMENETWORK_H
 #define _GAMENETWORK_H
 
+#include <iostream>
+#include <fstream>
 #include <Network.h>
+#include <Acceptor.h>
+#include <Connector.h>
+#include <Session.h>
+#include <SessionFactory.h>
+#include <Packet.h>
 #include <Config.h>
+#include <ServerApp.h>
+#include <Database.h>
+#include <Encoder.h>
+#include <PCTable.h>
 #include "GameProtocol.h"
 
-class GameClient : public Client
+enum GAME_SESSION
+{
+	SESSION_CLIENT,
+	SESSION_SERVER_ACTIVE,
+};
+
+const DWORD	MAX_NUMOF_GAME_CLIENT = 3;
+const DWORD	MAX_NUMOF_SERVER = 1;
+const DWORD	MAX_NUMOF_SESSION = MAX_NUMOF_GAME_CLIENT + MAX_NUMOF_SERVER;
+
+class GameServer : public ServerApp
 {
 public:
-	GameClient();
+	int	OnInitApp();
+	int	OnCreate();
+	void OnDestroy() {}
+	int	OnConfiguration(const char* ConfigFile);
+	int OnCommandArgument(int argc, _TCHAR* argv[]) { return 0; }
+	int	OnAppStart();
+	void Run()
+	{
+		DWORD TickCur, TickOld = ::GetTickCount();
+
+		while (IsRunnable())
+		{
+			TickCur = ::GetTickCount();
+			if (TickCur - TickOld >= 10000)
+			{
+				TickOld = TickCur;
+			}
+		}
+	}
+
+private:
+	Acceptor _clientAcceptor;
+
+public:
+	Config* ServerCfg;
+	Database* ServerDB;
+	int ServerID;
+	PCTable* pcTblData;
+};
+
+class GameClient : public Session
+{
+	friend class GameClientFactory;
+public:
+	GameClient(bool IsAliveCheck = false, bool IsOpcodeCheck = false);
 	~GameClient();
 
-	PCHAR_PROFILE PcProfile;
-	CHARSTATE CharState;
-	WORLD_INFO worldInfo;
-	ITEM_PROFILE ItemProfile[MAX_INVEN_ITEMCOUNT];
-	SKILL_INFO SkillInfo[MAX_PCHARSKILLS_COUNT];
-	QUICK_SLOT_PROFILE QuickSlotData[CHAR_QUICK_SLOT_MAX_COUNT];
-	bool TutorialMode;
+	int	OnAccept();
+	void OnClose();
+	int	OnDispatch(Packet* pPacket);
+	void Send(void* pData, int nSize);
+
+	// Opcode Control
+	bool PacketControl(Packet* pPacket);
 
 	// FUNCTIONS
 	void LoadCharacterData();
@@ -38,21 +93,50 @@ public:
 	void SendCharItemInfo();
 	void SendCharSkillInfo();
 	void SendCharQuickSlotInfo();
+
+private:
+	PacketEncoder _packetEncoder;
+	GameServer* pServer;
+
+	WCHAR userName[MAX_USERNAME_SIZE + 1];
+	WCHAR passWord[MAX_PASSWORD_SIZE + 1];
+	BYTE AuthKey[MAX_AUTHKEY_SIZE];
+	int AccountID;
+	BYTE LastServerID;
+	DWORD AcLevel;
+	BYTE CurrServerID;
+	BYTE CurrChannelID;
+	unsigned int CurrCharID;
+	bool goCharServer;
+
+	PCHAR_PROFILE PcProfile;
+	CHARSTATE CharState;
+	WORLD_INFO worldInfo;
+	ITEM_PROFILE ItemProfile[MAX_INVEN_ITEMCOUNT];
+	SKILL_INFO SkillInfo[MAX_PCHARSKILLS_COUNT];
+	QUICK_SLOT_PROFILE QuickSlotData[CHAR_QUICK_SLOT_MAX_COUNT];
+	bool TutorialMode;
 };
 
-class GameServer : public Server
+class GameClientFactory : public SessionFactory
 {
 public:
-	GameServer();
-	~GameServer();
+	Session* CreateSession(unsigned short sessionType)
+	{
+		Session* pSession = NULL;
+		switch (sessionType)
+		{
+		case SESSION_CLIENT:
+		{
+			pSession = new GameClient;
+		}
+		break;
 
-	void OnReady();
-	bool OnConnect(Client* client);
-	void OnDisconnect(Client* client);
-	bool OnDataReceived(Client* client, Packet* pData);
-	GameClient* CreateClient();
-	void DeleteClient(Client* client);
-	void PacketControl(GameClient* client, Packet* pData);
+		default:
+			break;
+		}
+		return pSession;
+	}
 };
 
 #endif

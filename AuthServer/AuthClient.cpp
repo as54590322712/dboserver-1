@@ -1,8 +1,54 @@
 #include "AuthNetwork.h"
 
-AuthClient::AuthClient() {}
+AuthClient::AuthClient(bool IsAliveCheck, bool IsOpcodeCheck)
+	:Session(SESSION_CLIENT)
+{
+	SetControlFlag(CONTROL_FLAG_USE_SEND_QUEUE);
 
-AuthClient::~AuthClient() {}
+	if (IsAliveCheck)
+	{
+		SetControlFlag(CONTROL_FLAG_CHECK_ALIVE);
+	}
+	if (IsOpcodeCheck)
+	{
+		SetControlFlag(CONTROL_FLAG_CHECK_OPCODE);
+	}
+
+	SetPacketEncoder(&_packetEncoder);
+	pServer = (AuthServer*)_GetApp();
+}
+
+AuthClient::~AuthClient()
+{
+}
+
+int	AuthClient::OnAccept()
+{
+	return 0;
+}
+
+void AuthClient::OnClose()
+{
+	if (goCharServer) pServer->ServerDB->ExecuteQuery("UPDATE `account` SET `State` = '2' WHERE `ID` = '%d';", AccountID);
+	else pServer->ServerDB->ExecuteQuery("UPDATE `account` SET `State` = '0' WHERE `ID` = '%d';", AccountID);
+}
+
+int AuthClient::OnDispatch(Packet* pPacket)
+{
+	PacketControl(pPacket);
+	//	return OnDispatch(pPacket);
+	return 0;
+}
+
+void AuthClient::Send(void* pData, int nSize)
+{
+	Packet* packet = new Packet((unsigned char*)pData, nSize);
+	int rc = pServer->Send(this->GetHandle(), packet);
+	if (0 != rc)
+	{
+		Logger::Log("Failed to send packet %d\n", rc);
+	}
+}
 
 char* AuthClient::GenAuthKey()
 {
@@ -72,21 +118,14 @@ ResultCodes AuthClient::LoginVerifyAccount()
 						pServer->ServerDB->Fetch();
 						if (pServer->ServerDB->rowsCount() == 0)
 						{
-							bool reconnect = false;
-
-							for each (Client* var in pServer->Clients)
-							{
-								if ((wcscmp(userName, var->userName) == 0) && (sock == var->sock))
-								{
-									reconnect = true;
-									break;
-								}
-							}
-
+							bool reconnect = true;
 							if (reconnect)
 							{
 								if (pServer->ServerDB->ExecuteQuery("UPDATE `account` SET `State` = '1' WHERE `ID` = '%d';", AccountID))
+								{
+									Logger::Log("Client[%d] Logged In with Account '%S' (%d)\n", this, userName, AccountID);
 									return AUTH_SUCCESS;
+								}
 								else
 									return AUTH_DB_FAIL;
 							}

@@ -1,64 +1,56 @@
 #include "AuthNetwork.h"
 
-AuthServer::AuthServer()
+int AuthServer::OnInitApp()
 {
-	ServerConfig = new Config("AuthServer");
-	ServerDB = new Database();
-	ServerDB->Connect(
-		ServerConfig->GetStr("MySQL", "Host"),
-		ServerConfig->GetStr("MySQL", "Database"),
-		ServerConfig->GetStr("MySQL", "User"),
-		ServerConfig->GetStr("MySQL", "Password"),
-		ServerConfig->GetInt("MySQL", "Port"));
-	this->sPort = ServerConfig->GetInt("Port");
-	if (!Start()) Logger::Log("Server ERROR!\n");
-}
+	_MaxSessionCount = MAX_NUMOF_SESSION;
 
-AuthServer::~AuthServer()
-{
-}
-
-void AuthServer::OnReady()
-{
-	Logger::Log("Server Listening on port (%d) ...\n", sPort);
-}
-
-bool AuthServer::OnConnect(Client* client)
-{
-	return true;
-}
-
-void AuthServer::OnDisconnect(Client* client)
-{
-	if (client->goCharServer) ServerDB->ExecuteQuery("UPDATE `account` SET `State` = '2' WHERE `ID` = '%d';", client->AccountID);
-	else ServerDB->ExecuteQuery("UPDATE `account` SET `State` = '0' WHERE `ID` = '%d';", client->AccountID);
-}
-
-bool AuthServer::OnDataReceived(Client* client, Packet* pData)
-{
-	PacketControl((AuthClient*)client, pData);
-	return true;
-}
-
-AuthClient* AuthServer::CreateClient()
-{
-	return new AuthClient();
-}
-
-void AuthServer::DeleteClient(Client* client)
-{
-	delete (AuthClient*)client;
-}
-
-void AuthServer::PacketControl(AuthClient* client, Packet* pData)
-{
-	LPPACKETDATA data = (LPPACKETDATA)pData->GetPacketData();
-	switch (data->wOpCode)
+	_SessionFactory = new AuthClientFactory;
+	if (NULL == _SessionFactory)
 	{
-		case UA_LOGIN_DISCONNECT_REQ: client->SendDisconnectRes((sUA_LOGIN_DISCONNECT_REQ*)data); break;
-		case UA_LOGIN_REQ: client->SendLoginRes((sUA_LOGIN_REQ*)data);  break;
-		case 1: { sPACKETHEADER reply(1); client->Send(&reply, sizeof(reply)); } break;
-		case 0: break;
-		default: Logger::Log("Received Opcode: %d\n", data->wOpCode); break;
+		return 1;//ERR_SYS_MEMORY_ALLOC_FAIL;
 	}
+
+	return 0;
+}
+
+int AuthServer::OnCreate()
+{
+	int rc = 0;
+	rc = _clientAcceptor.Create(ServerCfg->GetStr("Server", "IP"),
+		ServerCfg->GetInt("Server", "Port"),
+		SESSION_CLIENT,
+		MAX_NUMOF_GAME_CLIENT, 5, 2, MAX_NUMOF_GAME_CLIENT);
+	if (0 != rc)
+	{
+		return rc;
+	}
+
+	rc = _network.Associate(&_clientAcceptor, true);
+	if (0 != rc)
+	{
+		return rc;
+	}
+
+	ServerDB = new Database();
+	if (!ServerDB->Connect(
+		ServerCfg->GetStr("MySQL", "Host"),
+		ServerCfg->GetStr("MySQL", "Database"),
+		ServerCfg->GetStr("MySQL", "User"),
+		ServerCfg->GetStr("MySQL", "Password"),
+		ServerCfg->GetInt("MySQL", "Port")))
+		return 2;//ERR_DBSERVER_CONNECT
+
+	return 0;
+}
+
+int AuthServer::OnConfiguration(const char* ConfigFile)
+{
+	ServerCfg = new Config(ConfigFile);
+	return 0;
+}
+
+int AuthServer::OnAppStart()
+{
+	Logger::Log("Server listening on %s:%d\n", _clientAcceptor.GetListenIP(), _clientAcceptor.GetListenPort());
+	return 0;
 }

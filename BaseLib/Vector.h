@@ -1,10 +1,14 @@
 #ifndef _VECTOR
 #define _VECTOR
 
-#include <windows.h>
+#pragma once
+
+#include "Base.h"
+#include <Windows.h>
 #include <float.h>
 #include <math.h>
 #include <crtdbg.h>
+#include <string>
 
 #pragma once
 

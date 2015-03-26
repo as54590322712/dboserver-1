@@ -1,11 +1,53 @@
 #include "CharNetwork.h"
 
-CharClient::CharClient()
+CharClient::CharClient(bool IsAliveCheck, bool IsOpcodeCheck)
+	:Session(SESSION_CLIENT)
 {
+	SetControlFlag(CONTROL_FLAG_USE_SEND_QUEUE);
+
+	if (IsAliveCheck)
+	{
+		SetControlFlag(CONTROL_FLAG_CHECK_ALIVE);
+	}
+	if (IsOpcodeCheck)
+	{
+		SetControlFlag(CONTROL_FLAG_CHECK_OPCODE);
+	}
+
+	SetPacketEncoder(&_packetEncoder);
+	pServer = (CharServer*)_GetApp();
 }
 
 CharClient::~CharClient()
 {
+}
+
+int	CharClient::OnAccept()
+{
+	return 0;
+}
+
+void CharClient::OnClose()
+{
+	if (goGameServer) pServer->ServerDB->ExecuteQuery("UPDATE `account` SET `State` = '3' WHERE `ID` = '%d';", AccountID);
+	else pServer->ServerDB->ExecuteQuery("UPDATE `account` SET `State` = '0' WHERE `ID` = '%d';", AccountID);
+}
+
+int CharClient::OnDispatch(Packet* pPacket)
+{
+	PacketControl(pPacket);
+	//	return OnDispatch(pPacket);
+	return 0;
+}
+
+void CharClient::Send(void* pData, int nSize)
+{
+	Packet* packet = new Packet((unsigned char*)pData, nSize);
+	int rc = pServer->Send(this->GetHandle(), packet);
+	if (0 != rc)
+	{
+		Logger::Log("Failed to send packet %d\n", rc);
+	}
 }
 
 void CharClient::DBUpdateLastServer()

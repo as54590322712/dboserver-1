@@ -1,8 +1,10 @@
 #ifndef _CONFIG_H
 #define _CONFIG_H
 
-#include "Logger.h"
+#pragma once
 
+#include "Base.h"
+#include "Logger.h"
 #include <libxml/xmlmemory.h>
 #include <libxml/parser.h>
 #include <libxml/tree.h>
@@ -14,7 +16,7 @@
 class Config
 {
 public:
-	Config(char* rootname);
+	Config(const char* rootname);
 	~Config();
 	int GetInt(char* fieldname);
 	int GetInt(char* fieldname, char* valuename);

@@ -28,6 +28,7 @@ public:
 	bool ExecuteQuery(char* Format, ...);
 	bool ExecuteSelect(char* Format, ...);
 	bool Fetch();
+	float getFloat(const char* index);
 	long double getDouble(const char* index);
 	bool getBoolean(const char* index);
 	int getInt(const char* index);

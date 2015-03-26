@@ -163,9 +163,9 @@ int CharClient::GetDBAccCharListData(sCU_CHARACTER_INFO* outdata)
 				outdata->CharData[c].SkinColor = pServer->ServerDB->getInt("SkinColor");
 				outdata->CharData[c].worldTblidx = pServer->ServerDB->getInt("worldTblidx");
 				outdata->CharData[c].worldId = pServer->ServerDB->getInt("worldId");
-				outdata->CharData[c].PositionX = pServer->ServerDB->getDouble("PositionX");
-				outdata->CharData[c].PositionY = pServer->ServerDB->getDouble("PositionY");
-				outdata->CharData[c].PositionZ = pServer->ServerDB->getDouble("PositionZ");
+				outdata->CharData[c].PositionX = pServer->ServerDB->getFloat("PositionX");
+				outdata->CharData[c].PositionY = pServer->ServerDB->getFloat("PositionY");
+				outdata->CharData[c].PositionZ = pServer->ServerDB->getFloat("PositionZ");
 				outdata->CharData[c].Money = pServer->ServerDB->getInt("Money");
 				outdata->CharData[c].MoneyBank = pServer->ServerDB->getInt("MoneyBank");
 				outdata->CharData[c].MapInfoId = pServer->ServerDB->getInt("MapInfoId");

@@ -9,15 +9,15 @@ bool CharClient::PacketControl(Packet* pPacket)
 	case UC_LOGIN_REQ: SendLoginResult((sUC_LOGIN_REQ*)data); break;
 	case UC_CHARACTER_SERVERLIST_REQ: SendServerlist(false); break;
 	case UC_CHARACTER_SERVERLIST_ONE_REQ: SendServerlist(true); break;
-	case UC_CHARACTER_LOAD_REQ: SendCharLoadResult((sUC_CHARACTER_LOAD_REQ*)data); break;
-	case UC_CHARACTER_EXIT_REQ: SendCharExitRes((sUC_CHARACTER_EXIT_REQ*)data); break;
 	case UC_CHARACTER_ADD_REQ: SendCharCreateRes((sUC_CHARACTER_ADD_REQ*)data); break;
 	case UC_CHARACTER_DEL_REQ: SendCharDelRes((sUC_CHARACTER_DEL_REQ*)data); break;
+	case UC_CHARACTER_SELECT_REQ: SendCharSelectRes((sUC_CHARACTER_SELECT_REQ*)data); break;
+	case UC_CHARACTER_EXIT_REQ: SendCharExitRes((sUC_CHARACTER_EXIT_REQ*)data); break;
+	case UC_CHARACTER_LOAD_REQ: SendCharLoadResult((sUC_CHARACTER_LOAD_REQ*)data); break;
 	case UC_CHARACTER_DEL_CANCEL_REQ: SendCharDelCancelRes((sUC_CHARACTER_DEL_CANCEL_REQ*)data); break;
 	case UC_CONNECT_WAIT_CHECK_REQ: SendCharConnWaitCheckRes((sUC_CONNECT_WAIT_CHECK_REQ*)data); break;
-	case UC_CHARACTER_SELECT_REQ: SendCharSelectRes((sUC_CHARACTER_SELECT_REQ*)data); break;
-	case UC_CHARACTER_RENAME_REQ: SendCharRenameRes((sUC_CHARACTER_RENAME_REQ*)data); break;
 	case UC_CONNECT_WAIT_CANCEL_REQ: SendCancelWaitReq((sUC_CONNECT_WAIT_CANCEL_REQ*)data); break;
+	case UC_CHARACTER_RENAME_REQ: SendCharRenameRes((sUC_CHARACTER_RENAME_REQ*)data); break;
 	case 1: { sPACKETHEADER reply(1); Send(&reply, sizeof(reply)); } break;
 	default:
 		Logger::Log("Received Opcode: %d\n", data->wOpCode);
@@ -32,6 +32,8 @@ void CharClient::SendLoginResult(sUC_LOGIN_REQ* data)
 	CurrServerID = data->serverID;
 	AccountID = data->accountId;
 	memcpy(AuthKey, data->AuthKey, MAX_AUTHKEY_SIZE);
+
+	Logger::Log("Client[%d] entering char server (%d)\n", this, AccountID);
 
 	sCU_LOGIN_RES lRes;
 	memset(&lRes, 0, sizeof(sCU_LOGIN_RES));
@@ -108,6 +110,8 @@ void CharClient::SendCharLoadResult(sUC_CHARACTER_LOAD_REQ* data)
 	cinfo.OpCode = CU_CHARACTER_INFO;
 	Send((unsigned char*)&cinfo, sizeof(cinfo));
 
+	Logger::Log("Loaded %d characters from client[%d] (%d)\n", cinfo.Count, this, AccountID);
+
 	sCU_CHARACTER_LOAD_RES clres;
 	memset(&clres, 0, sizeof(sCU_CHARACTER_LOAD_RES));
 	clres.OpCode = CU_CHARACTER_LOAD_RES;
@@ -163,6 +167,7 @@ void CharClient::SendCharCreateRes(sUC_CHARACTER_ADD_REQ* data)
 		}
 		Res.CharData.charId = DBInsertCharData(Res.CharData, nbdata);
 	}
+	Logger::Log("Client[%d] created character '%S' (%d)\n", this, Res.CharData.Name, Res.CharData.charId);
 	Send((unsigned char*)&Res, sizeof(Res));
 }
 
@@ -223,6 +228,7 @@ void CharClient::SendCharSelectRes(sUC_CHARACTER_SELECT_REQ* data)
 	memcpy(selRes.GameServerIP, pServer->ServerCfg->GetChildStr(snode, cnode, "IP"), MAX_SRVADDR_SIZE);
 	selRes.GameServerPort = pServer->ServerCfg->GetChildInt(snode, cnode, "Port");
 	selRes.ResultCode = CHARACTER_SUCCESS;
+	Logger::Log("Client[%d] selected character (%d)\n", this, selRes.charId);
 	Send((unsigned char*)&selRes, sizeof(selRes));
 }
 

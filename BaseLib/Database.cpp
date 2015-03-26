@@ -118,6 +118,11 @@ bool Database::Fetch()
 	return res->next();
 }
 
+float Database::getFloat(const char* index)
+{
+	return static_cast<float>(res->getDouble(index));
+}
+
 long double Database::getDouble(const char* index)
 {
 	return res->getDouble(index);

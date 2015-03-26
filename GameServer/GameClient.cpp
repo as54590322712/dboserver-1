@@ -118,6 +118,10 @@ int GameClient::LoadItemData()
 
 void GameClient::UpdatePositions(VECTORXY Dir, VECTORXYZ Loc)
 {
+	CharState.CharStateBase.CurLoc = Loc;
+	CharState.CharStateBase.CurDir.x = Dir.x;
+	CharState.CharStateBase.CurDir.y = 0.0f;
+	CharState.CharStateBase.CurDir.z = Dir.z;
 	pServer->ServerDB->ExecuteQuery("CALL `spUpdatePosition`('%u', '%f', '%f', '%f');", this->CurrCharID, Loc.x, Loc.y, Loc.z);
 	pServer->ServerDB->ExecuteQuery("CALL `spUpdateDirection`('%u', '%f', '%f', '%f');", this->CurrCharID, Dir.x, 0.0f, Dir.z);
 }
@@ -279,12 +283,12 @@ void GameClient::LoadCharacterData()
 		CharState.CharStateBase.aspectState.AspectStateDetail.Vehicle.idVehicleTblidx = 0;
 		CharState.CharStateBase.aspectState.AspectStateDetail.Vehicle.IsEngineOn = 0;
 
-		CharState.CharStateBase.CurLoc.x = pServer->ServerDB->getDouble("PositionX");
-		CharState.CharStateBase.CurLoc.y = pServer->ServerDB->getDouble("PositionY");
-		CharState.CharStateBase.CurLoc.z = pServer->ServerDB->getDouble("PositionZ");
-		CharState.CharStateBase.CurDir.x = pServer->ServerDB->getDouble("DirectionX");
-		CharState.CharStateBase.CurDir.y = pServer->ServerDB->getDouble("DirectionY");
-		CharState.CharStateBase.CurDir.z = pServer->ServerDB->getDouble("DirectionZ");
+		CharState.CharStateBase.CurLoc.x = pServer->ServerDB->getFloat("PositionX");
+		CharState.CharStateBase.CurLoc.y = pServer->ServerDB->getFloat("PositionY");
+		CharState.CharStateBase.CurLoc.z = pServer->ServerDB->getFloat("PositionZ");
+		CharState.CharStateBase.CurDir.x = pServer->ServerDB->getFloat("DirectionX");
+		CharState.CharStateBase.CurDir.y = pServer->ServerDB->getFloat("DirectionY");
+		CharState.CharStateBase.CurDir.z = pServer->ServerDB->getFloat("DirectionZ");
 	}
 }
 

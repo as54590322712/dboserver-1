@@ -26,6 +26,9 @@ const DWORD	MAX_NUMOF_GAME_CLIENT = 3;
 const DWORD	MAX_NUMOF_SERVER = 1;
 const DWORD	MAX_NUMOF_SESSION = MAX_NUMOF_GAME_CLIENT + MAX_NUMOF_SERVER;
 
+class CharClient;
+class CharClientFactory;
+
 class CharServer : public ServerApp
 {
 public:

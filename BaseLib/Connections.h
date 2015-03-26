@@ -70,6 +70,7 @@ public:
 	int CompleteSend(DWORD TransferedBytes);
 	int CompleteAccept(DWORD TransferedBytes);
 	int CompleteConnect(DWORD TransferedBytes);
+	int PushPacket(void* pData, int nSize);
 	int PushPacket(Packet* pPacket);
 	bool PopPacket(Packet* pPacket);
 	virtual bool IsValidPacket(void* PacketHeader, WORD PacketLength);

@@ -26,38 +26,8 @@ const DWORD	MAX_NUMOF_GAME_CLIENT = 3;
 const DWORD	MAX_NUMOF_SERVER = 1;
 const DWORD	MAX_NUMOF_SESSION = MAX_NUMOF_GAME_CLIENT + MAX_NUMOF_SERVER;
 
-class GameServer : public ServerApp
-{
-public:
-	int	OnInitApp();
-	int	OnCreate();
-	void OnDestroy() {}
-	int	OnConfiguration(const char* ConfigFile);
-	int OnCommandArgument(int argc, _TCHAR* argv[]) { return 0; }
-	int	OnAppStart();
-	void Run()
-	{
-		DWORD TickCur, TickOld = ::GetTickCount();
-
-		while (IsRunnable())
-		{
-			TickCur = ::GetTickCount();
-			if (TickCur - TickOld >= 10000)
-			{
-				TickOld = TickCur;
-			}
-		}
-	}
-
-private:
-	Acceptor _clientAcceptor;
-
-public:
-	Config* ServerCfg;
-	Database* ServerDB;
-	int ServerID;
-	PCTable* pcTblData;
-};
+class GameServer;
+class GameClientFactory;
 
 class GameClient : public Session
 {
@@ -70,6 +40,7 @@ public:
 	void OnClose();
 	int	OnDispatch(Packet* pPacket);
 	void Send(void* pData, int nSize);
+	unsigned int GetCharSerialID() { return CharSerialID; };
 
 	// Opcode Control
 	bool PacketControl(Packet* pPacket);
@@ -93,6 +64,10 @@ public:
 	void SendCharItemInfo();
 	void SendCharSkillInfo();
 	void SendCharQuickSlotInfo();
+	void SendCharReadyRes();
+
+public:
+	sGU_OBJECT_CREATE charSpawn;
 
 private:
 	PacketEncoder _packetEncoder;
@@ -100,6 +75,8 @@ private:
 
 	WCHAR userName[MAX_USERNAME_SIZE + 1];
 	WCHAR passWord[MAX_PASSWORD_SIZE + 1];
+	WCHAR charName[MAX_CHARNAME_SIZE + 1];
+	WCHAR guildName[MAX_GUILDNAME_USIZE + 1];
 	BYTE AuthKey[MAX_AUTHKEY_SIZE];
 	int AccountID;
 	BYTE LastServerID;
@@ -116,6 +93,7 @@ private:
 	SKILL_INFO SkillInfo[MAX_PCHARSKILLS_COUNT];
 	QUICK_SLOT_PROFILE QuickSlotData[CHAR_QUICK_SLOT_MAX_COUNT];
 	bool TutorialMode;
+	unsigned int CharSerialID;
 };
 
 class GameClientFactory : public SessionFactory
@@ -137,6 +115,56 @@ public:
 		}
 		return pSession;
 	}
+};
+
+class GameServer : public ServerApp
+{
+public:
+	int	OnInitApp();
+	int	OnCreate();
+	void OnDestroy() {}
+	int	OnConfiguration(const char* ConfigFile);
+	int OnCommandArgument(int argc, _TCHAR* argv[]) { return 0; }
+	int	OnAppStart();
+	unsigned int AcquireCharSerialID();
+	unsigned int AcquireNpcSerialID();
+	unsigned int AcquireTargetSerialID();
+	bool AddClient(const char* charName, GameClient* pClient);
+	void RemoveClient(const char* charName);
+	bool FindClient(const char* charName);
+	void SendAll(void* pData, int nSize);
+	void SendOthers(void* pData, int nSize, GameClient* pClient, bool distCheck = false);
+	void RecvOthers(eOpcode Opcode, GameClient* pClient, bool distCheck = false);
+	void Run()
+	{
+		DWORD TickCur, TickOld = ::GetTickCount();
+
+		while (IsRunnable())
+		{
+			TickCur = ::GetTickCount();
+			if (TickCur - TickOld >= 10000)
+			{
+				TickOld = TickCur;
+			}
+		}
+	}
+
+private:
+	Acceptor _clientAcceptor;
+
+public:
+	Config* ServerCfg;
+	Database* ServerDB;
+	int ServerID;
+	PCTable* pcTblData;
+	unsigned int m_uiCharSerialID;
+	unsigned int m_uiNpcSerialID;
+	unsigned int m_uiTargetSerialID;
+
+	typedef std::map<GameString, GameClient*> CLENTLIST;
+	typedef CLENTLIST::value_type CLIENTVAL;
+	typedef CLENTLIST::iterator CLIENTIT;
+	CLENTLIST clientList;
 };
 
 #endif

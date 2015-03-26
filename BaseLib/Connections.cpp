@@ -705,6 +705,12 @@ BYTE Connections::GetSequence(void* PacketHeader)
 	return pPacketHeader->bySequence;
 }
 
+int Connections::PushPacket(void* pData, int nSize)
+{
+	Packet* packet = new Packet((unsigned char*)pData, nSize);
+	return PushPacket(packet);
+}
+
 int Connections::PushPacket(Packet* pPacket)
 {
 	FUNCTION_BEGIN();

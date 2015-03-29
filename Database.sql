@@ -25,7 +25,7 @@ CREATE TABLE `account` (
   `LastServerID` int(11) NOT NULL default '255',
   `State` int(11) NOT NULL default '0',
   PRIMARY KEY  (`ID`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
 
 /*Table structure for table `character` */
 
@@ -33,36 +33,49 @@ DROP TABLE IF EXISTS `character`;
 
 CREATE TABLE `character` (
   `ID` int(11) NOT NULL auto_increment,
-  `AccID` int(11) NOT NULL,
-  `ServerID` int(11) NOT NULL,
+  `AccID` int(11) NOT NULL default '0',
+  `ServerID` int(11) NOT NULL default '0',
   `Name` varchar(20) NOT NULL,
-  `Race` int(11) NOT NULL,
-  `Class` int(11) NOT NULL,
-  `Gender` int(11) NOT NULL,
-  `Face` int(11) NOT NULL,
-  `Hair` int(11) NOT NULL,
-  `HairColor` int(11) NOT NULL,
-  `SkinColor` int(11) NOT NULL,
+  `Race` int(11) NOT NULL default '0',
+  `Class` int(11) NOT NULL default '0',
+  `Gender` int(11) NOT NULL default '0',
+  `Face` int(11) NOT NULL default '0',
+  `Hair` int(11) NOT NULL default '0',
+  `HairColor` int(11) NOT NULL default '0',
+  `SkinColor` int(11) NOT NULL default '0',
   `Level` int(11) NOT NULL default '1',
-  `Exp` bigint(20) NOT NULL default '0',
-  `MapInfoId` bigint(20) NOT NULL,
-  `worldTblidx` int(11) NOT NULL,
-  `worldId` int(11) NOT NULL,
+  `CurExp` bigint(20) NOT NULL default '0',
+  `MapInfoId` bigint(20) NOT NULL default '0',
+  `worldTblidx` bigint(11) NOT NULL default '0',
+  `worldId` bigint(11) NOT NULL default '0',
+  `BindType` int(11) NOT NULL default '0',
+  `bindWorldId` bigint(20) NOT NULL default '0',
+  `bindObjectTblid` bigint(20) NOT NULL default '0',
   `PositionX` float(11,6) NOT NULL default '0.000000',
   `PositionY` float(11,6) NOT NULL default '0.000000',
   `PositionZ` float(11,6) NOT NULL default '0.000000',
   `DirectionX` float(11,6) NOT NULL default '0.000000',
   `DirectionY` float(11,6) NOT NULL default '0.000000',
   `DirectionZ` float(11,6) NOT NULL default '0.000000',
-  `Money` bigint(20) NOT NULL,
-  `MoneyBank` bigint(20) NOT NULL,
-  `Marking` int(11) NOT NULL,
+  `Money` bigint(20) NOT NULL default '0',
+  `MoneyBank` bigint(20) NOT NULL default '0',
+  `Marking` int(11) NOT NULL default '0',
   `Adult` tinyint(1) NOT NULL default '0',
-  `TutorialFlag` tinyint(1) NOT NULL,
+  `TutorialFlag` tinyint(1) NOT NULL default '0',
   `NeedNameChange` tinyint(1) NOT NULL default '0',
   `ToDelete` tinyint(1) NOT NULL default '0',
+  `ChangeClass` tinyint(1) NOT NULL default '0',
+  `IsGameMaster` tinyint(4) NOT NULL default '0',
+  `TutorialHint` bigint(20) NOT NULL default '0',
+  `Reputation` int(11) NOT NULL default '0',
+  `MudosaPoint` int(11) NOT NULL default '0',
+  `SpPoint` int(11) NOT NULL default '0',
+  `CurEP` int(11) NOT NULL default '0',
+  `MaxEP` int(11) NOT NULL default '0',
+  `CurLP` int(11) NOT NULL default '0',
+  `MaxLP` int(11) NOT NULL default '0',
   PRIMARY KEY  (`ID`)
-) ENGINE=InnoDB AUTO_INCREMENT=37 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=40 DEFAULT CHARSET=utf8;
 
 /*Table structure for table `inventory` */
 
@@ -88,7 +101,7 @@ CREATE TABLE `inventory` (
   `UseStartTime` timestamp NULL default CURRENT_TIMESTAMP,
   `UseEndTime` timestamp NULL default NULL,
   PRIMARY KEY  (`ID`)
-) ENGINE=InnoDB AUTO_INCREMENT=192 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=216 DEFAULT CHARSET=utf8;
 
 /*Table structure for table `quickslot` */
 
@@ -102,7 +115,7 @@ CREATE TABLE `quickslot` (
   `Type` tinyint(3) unsigned NOT NULL default '0',
   `Item` int(10) unsigned NOT NULL default '0',
   PRIMARY KEY  (`ID`)
-) ENGINE=InnoDB AUTO_INCREMENT=26 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=41 DEFAULT CHARSET=utf8;
 
 /*Table structure for table `skills` */
 
@@ -118,7 +131,145 @@ CREATE TABLE `skills` (
   `RemainSec` int(10) unsigned NOT NULL default '0',
   `Exp` int(10) unsigned NOT NULL default '0',
   PRIMARY KEY  (`ID`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8;
+
+/* Procedure structure for procedure `spInsertCharacter` */
+
+/*!50003 DROP PROCEDURE IF EXISTS  `spInsertCharacter` */;
+
+DELIMITER $$
+
+/*!50003 CREATE DEFINER=`root`@`localhost` PROCEDURE `spInsertCharacter`( 
+	in nAccID int, 
+	in nServerID int, 
+	in strName varchar(20), 
+	in nRace int, 
+	in nClass int, 
+	in nGender int, 
+	in nFace int, 
+	in nHair int, 
+	in nHairColor int, 
+	in nSkinColor int, 
+	in nLevel int, 
+	in nCurExp int, 
+	in nMapInfoId int, 
+	in nworldTblidx int, 
+	in nworldId int, 
+	in nBindType int, 
+	in nbindWorldId int, 
+	in nbindObjectTblid int, 
+	in fPositionX float(11,6), 
+	in fPositionY float(11,6), 
+	in fPositionZ float(11,6), 
+	in fDirectionX float(11,6), 
+	in fDirectionY float(11,6), 
+	in fDirectionZ float(11,6), 
+	in nMoney int, 
+	in nMoneyBank int, 
+	in nMarking int, 
+	in nAdult int, 
+	in nTutorialFlag int, 
+	in nNeedNameChange int, 
+	in nToDelete int, 
+	in nChangeClass int, 
+	in nIsGameMaster int, 
+	in nTutorialHint int, 
+	in nReputation int, 
+	in nMudosaPoint int, 
+	in nSpPoint int, 
+	in nCurEP int, 
+	in nMaxEP int, 
+	in nCurLP int, 
+	in nMaxLP int)
+BEGIN
+	INSERT INTO `dbo`.`character` 
+	(`AccID`, 
+	`ServerID`, 
+	`Name`, 
+	`Race`, 
+	`Class`, 
+	`Gender`, 
+	`Face`, 
+	`Hair`, 
+	`HairColor`, 
+	`SkinColor`, 
+	`Level`, 
+	`CurExp`, 
+	`MapInfoId`, 
+	`worldTblidx`, 
+	`worldId`, 
+	`BindType`, 
+	`bindWorldId`, 
+	`bindObjectTblid`, 
+	`PositionX`, 
+	`PositionY`, 
+	`PositionZ`, 
+	`DirectionX`, 
+	`DirectionY`, 
+	`DirectionZ`, 
+	`Money`, 
+	`MoneyBank`, 
+	`Marking`, 
+	`Adult`, 
+	`TutorialFlag`, 
+	`NeedNameChange`, 
+	`ToDelete`, 
+	`ChangeClass`, 
+	`IsGameMaster`, 
+	`TutorialHint`, 
+	`Reputation`, 
+	`MudosaPoint`, 
+	`SpPoint`, 
+	`CurEP`, 
+	`MaxEP`, 
+	`CurLP`, 
+	`MaxLP`
+	)
+	VALUES
+	(nAccID, 
+	nServerID, 
+	strName, 
+	nRace, 
+	nClass, 
+	nGender, 
+	nFace, 
+	nHair, 
+	nHairColor, 
+	nSkinColor, 
+	nLevel, 
+	nCurExp, 
+	nMapInfoId, 
+	nworldTblidx, 
+	nworldId, 
+	nBindType, 
+	nbindWorldId, 
+	nbindObjectTblid, 
+	fPositionX, 
+	fPositionY, 
+	fPositionZ, 
+	fDirectionX, 
+	fDirectionY, 
+	fDirectionZ, 
+	nMoney, 
+	nMoneyBank, 
+	nMarking, 
+	nAdult, 
+	nTutorialFlag, 
+	nNeedNameChange, 
+	nToDelete, 
+	nChangeClass, 
+	nIsGameMaster, 
+	nTutorialHint, 
+	nReputation, 
+	nMudosaPoint, 
+	nSpPoint, 
+	nCurEP, 
+	nMaxEP, 
+	nCurLP, 
+	nMaxLP
+	);
+    END */$$
+DELIMITER ;
 
 /* Procedure structure for procedure `spUpdateDirection` */
 

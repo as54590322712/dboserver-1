@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <GameServer>
   <!-- Server Configuration -->
-  <ID value="0" />
-  <Server IP="127.0.0.1" Port="50400" />
+  <Server ID="0" IP="0.0.0.0" Port="50400" />
   <MySQL Host="127.0.0.1" Port="3306" Database="DBO" User="root" Password="" />
   <!-- Chat Server Config -->
-  <ChatServer IP="127.0.0.1" Port="50100" />
+  <ChatServer IP="10.0.0.16" Port="50100" />
 </GameServer>

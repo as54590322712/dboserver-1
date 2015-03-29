@@ -47,6 +47,8 @@ int GameServer::OnCreate()
 		return 3;//ERR_LOADTABLE
 	}
 
+	this->ServerID = ServerCfg->GetInt("Server", "ID");
+
 	m_uiCharSerialID = INVALID_DWORD;
 	m_uiNpcSerialID = INVALID_DWORD;
 	m_uiTargetSerialID = INVALID_DWORD;
@@ -62,6 +64,10 @@ int GameServer::OnConfiguration(const char* ConfigFile)
 int GameServer::OnAppStart()
 {
 	Logger::Log("Server listening on %s:%d\n", _clientAcceptor.GetListenIP(), _clientAcceptor.GetListenPort());
+	_charManager = new CharacterManager();
+	_charManager->Init();
+	_objManager = new ObjectManager();
+	_objManager->Init();
 	return 0;
 }
 
@@ -98,57 +104,70 @@ unsigned int GameServer::AcquireTargetSerialID()
 	return m_uiTargetSerialID;
 }
 
-bool GameServer::AddClient(const char* charName, GameClient* pClient)
+bool GameServer::AddClient(GameClient* pClient)
 {
-	if (false == clientList.insert(CLIENTVAL(GameString(charName), pClient)).second)
-		return false;
+	cList.push_back(new ClientLink(pClient));
 	return true;
 }
 
-void GameServer::RemoveClient(const char* charName)
+void GameServer::RemoveClient(GameClient* pClient)
 {
-	clientList.erase(GameString(charName));
+	for (unsigned int i = 0; i < cList.size(); ++i)
+	{
+		if (pClient == cList.at(i)->GetClient())
+			cList.erase(cList.begin() + i);
+	}
 }
 
-bool GameServer::FindClient(const char* charName)
+bool GameServer::FindClient(GameClient* pClient)
 {
-	CLIENTIT it = clientList.find(GameString(charName));
-	if (it == clientList.end())
-		return false;
-	return true;
+	for (unsigned int i = 0; i < cList.size(); ++i)
+	{
+		if (pClient == cList.at(i)->GetClient()) return true;
+	}
+	return false;
 }
 
 void GameServer::SendAll(void* pData, int nSize)
 {
-	for (CLIENTIT it = clientList.begin(); it != clientList.end(); it++)
+	for (unsigned int i = 0; i < cList.size(); ++i)
 	{
-		it->second->PushPacket(pData, nSize);
+		cList.at(i)->GetClient()->PushPacket(pData, nSize);
 	}
 }
 
 void GameServer::SendOthers(void* pData, int nSize, GameClient* pClient, bool distCheck)
 {
-	for (CLIENTIT it = clientList.begin(); it != clientList.end(); it++)
+	for (unsigned int i = 0; i < cList.size(); ++i)
 	{
-		if (pClient->GetCharSerialID() != it->second->GetCharSerialID())
-			it->second->PushPacket(pData, nSize);
+		if (pClient->GetHandle() != cList.at(i)->GetClient()->GetHandle())
+			cList.at(i)->GetClient()->PushPacket(pData, nSize);
 	}
 }
 
-void GameServer::RecvOthers(eOpcode Opcode, GameClient* pClient, bool distCheck)
+void GameServer::RecvOthers(eOPCODE_GU Opcode, GameClient* pClient, bool distCheck)
 {
-	for (CLIENTIT it = clientList.begin(); it != clientList.end(); it++)
+	for (unsigned int i = 0; i < cList.size(); ++i)
 	{
-		if (pClient->GetCharSerialID() != it->second->GetCharSerialID())
+		if (pClient->GetHandle() != cList.at(i)->GetClient()->GetHandle())
 		{
 			switch (Opcode)
 			{
 			case GU_OBJECT_CREATE:
 				{
-					it->second->charSpawn.handle = it->second->GetCharSerialID();
-					pClient->PushPacket(&it->second->charSpawn, sizeof(it->second->charSpawn));
+					sGU_OBJECT_CREATE pSpawn = cList.at(i)->GetClient()->GetCharSpawnData();
+					pSpawn.handle = cList.at(i)->GetClient()->GetCharSerialID();
+					pClient->PushPacket(&pSpawn, sizeof(pSpawn));
 				} break;
 			}
 		}
+	}
+}
+
+void GameServer::SpawnObjects()
+{
+	for (unsigned int i = 0; i < cList.size(); ++i)
+	{
+		this->_objManager->SpawnToClient(cList.at(i)->GetClient());
 	}
 }

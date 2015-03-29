@@ -76,7 +76,7 @@ void NetworkProcessor::Run()
 		if (FALSE == Result)
 		{
 			int rc = GetLastError();
-			Logger::Log("Dispatcher\tGQCS Failed : Err:%d\n", rc);
+			//Logger::Log("Dispatcher\tGQCS Failed : Err:%d\n", rc);
 			continue;
 		}
 

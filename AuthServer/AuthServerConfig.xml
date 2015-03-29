@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <AuthServer>
   <!-- Server Configuration -->
-  <Server IP="127.0.0.1" Port="50200" />
+  <Server IP="0.0.0.0" Port="50200" />
   <MySQL Host="127.0.0.1" Port="3306" Database="DBO" User="root" Password="" />
   
   <!-- Server List Configuration -->
   <ServerList Count="1">
-    <Server1 IP="127.0.0.1" Port="50300" />
+    <Server1 IP="10.0.0.16" Port="50300" />
   </ServerList>
 </AuthServer>

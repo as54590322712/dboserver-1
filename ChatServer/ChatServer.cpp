@@ -104,7 +104,7 @@ void ChatServer::SendOthers(void* pData, int nSize, ChatClient* pClient, bool di
 }
 
 
-void ChatServer::RecvOthers(eOpcode Opcode, ChatClient* pClient, bool distCheck)
+void ChatServer::RecvOthers(eOPCODE_TU Opcode, ChatClient* pClient, bool distCheck)
 {
 	for (CLIENTIT it = clientList.begin(); it != clientList.end(); it++)
 	{

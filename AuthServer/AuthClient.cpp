@@ -52,8 +52,8 @@ void AuthClient::Send(void* pData, int nSize)
 
 char* AuthClient::GenAuthKey()
 {
-	char Key[MAX_AUTHKEY_SIZE];
-	sprintf_s(Key, MAX_AUTHKEY_SIZE, "%d", time(NULL));
+	char Key[NTL_MAX_SIZE_AUTH_KEY];
+	sprintf_s(Key, NTL_MAX_SIZE_AUTH_KEY, "%d", time(NULL));
 	return (char*)&Key[0];
 }
 
@@ -78,7 +78,7 @@ BYTE AuthClient::GetDBLastServerID()
 			return pServer->ServerDB->getInt("LastServerID");
 		}
 	}
-	return INVALID_SERVERID;
+	return 0xFF;
 }
 
 int AuthClient::GetDBAccountID()
@@ -93,7 +93,7 @@ int AuthClient::GetDBAccountID()
 	return 0;
 }
 
-ResultCodes AuthClient::LoginVerifyAccount()
+eRESULTCODE AuthClient::LoginVerifyAccount()
 {
 	if (pServer->ServerDB->ExecuteSelect("SELECT `ID` FROM account WHERE userName='%S'", userName))
 	{

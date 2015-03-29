@@ -4,7 +4,6 @@
 #pragma once
 
 #include "Base.h"
-#include "Def.h"
 #include "Packet.h"
 #include "Logger.h"
 

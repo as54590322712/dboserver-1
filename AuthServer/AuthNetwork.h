@@ -25,8 +25,71 @@ const DWORD	MAX_NUMOF_GAME_CLIENT = 3;
 const DWORD	MAX_NUMOF_SERVER = 1;
 const DWORD	MAX_NUMOF_SESSION = MAX_NUMOF_GAME_CLIENT + MAX_NUMOF_SERVER;
 
-class AuthClient;
+class AuthServer;
 class AuthClientFactory;
+
+class AuthClient : public Session
+{
+	friend class AuthClientFactory;
+public:
+	AuthClient(bool IsAliveCheck = false, bool IsOpcodeCheck = false);
+	~AuthClient();
+
+	int	OnAccept();
+	void OnClose();
+	int	OnDispatch(Packet* pPacket);
+	void Send(void* pData, int nSize);
+
+	// DATA Methods
+	char* GenAuthKey();
+	int GetDBAccountAcLevel();
+	BYTE GetDBLastServerID();
+	int GetDBAccountID();
+	eRESULTCODE LoginVerifyAccount();
+
+	// Opcode Control
+	bool PacketControl(Packet* pPacket);
+
+	// Protocol Resolvers
+	void SendLoginRes(sUA_LOGIN_REQ* data);
+	void SendDisconnectRes(sUA_LOGIN_DISCONNECT_REQ* data);
+
+private:
+	PacketEncoder _packetEncoder;
+	AuthServer* pServer;
+
+	WCHAR userName[NTL_MAX_SIZE_USERID_UNICODE + 1];
+	WCHAR passWord[NTL_MAX_SIZE_USERPW_UNICODE + 1];
+	BYTE AuthKey[NTL_MAX_SIZE_AUTH_KEY];
+	int AccountID;
+	BYTE LastServerID;
+	DWORD AcLevel;
+	BYTE CurrServerID;
+	BYTE CurrChannelID;
+	unsigned int CurrCharID;
+	bool goCharServer;
+};
+
+class AuthClientFactory : public SessionFactory
+{
+public:
+	Session* CreateSession(unsigned short sessionType)
+	{
+		Session* pSession = NULL;
+		switch (sessionType)
+		{
+		case SESSION_CLIENT:
+		{
+			pSession = new AuthClient;
+		}
+		break;
+
+		default:
+			break;
+		}
+		return pSession;
+	}
+};
 
 class AuthServer : public ServerApp
 {
@@ -58,69 +121,6 @@ public:
 	Config* ServerCfg;
 	Database* ServerDB;
 	int ServerID;
-};
-
-class AuthClient : public Session
-{
-	friend class AuthClientFactory;
-public:
-	AuthClient(bool IsAliveCheck = false, bool IsOpcodeCheck = false);
-	~AuthClient();
-
-	int	OnAccept();
-	void OnClose();
-	int	OnDispatch(Packet* pPacket);
-	void Send(void* pData, int nSize);
-
-	// DATA Methods
-	char* GenAuthKey();
-	int GetDBAccountAcLevel();
-	BYTE GetDBLastServerID();
-	int GetDBAccountID();
-	ResultCodes LoginVerifyAccount();
-
-	// Opcode Control
-	bool PacketControl(Packet* pPacket);
-
-	// Protocol Resolvers
-	void SendLoginRes(sUA_LOGIN_REQ* data);
-	void SendDisconnectRes(sUA_LOGIN_DISCONNECT_REQ* data);
-
-private:
-	PacketEncoder _packetEncoder;
-	AuthServer* pServer;
-
-	WCHAR userName[MAX_USERNAME_SIZE + 1];
-	WCHAR passWord[MAX_PASSWORD_SIZE + 1];
-	BYTE AuthKey[MAX_AUTHKEY_SIZE];
-	int AccountID;
-	BYTE LastServerID;
-	DWORD AcLevel;
-	BYTE CurrServerID;
-	BYTE CurrChannelID;
-	unsigned int CurrCharID;
-	bool goCharServer;
-};
-
-class AuthClientFactory : public SessionFactory
-{
-public:
-	Session* CreateSession(unsigned short sessionType)
-	{
-		Session* pSession = NULL;
-		switch (sessionType)
-		{
-		case SESSION_CLIENT:
-		{
-			pSession = new AuthClient;
-		}
-		break;
-
-		default:
-			break;
-		}
-		return pSession;
-	}
 };
 
 #endif

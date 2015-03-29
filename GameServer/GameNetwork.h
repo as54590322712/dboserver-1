@@ -3,6 +3,9 @@
 
 #include <iostream>
 #include <fstream>
+#include <boost\container\vector.hpp>
+
+// BaseLib
 #include <Network.h>
 #include <Acceptor.h>
 #include <Connector.h>
@@ -14,7 +17,12 @@
 #include <Database.h>
 #include <Encoder.h>
 #include <PCTable.h>
+
 #include "GameProtocol.h"
+#include "CharacterManager.h"
+#include "ObjectManager.h"
+
+using namespace boost::container;
 
 enum GAME_SESSION
 {
@@ -40,7 +48,13 @@ public:
 	void OnClose();
 	int	OnDispatch(Packet* pPacket);
 	void Send(void* pData, int nSize);
+	void Send(void* pData, int nSize, int nHandle);
 	unsigned int GetCharSerialID() { return CharSerialID; };
+	unsigned int GetCharID() { return CurrCharID; };
+	int GetServerID() { return CurrServerID; }
+	void AddSpawn(unsigned int nHandle, BYTE byType);
+	void RemoveSpawn(unsigned int nHandle);
+	bool FindSpawn(unsigned int nHandle, BYTE byType);
 
 	// Opcode Control
 	bool PacketControl(Packet* pPacket);
@@ -49,10 +63,13 @@ public:
 	void LoadCharacterData();
 	void LoadWorldInfoData();
 	unsigned int GetPCTblidx(BYTE Race, BYTE Gender, BYTE Class);
-	void UpdatePositions(VECTORXY Dir, VECTORXYZ Loc);
+	void UpdatePositions(sVECTOR2 Dir, sVECTOR3 Loc);
+	void UpdatePositions(sVECTOR3 Dir, sVECTOR3 Loc);
 	int LoadItemData();
 	int LoadSkillData();
 	int LoadQuickslotData();
+	void CalculateAtributes(PCData* pcdata);
+	sGU_OBJECT_CREATE GetCharSpawnData();
 
 	// PROTOCOL
 	void SendGameEnterRes(sUG_GAME_ENTER_REQ* data);
@@ -64,20 +81,26 @@ public:
 	void SendCharItemInfo();
 	void SendCharSkillInfo();
 	void SendCharQuickSlotInfo();
-	void SendCharReadyRes();
-
-public:
-	sGU_OBJECT_CREATE charSpawn;
+	void SendCharReadySpawnReq();
+	void SendCharReadyRes(sUG_CHAR_READY* pData);
+	void CheckCommand(sUG_SERVER_COMMAND* pData);
+	void SendCharBuffsInfo();
+	void SendAvatarWarFogInfo();
+	void SendAuthkeyCommSrvRes();
+	void SendGameLeaveRes();
+	void SendCharDestMove(sUG_CHAR_DEST_MOVE* pData);
+	void SendCharMoveSync(sUG_CHAR_MOVE_SYNC* pData);
+	void SpawnTesteMob(unsigned int id);
 
 private:
 	PacketEncoder _packetEncoder;
 	GameServer* pServer;
 
-	WCHAR userName[MAX_USERNAME_SIZE + 1];
-	WCHAR passWord[MAX_PASSWORD_SIZE + 1];
-	WCHAR charName[MAX_CHARNAME_SIZE + 1];
-	WCHAR guildName[MAX_GUILDNAME_USIZE + 1];
-	BYTE AuthKey[MAX_AUTHKEY_SIZE];
+	WCHAR userName[NTL_MAX_SIZE_USERID_UNICODE + 1];
+	WCHAR passWord[NTL_MAX_SIZE_USERPW_UNICODE + 1];
+	WCHAR charName[NTL_MAX_SIZE_CHAR_NAME_UNICODE + 1];
+	WCHAR guildName[NTL_MAX_SIZE_GUILD_NAME_IN_UNICODE + 1];
+	BYTE AuthKey[NTL_MAX_SIZE_AUTH_KEY];
 	int AccountID;
 	BYTE LastServerID;
 	DWORD AcLevel;
@@ -85,15 +108,19 @@ private:
 	BYTE CurrChannelID;
 	unsigned int CurrCharID;
 	bool goCharServer;
-
-	PCHAR_PROFILE PcProfile;
-	CHARSTATE CharState;
-	WORLD_INFO worldInfo;
-	ITEM_PROFILE ItemProfile[MAX_INVEN_ITEMCOUNT];
-	SKILL_INFO SkillInfo[MAX_PCHARSKILLS_COUNT];
-	QUICK_SLOT_PROFILE QuickSlotData[CHAR_QUICK_SLOT_MAX_COUNT];
+	bool isGameMaster;
 	bool TutorialMode;
 	unsigned int CharSerialID;
+
+	sPC_PROFILE PcProfile;
+	sCHARSTATE CharState;
+	sWORLD_INFO worldInfo;
+	sITEM_PROFILE ItemProfile[NTL_MAX_COUNT_USER_HAVE_INVEN_ITEM];
+	sSKILL_INFO SkillInfo[NTL_MAX_PC_HAVE_SKILL];
+	sQUICK_SLOT_PROFILE QuickSlotData[NTL_CHAR_QUICK_SLOT_MAX_COUNT];
+
+	std::map<unsigned int, BYTE>  objSpawn;
+	typedef std::pair<unsigned int, BYTE> objSp;
 };
 
 class GameClientFactory : public SessionFactory
@@ -117,6 +144,16 @@ public:
 	}
 };
 
+class ClientLink
+{
+public:
+	ClientLink(GameClient* pClient) { m_pClient = pClient; }
+	~ClientLink(void) {}
+	GameClient* GetClient() { return m_pClient; }
+protected:
+	GameClient* m_pClient;
+};
+
 class GameServer : public ServerApp
 {
 public:
@@ -129,12 +166,17 @@ public:
 	unsigned int AcquireCharSerialID();
 	unsigned int AcquireNpcSerialID();
 	unsigned int AcquireTargetSerialID();
-	bool AddClient(const char* charName, GameClient* pClient);
-	void RemoveClient(const char* charName);
-	bool FindClient(const char* charName);
+	bool AddClient(GameClient* pClient);
+	void RemoveClient(GameClient* pClient);
+	bool FindClient(GameClient* pClient);
 	void SendAll(void* pData, int nSize);
 	void SendOthers(void* pData, int nSize, GameClient* pClient, bool distCheck = false);
-	void RecvOthers(eOpcode Opcode, GameClient* pClient, bool distCheck = false);
+	void RecvOthers(eOPCODE_GU Opcode, GameClient* pClient, bool distCheck = false);
+	CharacterManager* GetClientManager() { return _charManager; }
+	ObjectManager* GetObjectManager() { return _objManager; }
+
+	void SpawnObjects();
+
 	void Run()
 	{
 		DWORD TickCur, TickOld = ::GetTickCount();
@@ -151,6 +193,8 @@ public:
 
 private:
 	Acceptor _clientAcceptor;
+	CharacterManager* _charManager;
+	ObjectManager* _objManager;
 
 public:
 	Config* ServerCfg;
@@ -161,10 +205,7 @@ public:
 	unsigned int m_uiNpcSerialID;
 	unsigned int m_uiTargetSerialID;
 
-	typedef std::map<GameString, GameClient*> CLENTLIST;
-	typedef CLENTLIST::value_type CLIENTVAL;
-	typedef CLENTLIST::iterator CLIENTIT;
-	CLENTLIST clientList;
+	vector<ClientLink*> cList;
 };
 
 #endif

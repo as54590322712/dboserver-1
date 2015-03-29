@@ -46,6 +46,12 @@ int CharServer::OnCreate()
 		Logger::Log("Failed to load Newbie Table!\n");
 		return 3;//ERR_LOADTABLE
 	}
+	pcTblData = new PCTable();
+	if (pcTblData->Load("..\\Tables\\table_pc_data.edf") != 0)
+	{
+		Logger::Log("Failed to load PC Table!\n");
+		return 3;//ERR_LOADTABLE
+	}
 
 	return 0;
 }

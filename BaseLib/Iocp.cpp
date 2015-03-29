@@ -54,7 +54,7 @@ public:
 			if (FALSE == Result)
 			{
 				rc = GetLastError();
-				Logger::Log("Session[%X] GQCS Error : Err:%d\n", pSession, rc);
+				//Logger::Log("Session[%X] GQCS Error : Err:%d\n", pSession, rc);
 				pSession->Close(true);
 			}
 			else

@@ -48,11 +48,11 @@ private:
 	PacketEncoder _packetEncoder;
 	ChatServer* pServer;
 
-	WCHAR userName[MAX_USERNAME_SIZE + 1];
-	WCHAR passWord[MAX_PASSWORD_SIZE + 1];
-	WCHAR charName[MAX_CHARNAME_SIZE + 1];
-	WCHAR guildName[MAX_GUILDNAME_USIZE + 1];
-	BYTE AuthKey[MAX_AUTHKEY_SIZE];
+	WCHAR userName[NTL_MAX_SIZE_USERID_UNICODE + 1];
+	WCHAR passWord[NTL_MAX_SIZE_USERPW_UNICODE + 1];
+	WCHAR charName[NTL_MAX_SIZE_CHAR_NAME_UNICODE + 1];
+	WCHAR guildName[NTL_MAX_SIZE_GUILD_NAME_IN_UNICODE + 1];
+	BYTE AuthKey[NTL_MAX_SIZE_AUTH_KEY];
 	int AccountID;
 	BYTE LastServerID;
 	DWORD AcLevel;
@@ -98,7 +98,7 @@ public:
 	bool FindClient(const char* charName);
 	void SendAll(void* pData, int nSize);
 	void SendOthers(void* pData, int nSize, ChatClient* pClient, bool distCheck = false);
-	void RecvOthers(eOpcode Opcode, ChatClient* pClient, bool distCheck = false);
+	void RecvOthers(eOPCODE_TU Opcode, ChatClient* pClient, bool distCheck = false);
 	void Run()
 	{
 		DWORD TickCur, TickOld = ::GetTickCount();

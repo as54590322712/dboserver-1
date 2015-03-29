@@ -7,9 +7,9 @@ bool ChatClient::PacketControl(Packet* pPacket)
 
 	switch (data->wOpCode)
 	{
-	case 1: { sPACKETHEADER reply(1); Send(&reply, sizeof(reply)); } break;
+	case 1: { sNTLPACKETHEADER reply(1); Send(&reply, sizeof(reply)); } break;
 	default:
-		Logger::Log("Received Opcode: %d\n", data->wOpCode);
+		Logger::Log("Received Opcode: %s\n", NtlGetPacketName_UT(data->wOpCode));
 		return false;
 		break;
 	}

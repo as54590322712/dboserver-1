@@ -1,17 +1,8 @@
 #ifndef _CHARPROTOCOL_H
 #define _CHARPROTOCOL_H
 
-#include "Protocol.h"
-
-#pragma once
-
-enum eOpcode
-{
-	tofill
-};
-
-#pragma pack(1)
-
-#pragma pack()
+#include <GameLib\NtlResultCode.h>
+#include <GameLib\NtlPacketTU.h>
+#include <GameLib\NtlPacketUT.h>
 
 #endif

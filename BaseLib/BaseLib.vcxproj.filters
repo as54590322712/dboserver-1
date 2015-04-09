@@ -213,6 +213,9 @@
     <ClCompile Include="GameLib\NtlBattle.cpp">
       <Filter>Source Files\GameLib</Filter>
     </ClCompile>
+    <ClCompile Include="SpawnTable.cpp">
+      <Filter>Source Files\Table</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Network.h">
@@ -499,6 +502,9 @@
     </ClInclude>
     <ClInclude Include="GameLib\NtlSystemEffect.h">
       <Filter>Header Files\GameLib</Filter>
+    </ClInclude>
+    <ClInclude Include="SpawnTable.h">
+      <Filter>Header Files\Table</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

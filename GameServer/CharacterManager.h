@@ -5,7 +5,10 @@
 #include <Def.h>
 #include <Thread.h>
 
+#include <map>
+
 class GameServer;
+class GameClient;
 
 class CharacterManager : public RunObject
 {
@@ -17,6 +20,21 @@ public:
 	void Release();
 	void CreateThread();
 	void Run();
+
+	void SpawnObjects();
+
+	bool AddClient(GameClient* pClient);
+	void RemoveClient(GameClient* pClient);
+	bool FindClient(GameClient* pClient);
+	void SendAll(void* pData, int nSize);
+	void SendOthers(void* pData, int nSize, GameClient* pClient, bool distCheck = false);
+	void RecvOthers(eOPCODE_GU Opcode, GameClient* pClient, bool distCheck = false);
+
+	typedef std::map<unsigned int, GameClient*> clientList;
+	typedef clientList::iterator cliIt;
+	typedef clientList::value_type cliVal;
+
+	clientList cList;
 
 private:
 	Thread * pThread;

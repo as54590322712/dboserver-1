@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <fstream>
+
 #include <Network.h>
 #include <Acceptor.h>
 #include <Connector.h>
@@ -13,7 +14,9 @@
 #include <ServerApp.h>
 #include <Database.h>
 #include <Encoder.h>
+
 #include "ChatProtocol.h"
+#include "ChatManager.h"
 
 enum CHAT_SESSION
 {
@@ -40,9 +43,13 @@ public:
 	int	OnDispatch(Packet* pPacket);
 	void Send(void* pData, int nSize);
 	unsigned int GetCharSerialID() { return CharSerialID; };
+	void GetCharInfo();
 
 	// Opcode Control
 	bool PacketControl(Packet* pPacket);
+
+	void SendChatEnterRes(sUT_ENTER_CHAT* pData);
+	void SendChatSay(sUT_CHAT_MESSAGE_SAY* pData);
 
 private:
 	PacketEncoder _packetEncoder;
@@ -93,12 +100,7 @@ public:
 	int OnCommandArgument(int argc, _TCHAR* argv[]) { return 0; }
 	int	OnAppStart();
 	unsigned int AcquireCharSerialID();
-	bool AddClient(const char* charName, ChatClient* pClient);
-	void RemoveClient(const char* charName);
-	bool FindClient(const char* charName);
-	void SendAll(void* pData, int nSize);
-	void SendOthers(void* pData, int nSize, ChatClient* pClient, bool distCheck = false);
-	void RecvOthers(eOPCODE_TU Opcode, ChatClient* pClient, bool distCheck = false);
+	ChatManager* GetChatManager() { return _chatManager; }
 	void Run()
 	{
 		DWORD TickCur, TickOld = ::GetTickCount();
@@ -115,17 +117,13 @@ public:
 
 private:
 	Acceptor _clientAcceptor;
+	ChatManager* _chatManager;
 
 public:
 	Config* ServerCfg;
 	Database* ServerDB;
 	int ServerID;
 	unsigned int m_uiCharSerialID;
-
-	typedef std::map<GameString, ChatClient*> CLENTLIST;
-	typedef CLENTLIST::value_type CLIENTVAL;
-	typedef CLENTLIST::iterator CLIENTIT;
-	CLENTLIST clientList;
 };
 
 #endif

@@ -52,6 +52,8 @@ int ChatServer::OnConfiguration(const char* ConfigFile)
 int ChatServer::OnAppStart()
 {
 	Logger::Log("Server listening on %s:%d\n", _clientAcceptor.GetListenIP(), _clientAcceptor.GetListenPort());
+	_chatManager = new ChatManager();
+	_chatManager->Init();
 	return 0;
 }
 
@@ -64,56 +66,4 @@ unsigned int ChatServer::AcquireCharSerialID()
 	}
 
 	return m_uiCharSerialID;
-}
-
-bool ChatServer::AddClient(const char* charName, ChatClient* pClient)
-{
-	if (false == clientList.insert(CLIENTVAL(GameString(charName), pClient)).second)
-		return false;
-	return true;
-}
-
-void ChatServer::RemoveClient(const char* charName)
-{
-	clientList.erase(GameString(charName));
-}
-
-bool ChatServer::FindClient(const char* charName)
-{
-	CLIENTIT it = clientList.find(GameString(charName));
-	if (it == clientList.end())
-		return false;
-	return true;
-}
-
-void ChatServer::SendAll(void* pData, int nSize)
-{
-	for (CLIENTIT it = clientList.begin(); it != clientList.end(); it++)
-	{
-		it->second->PushPacket(pData, nSize);
-	}
-}
-
-void ChatServer::SendOthers(void* pData, int nSize, ChatClient* pClient, bool distCheck)
-{
-	for (CLIENTIT it = clientList.begin(); it != clientList.end(); it++)
-	{
-		if (pClient->GetCharSerialID() != it->second->GetCharSerialID())
-			it->second->PushPacket(pData, nSize);
-	}
-}
-
-
-void ChatServer::RecvOthers(eOPCODE_TU Opcode, ChatClient* pClient, bool distCheck)
-{
-	for (CLIENTIT it = clientList.begin(); it != clientList.end(); it++)
-	{
-		if (pClient->GetCharSerialID() != it->second->GetCharSerialID())
-		{
-			switch (Opcode)
-			{
-			default: break;
-			}
-		}
-	}
 }

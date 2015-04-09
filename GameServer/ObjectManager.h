@@ -5,23 +5,14 @@
 #include <Def.h>
 #include <Thread.h>
 
-#include <boost\container\vector.hpp>
+#include <iostream>
+#include <memory>
+#include <map>
 
 #include "GameProtocol.h"
 
-using namespace boost::container;
-
 class GameServer;
 class GameClient;
-
-class ObjectLink
-{
-public:
-	ObjectLink(sGU_OBJECT_CREATE sObj) { memcpy(&m_sObj, &sObj, sizeof(sObj)); }
-	sGU_OBJECT_CREATE* GetObj() { return &m_sObj; }
-private:
-	sGU_OBJECT_CREATE m_sObj;
-};
 
 class ObjectManager : public RunObject
 {
@@ -34,16 +25,22 @@ public:
 	void CreateThread();
 	void Run();
 
-	void AddObject(sGU_OBJECT_CREATE pObj);
+	bool AddObject(sGU_OBJECT_CREATE pObj);
 	void RemoveObject(unsigned int nHandle, BYTE byType);
 	bool FindObject(unsigned int nHandle, BYTE byType);
 
+	void UpdatePcItemBrief(unsigned int nHandle, sITEM_BRIEF sBrief, BYTE byPos);
+	void UpdateCharState(unsigned int nHandle, sCHARSTATE CharState);
 	void SpawnToClient(GameClient* pClient);
 
-	vector<ObjectLink*> objList;
+	typedef std::map<HOBJECT, sGU_OBJECT_CREATE> objectList;
+	typedef objectList::iterator objIt;
+	typedef objectList::value_type objVal;
+
+	objectList objList;
 
 private:
-	Thread * pThread;
+	Thread* pThread;
 	GameServer* pServer;
 };
 

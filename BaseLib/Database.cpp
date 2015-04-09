@@ -102,7 +102,7 @@ bool Database::ExecuteSelect(char* Format, ...)
 	SQLString query = SQLString(szQuery);
 
 	try {
-		res = (std::unique_ptr<ResultSet>)(stmt->executeQuery(query));
+		res.reset(stmt->executeQuery(query));
 		return true;
 	}
 	catch (SQLException &e) {
@@ -113,9 +113,40 @@ bool Database::ExecuteSelect(char* Format, ...)
 	return false;
 }
 
+bool Database::ExecuteSp(char* Format, ...)
+{
+	char szQuery[6000];
+	va_list ap;
+	va_start(ap, Format);
+	vsprintf_s(szQuery, Format, ap);
+	va_end(ap);
+	SQLString query = SQLString(szQuery);
+
+	try {
+		stmt->execute(query);
+		return true;
+	}
+	catch (SQLException &e) {
+		Logger::Log("# ERROR #\n");
+		std::cout << "\t\tSQLException in " << __FILE__ << " (" << __FUNCTION__ << ") on line " << __LINE__ << std::endl;
+		std::cout << "\t\t" << e.what() << " (MySQL error code: " << e.getErrorCode() << " SQLState: " << e.getSQLState() << std::endl;
+	}
+	return false;
+}
+
+void Database::GetResultSet()
+{
+	res.reset(stmt->getResultSet());
+}
+
 bool Database::Fetch()
 {
 	return res->next();
+}
+
+bool Database::GetMoreResults()
+{
+	return stmt->getMoreResults();
 }
 
 float Database::getFloat(const char* index)

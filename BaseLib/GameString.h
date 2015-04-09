@@ -6,6 +6,9 @@
 #include "Base.h"
 #include <string>
 #include <stdarg.h>
+#include <vector>
+#include <iostream>
+#include <sstream>
 
 class GameString
 {
@@ -28,6 +31,8 @@ public:
 		if (m_str<right.m_str) return true;
 		else return false;
 	}
+
+	void GetToken(std::vector<std::string>& tokens, char token);
 
 private:
 	std::string m_str;

@@ -57,3 +57,13 @@ int GameString::Format(const char *format, ...)
 
 	return nRV;
 }
+
+void GameString::GetToken(std::vector<std::string>& tokens, char token)
+{
+	std::istringstream iss(m_str);
+	std::string part;
+	while (std::getline(iss, part, token))
+	{
+		tokens.push_back(part);
+	}
+}

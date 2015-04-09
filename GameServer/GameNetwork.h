@@ -3,7 +3,6 @@
 
 #include <iostream>
 #include <fstream>
-#include <boost\container\vector.hpp>
 
 // BaseLib
 #include <Network.h>
@@ -17,12 +16,11 @@
 #include <Database.h>
 #include <Encoder.h>
 #include <PCTable.h>
+#include <SpawnTable.h>
 
 #include "GameProtocol.h"
 #include "CharacterManager.h"
 #include "ObjectManager.h"
-
-using namespace boost::container;
 
 enum GAME_SESSION
 {
@@ -55,6 +53,8 @@ public:
 	void AddSpawn(unsigned int nHandle, BYTE byType);
 	void RemoveSpawn(unsigned int nHandle);
 	bool FindSpawn(unsigned int nHandle, BYTE byType);
+	void InsertOnlineData();
+	void RemoveOnlineData();
 
 	// Opcode Control
 	bool PacketControl(Packet* pPacket);
@@ -70,6 +70,10 @@ public:
 	int LoadQuickslotData();
 	void CalculateAtributes(PCData* pcdata);
 	sGU_OBJECT_CREATE GetCharSpawnData();
+	sGU_ITEM_CREATE InsertNextBagSlot(ITEMID item, BYTE qtd = 1);
+	HOBJECT GetInventoryItemSerialID(BYTE byPlace, BYTE byPos);
+	void UpdateItemInventoryPosition(HOBJECT hItem, BYTE byPlace, BYTE byPos);
+	void GetItemBrief(sITEM_BRIEF& sBrief, HOBJECT hItem);
 
 	// PROTOCOL
 	void SendGameEnterRes(sUG_GAME_ENTER_REQ* data);
@@ -91,6 +95,22 @@ public:
 	void SendCharDestMove(sUG_CHAR_DEST_MOVE* pData);
 	void SendCharMoveSync(sUG_CHAR_MOVE_SYNC* pData);
 	void SpawnTesteMob(unsigned int id);
+	void SendCharJump(sUG_CHAR_JUMP* pData);
+	void SendCharJumpEnd();
+	void SendCharChangeHeading(sUG_CHAR_CHANGE_HEADING* pData);
+	void SendCharExitRes();
+	void SendGameExitRes();
+	void SendIemMoveRes(sUG_ITEM_MOVE_REQ* pData);
+	void UpdateCharObjEquips(HOBJECT hItem, BYTE byPos);
+	void SendTSConfirmRes(sUG_TS_CONFIRM_STEP_REQ* pData);
+	void SendSocialAction(sUG_SOCIAL_ACTION* pData);
+	void SendTutoHintUpdateRes(sUG_TUTORIAL_HINT_UPDATE_REQ* pData);
+
+	//CASH/EVENT SHOPS
+	void SendEventItemStartRes();
+	void SendEventItemEndRes();
+	void SendNetpyItemStartRes();
+	void SendNetpyItemEndRes();
 
 private:
 	PacketEncoder _packetEncoder;
@@ -112,6 +132,10 @@ private:
 	bool TutorialMode;
 	unsigned int CharSerialID;
 
+	BYTE byMoveDirection;
+	BYTE byAvatarType;
+
+public:
 	sPC_PROFILE PcProfile;
 	sCHARSTATE CharState;
 	sWORLD_INFO worldInfo;
@@ -119,6 +143,7 @@ private:
 	sSKILL_INFO SkillInfo[NTL_MAX_PC_HAVE_SKILL];
 	sQUICK_SLOT_PROFILE QuickSlotData[NTL_CHAR_QUICK_SLOT_MAX_COUNT];
 
+private:
 	std::map<unsigned int, BYTE>  objSpawn;
 	typedef std::pair<unsigned int, BYTE> objSp;
 };
@@ -163,19 +188,13 @@ public:
 	int	OnConfiguration(const char* ConfigFile);
 	int OnCommandArgument(int argc, _TCHAR* argv[]) { return 0; }
 	int	OnAppStart();
-	unsigned int AcquireCharSerialID();
-	unsigned int AcquireNpcSerialID();
-	unsigned int AcquireTargetSerialID();
-	bool AddClient(GameClient* pClient);
-	void RemoveClient(GameClient* pClient);
-	bool FindClient(GameClient* pClient);
-	void SendAll(void* pData, int nSize);
-	void SendOthers(void* pData, int nSize, GameClient* pClient, bool distCheck = false);
-	void RecvOthers(eOPCODE_GU Opcode, GameClient* pClient, bool distCheck = false);
+
+	unsigned int AcquireSerialID();
+
 	CharacterManager* GetClientManager() { return _charManager; }
 	ObjectManager* GetObjectManager() { return _objManager; }
 
-	void SpawnObjects();
+	void AddSpawn(SpawnData data, eOBJTYPE type);
 
 	void Run()
 	{
@@ -201,11 +220,9 @@ public:
 	Database* ServerDB;
 	int ServerID;
 	PCTable* pcTblData;
-	unsigned int m_uiCharSerialID;
-	unsigned int m_uiNpcSerialID;
-	unsigned int m_uiTargetSerialID;
-
-	vector<ClientLink*> cList;
+	SpawnTable* npcspawnTblData;
+	SpawnTable* mobspawnTblData;
+	unsigned int m_uiSerialID;
 };
 
 #endif

@@ -18,7 +18,10 @@ bool CharClient::PacketControl(Packet* pPacket)
 	case UC_CONNECT_WAIT_CHECK_REQ: SendCharConnWaitCheckRes((sUC_CONNECT_WAIT_CHECK_REQ*)data); break;
 	case UC_CONNECT_WAIT_CANCEL_REQ: SendCancelWaitReq((sUC_CONNECT_WAIT_CANCEL_REQ*)data); break;
 	case UC_CHARACTER_RENAME_REQ: SendCharRenameRes((sUC_CHARACTER_RENAME_REQ*)data); break;
-	case 1: { sNTLPACKETHEADER reply(1); Send(&reply, sizeof(reply)); } break;
+
+	// SYS PACKETS
+	case SYS_ALIVE: { ResetAliveTime(); } break;
+	case SYS_PING: break;
 	default:
 		Logger::Log("Received Opcode: %s\n", NtlGetPacketName_UC(data->wOpCode));
 		return false;

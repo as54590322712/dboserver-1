@@ -20,6 +20,7 @@ GameClient::GameClient(bool IsAliveCheck, bool IsOpcodeCheck)
 
 GameClient::~GameClient()
 {
+	OnClose();
 }
 
 int	GameClient::OnAccept()
@@ -31,12 +32,23 @@ void GameClient::OnClose()
 {
 	if (goCharServer) pServer->ServerDB->ExecuteQuery("UPDATE `account` SET `State` = '2' WHERE `ID` = '%d';", AccountID);
 	else pServer->ServerDB->ExecuteQuery("UPDATE `account` SET `State` = '0' WHERE `ID` = '%d';", AccountID);
+	if (pServer->GetClientManager()->FindClient(this))
+		pServer->GetClientManager()->RemoveClient(this);
+	if (pServer->GetObjectManager()->FindObject(GetCharSerialID(), OBJTYPE_PC))
+	{
+		pServer->GetObjectManager()->RemoveObject(GetCharSerialID(), OBJTYPE_PC);
+		sGU_OBJECT_DESTROY obDes;
+		memset(&obDes, 0, sizeof(obDes));
+		obDes.wOpCode = GU_OBJECT_DESTROY;
+		obDes.handle = GetCharSerialID();
+		pServer->GetClientManager()->SendOthers(&obDes, sizeof(obDes), this);
+	}
+	RemoveOnlineData();
 }
 
 int GameClient::OnDispatch(Packet* pPacket)
 {
 	PacketControl(pPacket);
-	//	return OnDispatch(pPacket);
 	return 0;
 }
 
@@ -75,6 +87,69 @@ bool GameClient::FindSpawn(unsigned int nHandle, BYTE byType)
 	return false;
 }
 
+void GameClient::GetItemBrief(sITEM_BRIEF& sBrief, HOBJECT hItem)
+{
+	if (hItem == INVALID_HOBJECT)
+	{
+		sBrief.tblidx = INVALID_ITEMID;
+	}
+	else
+	{
+		for (int i = 0; i < NTL_MAX_COUNT_USER_HAVE_INVEN_ITEM; ++i)
+		{
+			if (ItemProfile[i].handle == hItem)
+			{
+				sBrief.tblidx = ItemProfile[i].tblidx;
+				sBrief.byBattleAttribute = ItemProfile[i].byBattleAttribute;
+				sBrief.byGrade = ItemProfile[i].byGrade;
+				sBrief.byRank = ItemProfile[i].byRank;
+				sBrief.aOptionTblidx[0] = ItemProfile[i].aOptionTblidx[0];
+				sBrief.aOptionTblidx[1] = ItemProfile[i].aOptionTblidx[1];
+			}
+		}
+	}
+}
+
+void GameClient::UpdateItemInventoryPosition(HOBJECT hItem, BYTE byPlace, BYTE byPos)
+{
+	pServer->ServerDB->ExecuteQuery("UPDATE `inventory` SET `Place` = '%d', `Slot` = '%d' WHERE `ID` = '%u' AND `CharID` = '%u';",
+		byPlace, byPos, hItem, CurrCharID);
+	for (int i = 0; i < NTL_MAX_COUNT_USER_HAVE_INVEN_ITEM; ++i)
+	{
+		if (ItemProfile[i].handle == hItem)
+		{
+			ItemProfile[i].byPlace = byPlace;
+			ItemProfile[i].byPos = byPos;
+		}
+	}
+}
+
+HOBJECT GameClient::GetInventoryItemSerialID(BYTE byPlace, BYTE byPos)
+{
+	HOBJECT ret = INVALID_HOBJECT;
+	if (pServer->ServerDB->ExecuteSelect("SELECT `ID` FROM `inventory` WHERE `Place` = '%d' AND `Slot` = '%d' AND `CharID` = '%u';",
+		byPlace, byPos, CurrCharID))
+	{
+		while (pServer->ServerDB->Fetch())
+		{
+			ret = pServer->ServerDB->getInt("ID");
+		}
+	}
+	return ret;
+}
+
+void GameClient::InsertOnlineData()
+{
+	pServer->ServerDB->ExecuteQuery("CALL `spInsertOnline`('%u','%u','%u','%u','%u');",
+		AccountID, CurrCharID, CurrServerID, CurrChannelID, CharSerialID);
+}
+
+void GameClient::RemoveOnlineData()
+{
+	pServer->ServerDB->ExecuteQuery("CALL `spDeleteOnline`('%u','%u');",
+		AccountID, CurrCharID);
+}
+
 int GameClient::LoadQuickslotData()
 {
 	int count = 0;
@@ -111,8 +186,71 @@ int GameClient::LoadSkillData()
 	return count;
 }
 
+sGU_ITEM_CREATE GameClient::InsertNextBagSlot(ITEMID item, BYTE qtd)
+{
+	sGU_ITEM_CREATE itemdata;
+	memset(&itemdata, 0, sizeof(itemdata));
+	HOBJECT hItem = INVALID_HOBJECT;
+	int lastbagslot = 0;
+	int lastbag = 1;
+	bool found = false;
+	for (int i = 0; i < NTL_MAX_COUNT_USER_HAVE_INVEN_ITEM; ++i)
+	{
+		if (ItemProfile[i].byPlace >= CONTAINER_TYPE_BAG_FIRST && ItemProfile[i].byPlace <= CONTAINER_TYPE_BAG_LAST)
+		{
+			if (lastbagslot < ItemProfile[i].byPos)
+			{
+				lastbagslot = ItemProfile[i].byPos;
+				lastbag = ItemProfile[i].byPlace;
+			}
+		}
+		
+		if (ItemProfile[i].handle == INVALID_HOBJECT && ItemProfile[i].tblidx == INVALID_TBLIDX)
+		{
+			if (lastbagslot != 0) lastbagslot++;
+			if (pServer->ServerDB->ExecuteSp("CALL `spInsertItem`('%u','%u','%d','%d','%d','1','100','0','0','0','0','','0','0','0');",
+				item, CurrCharID, lastbag, lastbagslot, qtd))
+			{
+				do {
+					pServer->ServerDB->GetResultSet();
+					while (pServer->ServerDB->Fetch()) {
+						hItem = pServer->ServerDB->getInt("LastID");
+					}
+				} while (pServer->ServerDB->GetMoreResults());
+			}
+
+			itemdata.bIsNew = true;
+			itemdata.wOpCode = GU_ITEM_CREATE;
+			itemdata.handle = hItem;
+			itemdata.sItemData.itemId = hItem;
+			itemdata.sItemData.charId = CurrCharID;
+			itemdata.sItemData.itemNo = item;
+			itemdata.sItemData.byCurrentDurability = 100;
+			itemdata.sItemData.byPlace = lastbag;
+			itemdata.sItemData.byPosition = lastbagslot;
+			itemdata.sItemData.byStackcount = qtd;
+			itemdata.sItemData.byRank = 1;
+
+			ItemProfile[i].handle = itemdata.sItemData.itemId;
+			ItemProfile[i].tblidx = item;
+			ItemProfile[i].byCurDur = itemdata.sItemData.byCurrentDurability;
+			ItemProfile[i].byPlace = itemdata.sItemData.byPlace;
+			ItemProfile[i].byPos = itemdata.sItemData.byPosition;
+			ItemProfile[i].byStackcount = itemdata.sItemData.byStackcount;
+			ItemProfile[i].byRank = itemdata.sItemData.byRank;
+			break;
+		}
+	}
+	return itemdata;
+}
+
 int GameClient::LoadItemData()
 {
+	for (int i = 0; i < NTL_MAX_COUNT_USER_HAVE_INVEN_ITEM; ++i)
+	{
+		ItemProfile[i].handle = INVALID_HOBJECT;
+		ItemProfile[i].tblidx = INVALID_TBLIDX;
+	}
 	int count = 0;
 	if (pServer->ServerDB->ExecuteSelect("SELECT * FROM `inventory` WHERE `CharID`='%u';", this->CurrCharID))
 	{
@@ -257,7 +395,7 @@ void GameClient::LoadCharacterData()
 		CharState.sCharStateBase.dwConditionFlag = 0;
 		CharState.sCharStateBase.bFightMode = false;
 		CharState.sCharStateBase.byStateID = 0;
-		CharState.sCharStateBase.dwStateTime = time(NULL);
+		CharState.sCharStateBase.dwStateTime = (DWORD)time(NULL);
 		CharState.sCharStateBase.aspectState.sAspectStateBase.byAspectStateId = ASPECTSTATE_INVALID;
 		CharState.sCharStateBase.aspectState.sAspectStateDetail.sGreatNamek.bySourceGrade = 0;
 		CharState.sCharStateBase.aspectState.sAspectStateDetail.sKaioken.bySourceGrade = 0;
@@ -296,7 +434,7 @@ sGU_OBJECT_CREATE GameClient::GetCharSpawnData()
 	memcpy(&charSpawn.sObjectInfo.pcBrief.sPcShape, &PcProfile.sPcShape, sizeof(PcProfile.sPcShape));
 	memcpy(&charSpawn.sObjectInfo.pcState, &CharState, sizeof(CharState));
 	charSpawn.sObjectInfo.pcState.sCharStateBase.byStateID = CHARSTATE_SPAWNING;
-	charSpawn.sObjectInfo.pcState.sCharStateBase.dwStateTime = time(NULL);
+	charSpawn.sObjectInfo.pcState.sCharStateBase.dwStateTime = (DWORD)time(NULL);
 	charSpawn.sObjectInfo.pcState.sCharStateDetail.sCharStateSpawning.byTeleportType = TELEPORT_TYPE_GAME_IN;
 	charSpawn.sObjectInfo.pcState.sCharStateBase.dwConditionFlag = 0;
 	charSpawn.sObjectInfo.pcState.sCharStateBase.bFightMode = false;
@@ -309,13 +447,14 @@ sGU_OBJECT_CREATE GameClient::GetCharSpawnData()
 
 	for (int i = 0; i < EQUIP_SLOT_TYPE_COUNT; i++)
 	{
-		memset(&charSpawn.sObjectInfo.pcBrief.sItemBrief[i], 0xFF, sizeof(sITEM_BRIEF));
+		charSpawn.sObjectInfo.pcBrief.sItemBrief[i].tblidx = INVALID_ITEMID;
 	}
 
 	for (int i = 0; i < NTL_MAX_COUNT_USER_HAVE_INVEN_ITEM; i++)
 	{
 		int slot = ItemProfile[i].byPos;
-		if ((slot >= EQUIP_SLOT_TYPE_FIRST) && (slot <= EQUIP_SLOT_TYPE_LAST))
+		if (ItemProfile[i].byPlace == CONTAINER_TYPE_EQUIP &&
+			((slot >= EQUIP_SLOT_TYPE_FIRST) && (slot <= EQUIP_SLOT_TYPE_LAST)))
 		{
 			charSpawn.sObjectInfo.pcBrief.sItemBrief[slot].tblidx = ItemProfile[i].tblidx;
 			charSpawn.sObjectInfo.pcBrief.sItemBrief[slot].byBattleAttribute = ItemProfile[i].byBattleAttribute;

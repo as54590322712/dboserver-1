@@ -25,7 +25,7 @@ CREATE TABLE `account` (
   `LastServerID` int(11) NOT NULL default '255',
   `State` int(11) NOT NULL default '0',
   PRIMARY KEY  (`ID`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;
 
 /*Table structure for table `character` */
 
@@ -75,7 +75,7 @@ CREATE TABLE `character` (
   `CurLP` int(11) NOT NULL default '0',
   `MaxLP` int(11) NOT NULL default '0',
   PRIMARY KEY  (`ID`)
-) ENGINE=InnoDB AUTO_INCREMENT=40 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=49 DEFAULT CHARSET=utf8;
 
 /*Table structure for table `inventory` */
 
@@ -89,7 +89,7 @@ CREATE TABLE `inventory` (
   `Slot` tinyint(4) NOT NULL default '0',
   `Stack` tinyint(4) NOT NULL default '0',
   `Rank` tinyint(4) NOT NULL default '1',
-  `CurDur` tinyint(4) NOT NULL default '10',
+  `CurDur` tinyint(4) NOT NULL default '100',
   `NeedToIdentify` tinyint(4) NOT NULL default '0',
   `Grade` tinyint(4) NOT NULL default '0',
   `BattleAttribute` tinyint(4) NOT NULL default '0',
@@ -101,7 +101,20 @@ CREATE TABLE `inventory` (
   `UseStartTime` timestamp NULL default CURRENT_TIMESTAMP,
   `UseEndTime` timestamp NULL default NULL,
   PRIMARY KEY  (`ID`)
-) ENGINE=InnoDB AUTO_INCREMENT=216 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=79 DEFAULT CHARSET=utf8;
+
+/*Table structure for table `online` */
+
+DROP TABLE IF EXISTS `online`;
+
+CREATE TABLE `online` (
+  `AccountID` int(11) NOT NULL default '0',
+  `CharID` bigint(20) default '0',
+  `ServerID` int(11) default '0',
+  `ChannelID` int(11) default '0',
+  `Handle` bigint(20) default '0',
+  PRIMARY KEY  (`AccountID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 /*Table structure for table `quickslot` */
 
@@ -115,7 +128,7 @@ CREATE TABLE `quickslot` (
   `Type` tinyint(3) unsigned NOT NULL default '0',
   `Item` int(10) unsigned NOT NULL default '0',
   PRIMARY KEY  (`ID`)
-) ENGINE=InnoDB AUTO_INCREMENT=41 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=86 DEFAULT CHARSET=utf8;
 
 /*Table structure for table `skills` */
 
@@ -131,7 +144,31 @@ CREATE TABLE `skills` (
   `RemainSec` int(10) unsigned NOT NULL default '0',
   `Exp` int(10) unsigned NOT NULL default '0',
   PRIMARY KEY  (`ID`)
-) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=18 DEFAULT CHARSET=utf8;
+
+/* Procedure structure for procedure `spClearOnline` */
+
+/*!50003 DROP PROCEDURE IF EXISTS  `spClearOnline` */;
+
+DELIMITER $$
+
+/*!50003 CREATE DEFINER=`root`@`localhost` PROCEDURE `spClearOnline`(IN SrvID INT)
+BEGIN
+	DELETE FROM `online` WHERE `ServerID` = SrvID;
+    END */$$
+DELIMITER ;
+
+/* Procedure structure for procedure `spDeleteOnline` */
+
+/*!50003 DROP PROCEDURE IF EXISTS  `spDeleteOnline` */;
+
+DELIMITER $$
+
+/*!50003 CREATE DEFINER=`root`@`localhost` PROCEDURE `spDeleteOnline`(in AccId int, in CharId int)
+BEGIN
+	DELETE FROM `online` WHERE `AccountID` = AccId AND `CharID` = CharId;
+    END */$$
+DELIMITER ;
 
 /* Procedure structure for procedure `spInsertCharacter` */
 
@@ -267,6 +304,95 @@ BEGIN
 	nMaxEP, 
 	nCurLP, 
 	nMaxLP
+	);
+    END */$$
+DELIMITER ;
+
+/* Procedure structure for procedure `spInsertItem` */
+
+/*!50003 DROP PROCEDURE IF EXISTS  `spInsertItem` */;
+
+DELIMITER $$
+
+/*!50003 CREATE DEFINER=`root`@`localhost` PROCEDURE `spInsertItem`(
+	IN nItemID INT,
+	IN nCharID INT,
+	IN nPlace INT,
+	IN nSlot INT,
+	IN nStack INT,
+	IN nRank INT,
+	IN nCurDur INT,
+	IN nNeedToIdentify INT,
+	IN nGrade INT,
+	IN nBattleAttribute INT,
+	IN nRestrictType INT,
+	IN nMaker VARCHAR(20),
+	IN nOpt1 INT,
+	IN nOpt2 INT,
+	IN nDurationType INT)
+BEGIN
+	INSERT INTO `inventory` 
+	(`ItemID`, 
+	`CharID`, 
+	`Place`, 
+	`Slot`, 
+	`Stack`, 
+	`Rank`, 
+	`CurDur`, 
+	`NeedToIdentify`, 
+	`Grade`, 
+	`BattleAttribute`, 
+	`RestrictType`, 
+	`Maker`, 
+	`Opt1`, 
+	`Opt2`, 
+	`DurationType`)
+	VALUES
+	(nItemID,
+	nCharID,
+	nPlace,
+	nSlot,
+	nStack,
+	nRank,
+	nCurDur,
+	nNeedToIdentify,
+	nGrade,
+	nBattleAttribute,
+	nRestrictType,
+	nMaker,
+	nOpt1,
+	nOpt2,
+	nDurationType);
+	SELECT LAST_INSERT_ID() AS `LastID` LIMIT 1;
+    END */$$
+DELIMITER ;
+
+/* Procedure structure for procedure `spInsertOnline` */
+
+/*!50003 DROP PROCEDURE IF EXISTS  `spInsertOnline` */;
+
+DELIMITER $$
+
+/*!50003 CREATE DEFINER=`root`@`localhost` PROCEDURE `spInsertOnline`(
+		in AccId int,
+		in CharId int,
+		in SrvId int,
+		in ChanId int,
+		in Handle int)
+BEGIN
+	INSERT INTO `online` 
+	(`AccountID`, 
+	`CharID`, 
+	`ServerID`, 
+	`ChannelID`, 
+	`Handle`
+	)
+	VALUES
+	(AccId, 
+	 CharId, 
+	 SrvId, 
+	 ChanId, 
+	 Handle
 	);
     END */$$
 DELIMITER ;

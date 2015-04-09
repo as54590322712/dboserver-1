@@ -112,6 +112,11 @@ int CharClient::DBInsertCharData(sPC_SUMMARY data, NewbieData nbdata)
 		pServer->ServerDB->Fetch();
 		charid = pServer->ServerDB->getInt("ID");
 	}
+	// BAGS CONAINERS
+	pServer->ServerDB->ExecuteQuery("INSERT INTO `inventory` (`ItemID`,`CharID`,`Slot`,`Stack`,`Place`) VALUES ('%u', '%u', '%u', '%u', '%u');", 19901, charid, 0, 1, CONTAINER_TYPE_BAGSLOT);
+	pServer->ServerDB->ExecuteQuery("INSERT INTO `inventory` (`ItemID`,`CharID`,`Slot`,`Stack`,`Place`) VALUES ('%u', '%u', '%u', '%u', '%u');", 19905, charid, 1, 1, CONTAINER_TYPE_BAGSLOT);
+	pServer->ServerDB->ExecuteQuery("INSERT INTO `inventory` (`ItemID`,`CharID`,`Slot`,`Stack`,`Place`) VALUES ('%u', '%u', '%u', '%u', '%u');", 19991, charid, 0, 1, CONTAINER_TYPE_BANKSLOT);
+	// START ITEMS
 	for (int i = 0; i < NTL_MAX_NEWBIE_ITEM; i++)
 	{
 		int slot = nbdata.itemSlot[i];
@@ -119,17 +124,16 @@ int CharClient::DBInsertCharData(sPC_SUMMARY data, NewbieData nbdata)
 			pServer->ServerDB->ExecuteQuery("INSERT INTO `inventory` (`ItemID`,`CharID`,`Slot`,`Stack`,`Place`) VALUES ('%u', '%u', '%u', '%u', '%u');",
 			nbdata.itemId[i], charid, slot, nbdata.itemStack[i], CONTAINER_TYPE_EQUIP);
 	}
-	pServer->ServerDB->ExecuteQuery("INSERT INTO `inventory` (`ItemID`,`CharID`,`Slot`,`Stack`,`Place`) VALUES ('%u', '%u', '%u', '%u', '%u');", 19901, charid, 0, 1, CONTAINER_TYPE_BAGSLOT);
-	pServer->ServerDB->ExecuteQuery("INSERT INTO `inventory` (`ItemID`,`CharID`,`Slot`,`Stack`,`Place`) VALUES ('%u', '%u', '%u', '%u', '%u');", 19905, charid, 1, 1, CONTAINER_TYPE_BAGSLOT);
-	pServer->ServerDB->ExecuteQuery("INSERT INTO `inventory` (`ItemID`,`CharID`,`Slot`,`Stack`,`Place`) VALUES ('%u', '%u', '%u', '%u', '%u');", 19991, charid, 0, 1, CONTAINER_TYPE_BANKSLOT);
 	// dragon balls
 	//for (int i = 0; i < 7; i++)
 	//	pServer->ServerDB->ExecuteQuery("INSERT INTO `inventory` (`ItemID`,`CharID`,`Slot`,`Stack`,`Place`) VALUES ('%u', '%u', '%u', '%u', '%u');", 200001 + i, charid, i, 1, CONTAINER_TYPE_BAG1);
+	// START QUICKSLOTS CONFIG
 	for (int i = 0; i < NTL_MAX_NEWBIE_QUICKSLOT_COUNT; i++)
 	{
 		pServer->ServerDB->ExecuteQuery("INSERT INTO `quickslot` (`CharID`,`TblID`,`Slot`,`Type`) VALUES ('%u','%u','%u','%u');",
 			charid, nbdata.QuickSlotData[i].tbilidx, nbdata.QuickSlotData[i].byQuickSlot, nbdata.QuickSlotData[i].byType);
 	}
+	// START SKILLS
 	for (int i = 0; i < NTL_MAX_NEWBIE_SKILL; i++)
 	{
 		if (nbdata.SkillsIds[i] != INVALID_DWORD)
@@ -183,7 +187,7 @@ int CharClient::GetDBAccCharListData(sCU_CHARACTER_INFO* outdata)
 		{
 			for (int x = 0; x < EQUIP_SLOT_TYPE_COUNT; x++)
 			{
-				memset(&outdata->sPcData[i].sItem[x], 0xFF, sizeof(sITEM_SUMMARY));
+				outdata->sPcData[i].sItem[x].tblidx = INVALID_ITEMID;
 			}
 			if (pServer->ServerDB->ExecuteSelect("SELECT * FROM `inventory` WHERE `CharID`='%u';", outdata->sPcData[i].charId))
 			{
@@ -191,7 +195,7 @@ int CharClient::GetDBAccCharListData(sCU_CHARACTER_INFO* outdata)
 				{
 					int slot = pServer->ServerDB->getInt("Slot");
 					int place = pServer->ServerDB->getInt("Place");
-					if (((slot >= 0) && (slot <= 12)) && place == CONTAINER_TYPE_EQUIP)
+					if (((slot >= EQUIP_SLOT_TYPE_FIRST) && (slot <= EQUIP_SLOT_TYPE_LAST)) && place == CONTAINER_TYPE_EQUIP)
 					{
 						outdata->sPcData[i].sItem[slot].tblidx = pServer->ServerDB->getInt("ItemID");
 						outdata->sPcData[i].sItem[slot].byRank = pServer->ServerDB->getInt("Rank");

@@ -58,6 +58,7 @@
     <ClCompile Include="Session.cpp" />
     <ClCompile Include="SessionList.cpp" />
     <ClCompile Include="Socket.cpp" />
+    <ClCompile Include="SpawnTable.cpp" />
     <ClCompile Include="stdafx.cpp" />
     <ClCompile Include="Table.cpp" />
     <ClCompile Include="Thread.cpp" />
@@ -153,6 +154,7 @@
     <ClInclude Include="Singleton.h" />
     <ClInclude Include="Socket.h" />
     <ClInclude Include="SocketAddr.h" />
+    <ClInclude Include="SpawnTable.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="Table.h" />
     <ClInclude Include="Thread.h" />
@@ -209,7 +211,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <PostBuildEvent>
-      <Command>copy "$(SolutionDir)Deps\bin\pthreadVC2.dll" "$(OutDir)"</Command>
+      <Command>copy "$(SolutionDir)Deps\bin\libmysql.dll" "$(OutDir)"</Command>
     </PostBuildEvent>
     <Lib>
       <AdditionalDependencies>Crypto.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -232,7 +234,7 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <PostBuildEvent>
-      <Command>copy "$(SolutionDir)Deps\bin\pthreadVC2.dll" "$(OutDir)"</Command>
+      <Command>copy "$(SolutionDir)Deps\bin\libmysql.dll" "$(OutDir)"</Command>
     </PostBuildEvent>
     <Lib>
       <AdditionalDependencies>Crypto.lib;%(AdditionalDependencies)</AdditionalDependencies>

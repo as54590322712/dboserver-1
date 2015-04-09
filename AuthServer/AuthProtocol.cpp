@@ -8,7 +8,10 @@ bool AuthClient::PacketControl(Packet* pPacket)
 	{
 	case UA_LOGIN_DISCONNECT_REQ: SendDisconnectRes((sUA_LOGIN_DISCONNECT_REQ*)data); break;
 	case UA_LOGIN_REQ: SendLoginRes((sUA_LOGIN_REQ*)data); break;
-	case 1: { sNTLPACKETHEADER reply(1); Send(&reply, sizeof(reply)); } break;
+	
+	// SYS PACKETS
+	case SYS_ALIVE: { ResetAliveTime(); } break;
+	case SYS_PING: break;
 	default:
 		Logger::Log("Received Opcode: %s\n", NtlGetPacketName_UA(data->wOpCode));
 		return false;
@@ -34,13 +37,13 @@ void AuthClient::SendLoginRes(sUA_LOGIN_REQ* data)
 	memcpy(lRes.awchUserId, data->awchUserId, NTL_MAX_SIZE_USERID_UNICODE);
 
 	// servers
-	lRes.byServerInfoCount = pServer->ServerCfg->GetInt("ServerList", "Count");
+	lRes.byServerInfoCount = pServer->ServerCfg->GetInt("CharServerList", "Count");
 	for (int x = 0; x < lRes.byServerInfoCount; x++)
 	{
 		char snode[20];
-		sprintf_s(snode, "Server%d", x + 1);
-		memcpy(lRes.aServerInfo[x].szCharacterServerIP, pServer->ServerCfg->GetChildStr("ServerList", snode, "IP"), NTL_MAX_LENGTH_OF_IP);
-		lRes.aServerInfo[x].wCharacterServerPortForClient = pServer->ServerCfg->GetChildInt("ServerList", snode, "Port");
+		sprintf_s(snode, "CharServer%d", x + 1);
+		memcpy(lRes.aServerInfo[x].szCharacterServerIP, pServer->ServerCfg->GetChildStr("CharServerList", snode, "IP"), NTL_MAX_LENGTH_OF_IP);
+		lRes.aServerInfo[x].wCharacterServerPortForClient = pServer->ServerCfg->GetChildInt("CharServerList", snode, "Port");
 		lRes.aServerInfo[x].dwLoad = 0;
 	}
 	Send((unsigned char*)&lRes, sizeof(lRes));

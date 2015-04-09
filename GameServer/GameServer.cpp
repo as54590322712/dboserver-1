@@ -31,6 +31,11 @@ int GameServer::OnCreate()
 		return rc;
 	}
 
+	_charManager = new CharacterManager();
+	_charManager->Init();
+	_objManager = new ObjectManager();
+	_objManager->Init();
+
 	ServerDB = new Database();
 	if (!ServerDB->Connect(
 		ServerCfg->GetStr("MySQL", "Host"),
@@ -47,11 +52,25 @@ int GameServer::OnCreate()
 		return 3;//ERR_LOADTABLE
 	}
 
+	npcspawnTblData = new SpawnTable();
+	if (npcspawnTblData->Load("..\\Tables\\spawn_npc_main_world.edf") != 0)
+	{
+		Logger::Log("Failed to load NPC Spawn Table!\n");
+		return 3;//ERR_LOADTABLE
+	}
+
 	this->ServerID = ServerCfg->GetInt("Server", "ID");
 
-	m_uiCharSerialID = INVALID_DWORD;
-	m_uiNpcSerialID = INVALID_DWORD;
-	m_uiTargetSerialID = INVALID_DWORD;
+	m_uiSerialID = INVALID_DWORD;
+
+	Logger::Log("Loading %u NPC Spawns... please wait!\n", npcspawnTblData->GetCount());
+	for (int i = 1; i < (npcspawnTblData->GetCount() + 1); ++i)
+	{
+		AddSpawn(npcspawnTblData->GetData(i), OBJTYPE_NPC);
+	}
+	Logger::Log("Loaded %u NPC Spawns!\n", npcspawnTblData->GetCount());
+
+	ServerDB->ExecuteQuery("CALL `spClearOnline`('%u');", ServerID);
 	return 0;
 }
 
@@ -64,110 +83,66 @@ int GameServer::OnConfiguration(const char* ConfigFile)
 int GameServer::OnAppStart()
 {
 	Logger::Log("Server listening on %s:%d\n", _clientAcceptor.GetListenIP(), _clientAcceptor.GetListenPort());
-	_charManager = new CharacterManager();
-	_charManager->Init();
-	_objManager = new ObjectManager();
-	_objManager->Init();
 	return 0;
 }
 
-unsigned int GameServer::AcquireCharSerialID()
+unsigned int GameServer::AcquireSerialID()
 {
-	if (m_uiCharSerialID++)
+	if (m_uiSerialID++)
 	{
-		if (m_uiCharSerialID == INVALID_DWORD)
-			m_uiCharSerialID = 0;
+		if (m_uiSerialID == INVALID_DWORD)
+			m_uiSerialID = 0;
 	}
 
-	return m_uiCharSerialID;
+	return m_uiSerialID;
 }
 
-unsigned int GameServer::AcquireNpcSerialID()
+void GameServer::AddSpawn(SpawnData data, eOBJTYPE type)
 {
-	if (m_uiNpcSerialID++)
+	sGU_OBJECT_CREATE sPacket;
+	memset(&sPacket, 0, sizeof(sGU_OBJECT_CREATE));
+	sPacket.wOpCode = GU_OBJECT_CREATE;
+	sPacket.handle = AcquireSerialID();
+	switch (type)
 	{
-		if (m_uiNpcSerialID == INVALID_DWORD)
-			m_uiNpcSerialID = 0;
+	case OBJTYPE_NPC:
+		sPacket.sObjectInfo.objType = OBJTYPE_NPC;
+		sPacket.sObjectInfo.npcBrief.tblidx = data.mob_Tblidx;
+		sPacket.sObjectInfo.npcBrief.wCurLP = 100;
+		sPacket.sObjectInfo.npcBrief.wMaxLP = 100;
+		sPacket.sObjectInfo.npcBrief.fLastWalkingSpeed = 3.0f;
+		sPacket.sObjectInfo.npcBrief.fLastRunningSpeed = 7.0f;
+
+		sPacket.sObjectInfo.npcState.sCharStateBase.byStateID = CHARSTATE_SPAWNING;
+		sPacket.sObjectInfo.npcState.sCharStateBase.bFightMode = FALSE;
+
+		sPacket.sObjectInfo.npcState.sCharStateBase.vCurLoc.x = data.vSpawn_Loc.x;
+		sPacket.sObjectInfo.npcState.sCharStateBase.vCurLoc.y = data.vSpawn_Loc.y;
+		sPacket.sObjectInfo.npcState.sCharStateBase.vCurLoc.z = data.vSpawn_Loc.z;
+
+		sPacket.sObjectInfo.npcState.sCharStateBase.vCurDir.x = data.vSpawn_Dir.x;
+		sPacket.sObjectInfo.npcState.sCharStateBase.vCurDir.y = data.vSpawn_Dir.y;
+		sPacket.sObjectInfo.npcState.sCharStateBase.vCurDir.z = data.vSpawn_Dir.z;
+		break;
+	case OBJTYPE_MOB:
+		sPacket.sObjectInfo.objType = OBJTYPE_MOB;
+		sPacket.sObjectInfo.mobBrief.tblidx = data.mob_Tblidx;
+		sPacket.sObjectInfo.mobBrief.wCurLP = 100;
+		sPacket.sObjectInfo.mobBrief.wMaxLP = 100;
+		sPacket.sObjectInfo.mobBrief.fLastWalkingSpeed = 3.0f;
+		sPacket.sObjectInfo.mobBrief.fLastRunningSpeed = 7.0f;
+
+		sPacket.sObjectInfo.mobState.sCharStateBase.byStateID = CHARSTATE_SPAWNING;
+		sPacket.sObjectInfo.mobState.sCharStateBase.bFightMode = FALSE;
+
+		sPacket.sObjectInfo.mobState.sCharStateBase.vCurLoc.x = data.vSpawn_Loc.x + (float)(rand() % data.bySpawn_Loc_Range);
+		sPacket.sObjectInfo.mobState.sCharStateBase.vCurLoc.y = data.vSpawn_Loc.y;
+		sPacket.sObjectInfo.mobState.sCharStateBase.vCurLoc.z = data.vSpawn_Loc.z + (float)(rand() % data.bySpawn_Loc_Range);
+
+		sPacket.sObjectInfo.mobState.sCharStateBase.vCurDir.x = data.vSpawn_Dir.x;
+		sPacket.sObjectInfo.mobState.sCharStateBase.vCurDir.y = data.vSpawn_Dir.y;
+		sPacket.sObjectInfo.mobState.sCharStateBase.vCurDir.z = data.vSpawn_Dir.z;
+		break;
 	}
-
-	return m_uiNpcSerialID;
-}
-
-unsigned int GameServer::AcquireTargetSerialID()
-{
-	if (m_uiTargetSerialID++)
-	{
-		if (m_uiTargetSerialID == INVALID_DWORD)
-			m_uiTargetSerialID = 0;
-	}
-
-	return m_uiTargetSerialID;
-}
-
-bool GameServer::AddClient(GameClient* pClient)
-{
-	cList.push_back(new ClientLink(pClient));
-	return true;
-}
-
-void GameServer::RemoveClient(GameClient* pClient)
-{
-	for (unsigned int i = 0; i < cList.size(); ++i)
-	{
-		if (pClient == cList.at(i)->GetClient())
-			cList.erase(cList.begin() + i);
-	}
-}
-
-bool GameServer::FindClient(GameClient* pClient)
-{
-	for (unsigned int i = 0; i < cList.size(); ++i)
-	{
-		if (pClient == cList.at(i)->GetClient()) return true;
-	}
-	return false;
-}
-
-void GameServer::SendAll(void* pData, int nSize)
-{
-	for (unsigned int i = 0; i < cList.size(); ++i)
-	{
-		cList.at(i)->GetClient()->PushPacket(pData, nSize);
-	}
-}
-
-void GameServer::SendOthers(void* pData, int nSize, GameClient* pClient, bool distCheck)
-{
-	for (unsigned int i = 0; i < cList.size(); ++i)
-	{
-		if (pClient->GetHandle() != cList.at(i)->GetClient()->GetHandle())
-			cList.at(i)->GetClient()->PushPacket(pData, nSize);
-	}
-}
-
-void GameServer::RecvOthers(eOPCODE_GU Opcode, GameClient* pClient, bool distCheck)
-{
-	for (unsigned int i = 0; i < cList.size(); ++i)
-	{
-		if (pClient->GetHandle() != cList.at(i)->GetClient()->GetHandle())
-		{
-			switch (Opcode)
-			{
-			case GU_OBJECT_CREATE:
-				{
-					sGU_OBJECT_CREATE pSpawn = cList.at(i)->GetClient()->GetCharSpawnData();
-					pSpawn.handle = cList.at(i)->GetClient()->GetCharSerialID();
-					pClient->PushPacket(&pSpawn, sizeof(pSpawn));
-				} break;
-			}
-		}
-	}
-}
-
-void GameServer::SpawnObjects()
-{
-	for (unsigned int i = 0; i < cList.size(); ++i)
-	{
-		this->_objManager->SpawnToClient(cList.at(i)->GetClient());
-	}
+	GetObjectManager()->AddObject(sPacket);
 }

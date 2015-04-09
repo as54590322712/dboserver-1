@@ -41,12 +41,12 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(SolutionDir)Deps\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)Deps\include;C:\Arquivos\boost_1_57_0;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)Deps\lib;$(SolutionDir)Deps\lib\Debug;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(SolutionDir)Deps\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)Deps\include;C:\Arquivos\boost_1_57_0;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)Deps\lib;$(SolutionDir)Deps\lib\Release;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -66,7 +66,14 @@
       <IgnoreSpecificDefaultLibraries>MSVCRT;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <IgnoreAllDefaultLibraries>
       </IgnoreAllDefaultLibraries>
+      <HeapCommitSize>
+      </HeapCommitSize>
+      <StackCommitSize>
+      </StackCommitSize>
     </Link>
+    <PostBuildEvent>
+      <Command>copy "$(ProjectDir)$(ProjectName)Config.xml" "$(OutputPath)"</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -86,10 +93,16 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <IgnoreSpecificDefaultLibraries>MSVCRTD;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <HeapCommitSize>6000</HeapCommitSize>
+      <StackCommitSize>6000</StackCommitSize>
     </Link>
+    <PostBuildEvent>
+      <Command>copy "$(ProjectDir)$(ProjectName)Config.xml" "$(OutputPath)"</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="ChatClient.cpp" />
+    <ClCompile Include="ChatManager.cpp" />
     <ClCompile Include="ChatNetwork.h" />
     <ClCompile Include="ChatProtocol.cpp" />
     <ClCompile Include="ChatServer.cpp" />
@@ -101,6 +114,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="ChatManager.h" />
     <ClInclude Include="ChatProtocol.h" />
   </ItemGroup>
   <ItemGroup>

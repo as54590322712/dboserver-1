@@ -27,7 +27,10 @@ public:
 	bool ChangeDB(char* db);
 	bool ExecuteQuery(char* Format, ...);
 	bool ExecuteSelect(char* Format, ...);
+	bool ExecuteSp(char* Format, ...);
+	void GetResultSet();
 	bool Fetch();
+	bool GetMoreResults();
 	float getFloat(const char* index);
 	long double getDouble(const char* index);
 	bool getBoolean(const char* index);

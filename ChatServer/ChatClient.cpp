@@ -1,5 +1,7 @@
 #include "ChatNetwork.h"
 
+#include <Def.h>
+
 ChatClient::ChatClient(bool IsAliveCheck, bool IsOpcodeCheck)
 	:Session(SESSION_CLIENT)
 {
@@ -20,6 +22,7 @@ ChatClient::ChatClient(bool IsAliveCheck, bool IsOpcodeCheck)
 
 ChatClient::~ChatClient()
 {
+	OnClose();
 }
 
 int	ChatClient::OnAccept()
@@ -29,12 +32,13 @@ int	ChatClient::OnAccept()
 
 void ChatClient::OnClose()
 {
+	if (pServer->GetChatManager()->FindClient(this))
+		pServer->GetChatManager()->RemoveClient(this);
 }
 
 int ChatClient::OnDispatch(Packet* pPacket)
 {
 	PacketControl(pPacket);
-	//	return OnDispatch(pPacket);
 	return 0;
 }
 
@@ -45,5 +49,24 @@ void ChatClient::Send(void* pData, int nSize)
 	if (0 != rc)
 	{
 		Logger::Log("Failed to send packet %d\n", rc);
+	}
+}
+
+void ChatClient::GetCharInfo()
+{
+	if (pServer->ServerDB->ExecuteSelect("SELECT * FROM `online` WHERE `AccountID` = '%u';", AccountID))
+	{
+		while (pServer->ServerDB->Fetch()) {
+			CurrCharID = pServer->ServerDB->getInt("CharID");
+			CurrServerID = pServer->ServerDB->getInt("ServerID");
+			CurrChannelID = pServer->ServerDB->getInt("ChannelID");
+			CharSerialID = pServer->ServerDB->getInt("Handle");
+		}
+	}
+	if (pServer->ServerDB->ExecuteSelect("SELECT * FROM `character` WHERE `ID` = '%u';", CurrCharID))
+	{
+		while (pServer->ServerDB->Fetch()) {
+			memcpy(this->charName, charToWChar(pServer->ServerDB->getString("Name")), NTL_MAX_SIZE_CHAR_NAME_UNICODE);
+		}
 	}
 }

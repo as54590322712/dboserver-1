@@ -73,11 +73,13 @@ eRESULTCODE CharClient::CheckUsedName(WCHAR* Name)
 {
 	if (pServer->ServerDB->ExecuteSelect("SELECT * FROM `character` WHERE `Name`='%S';", Name))
 	{
-		pServer->ServerDB->Fetch();
-		if (pServer->ServerDB->rowsCount() == 0)
-			return CHARACTER_SUCCESS;
-		else
-			return CHARACTER_SAMENAME_EXIST;
+		while (pServer->ServerDB->Fetch())
+		{
+			if (pServer->ServerDB->rowsCount() == 0)
+				return CHARACTER_SUCCESS;
+			else
+				return CHARACTER_SAMENAME_EXIST;
+		}
 	}
 	return CHARACTER_DB_QUERY_FAIL;
 }
@@ -86,14 +88,16 @@ eRESULTCODE CharClient::DBChangeCharName(WCHAR* Name, int charId)
 {
 	if (pServer->ServerDB->ExecuteSelect("SELECT * FROM `character` WHERE `Name`='%S';", Name))
 	{
-		pServer->ServerDB->Fetch();
-		if (pServer->ServerDB->rowsCount() == 0)
+		while (pServer->ServerDB->Fetch())
 		{
-			pServer->ServerDB->ExecuteQuery("UPDATE `character` SET `Name` = '%S' WHERE `ID` = '%d';", Name, charId);
-			return CHARACTER_SUCCESS;
+			if (pServer->ServerDB->rowsCount() == 0)
+			{
+				pServer->ServerDB->ExecuteQuery("UPDATE `character` SET `Name` = '%S' WHERE `ID` = '%d';", Name, charId);
+				return CHARACTER_SUCCESS;
+			}
+			else
+				return CHARACTER_SAMENAME_EXIST;
 		}
-		else
-			return CHARACTER_SAMENAME_EXIST;
 	}
 	return CHARACTER_DB_QUERY_FAIL;
 }
@@ -109,8 +113,10 @@ int CharClient::DBInsertCharData(sPC_SUMMARY data, NewbieData nbdata)
 		data.fPositionZ, nbdata.spawnDir.x, nbdata.spawnDir.y, nbdata.spawnDir.z, data.dwMoney, data.dwMoneyBank, data.bIsAdult, data.bTutorialFlag, data.bNeedNameChange, pcdata.Basic_EP, pcdata.Basic_EP, pcdata.Basic_LP, pcdata.Basic_LP);
 	if (pServer->ServerDB->ExecuteSelect("SELECT `ID` FROM `character` WHERE `AccID`='%d' AND `Name`='%S';", AccountID, data.awchName))
 	{
-		pServer->ServerDB->Fetch();
-		charid = pServer->ServerDB->getInt("ID");
+		while (pServer->ServerDB->Fetch())
+		{
+			charid = pServer->ServerDB->getInt("ID");
+		}
 	}
 	// BAGS CONAINERS
 	pServer->ServerDB->ExecuteQuery("INSERT INTO `inventory` (`ItemID`,`CharID`,`Slot`,`Stack`,`Place`) VALUES ('%u', '%u', '%u', '%u', '%u');", 19901, charid, 0, 1, CONTAINER_TYPE_BAGSLOT);

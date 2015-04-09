@@ -301,11 +301,13 @@ void GameClient::LoadWorldInfoData()
 {
 	if (pServer->ServerDB->ExecuteSelect("SELECT * FROM `character` WHERE `AccID`='%d' AND `ID`='%d';", this->AccountID, this->CurrCharID))
 	{
-		pServer->ServerDB->Fetch();
-		worldInfo.tblidx = pServer->ServerDB->getInt("worldTblidx");
-		worldInfo.worldID = pServer->ServerDB->getInt("worldId");
-		worldInfo.hTriggerObjectOffset = 100000; // WHAT IS THIS??
-		worldInfo.sRuleInfo.byRuleType = GAMERULE_NORMAL;
+		while (pServer->ServerDB->Fetch())
+		{
+			worldInfo.tblidx = pServer->ServerDB->getInt("worldTblidx");
+			worldInfo.worldID = pServer->ServerDB->getInt("worldId");
+			worldInfo.hTriggerObjectOffset = 100000; // WHAT IS THIS??
+			worldInfo.sRuleInfo.byRuleType = GAMERULE_NORMAL;
+		}
 	}
 }
 
@@ -344,71 +346,73 @@ void GameClient::LoadCharacterData()
 {
 	if (pServer->ServerDB->ExecuteSelect("SELECT * FROM `character` WHERE `AccID`='%u' AND `ID`='%u';", AccountID, CurrCharID))
 	{
-		pServer->ServerDB->Fetch();
-		int Race = pServer->ServerDB->getInt("Race");
-		int Class = pServer->ServerDB->getInt("Class");
-		int Gender = pServer->ServerDB->getInt("Gender");
-		PCData pcdata = pServer->pcTblData->GetData(Race,Class,Gender);
-		Logger::Log("Loaded PC TblInfo: Idx(%u) Race(%u) Class(%u) Gender(%u)\n", pcdata.TblIndex, pcdata.Race, pcdata.Class, pcdata.Gender);
-		memset(&PcProfile, 0, sizeof(PcProfile));
-		memcpy(PcProfile.awchName, charToWChar(pServer->ServerDB->getString("Name")), NTL_MAX_SIZE_CHAR_NAME_UNICODE);
-		memcpy(this->charName, charToWChar(pServer->ServerDB->getString("Name")), NTL_MAX_SIZE_CHAR_NAME_UNICODE);
-		PcProfile.tblidx = pcdata.TblIndex;
-		PcProfile.charId = pServer->ServerDB->getInt("ID");
-		this->isGameMaster = PcProfile.bIsGameMaster = pServer->ServerDB->getBoolean("IsGameMaster");
-		PcProfile.byLevel = pServer->ServerDB->getInt("Level");
-		PcProfile.dwCurExp = pServer->ServerDB->getInt("CurExp");
-		PcProfile.bIsAdult = pServer->ServerDB->getBoolean("Adult");
-		PcProfile.dwMaxExpInThisLevel = 100;
-		PcProfile.dwTutorialHint = pServer->ServerDB->getInt("TutorialHint");
-		PcProfile.wCurEP = pServer->ServerDB->getInt("CurEP");;
-		PcProfile.wCurLP = pServer->ServerDB->getInt("CurLP");;
-		PcProfile.wCurRP = pcdata.Basic_RP;
-		PcProfile.dwZenny = pServer->ServerDB->getInt("Money");
-		PcProfile.sMarking.byCode = INVALID_MARKING_TYPE;
+		while (pServer->ServerDB->Fetch())
+		{
+			int Race = pServer->ServerDB->getInt("Race");
+			int Class = pServer->ServerDB->getInt("Class");
+			int Gender = pServer->ServerDB->getInt("Gender");
+			PCData pcdata = pServer->pcTblData->GetData(Race, Class, Gender);
+			Logger::Log("Loaded PC TblInfo: Idx(%u) Race(%u) Class(%u) Gender(%u)\n", pcdata.TblIndex, pcdata.Race, pcdata.Class, pcdata.Gender);
+			memset(&PcProfile, 0, sizeof(PcProfile));
+			memcpy(PcProfile.awchName, charToWChar(pServer->ServerDB->getString("Name")), NTL_MAX_SIZE_CHAR_NAME_UNICODE);
+			memcpy(this->charName, charToWChar(pServer->ServerDB->getString("Name")), NTL_MAX_SIZE_CHAR_NAME_UNICODE);
+			PcProfile.tblidx = pcdata.TblIndex;
+			PcProfile.charId = pServer->ServerDB->getInt("ID");
+			this->isGameMaster = PcProfile.bIsGameMaster = pServer->ServerDB->getBoolean("IsGameMaster");
+			PcProfile.byLevel = pServer->ServerDB->getInt("Level");
+			PcProfile.dwCurExp = pServer->ServerDB->getInt("CurExp");
+			PcProfile.bIsAdult = pServer->ServerDB->getBoolean("Adult");
+			PcProfile.dwMaxExpInThisLevel = 100;
+			PcProfile.dwTutorialHint = pServer->ServerDB->getInt("TutorialHint");
+			PcProfile.wCurEP = pServer->ServerDB->getInt("CurEP");;
+			PcProfile.wCurLP = pServer->ServerDB->getInt("CurLP");;
+			PcProfile.wCurRP = pcdata.Basic_RP;
+			PcProfile.dwZenny = pServer->ServerDB->getInt("Money");
+			PcProfile.sMarking.byCode = INVALID_MARKING_TYPE;
 
-		PcProfile.avatarAttribute.wBaseMaxEP = pServer->ServerDB->getInt("MaxEP");
-		PcProfile.avatarAttribute.wBaseMaxLP = pServer->ServerDB->getInt("MaxLP");
-		PcProfile.avatarAttribute.wBaseMaxRP = pcdata.Basic_RP;
-		PcProfile.avatarAttribute.byBaseStr = pcdata.Str;
-		PcProfile.avatarAttribute.byBaseFoc = pcdata.Foc;
-		PcProfile.avatarAttribute.byBaseSol = pcdata.Sol;
-		PcProfile.avatarAttribute.byBaseDex = pcdata.Dex;
-		PcProfile.avatarAttribute.byBaseCon = pcdata.Con;
-		PcProfile.avatarAttribute.byBaseEng = pcdata.Eng;
-		PcProfile.avatarAttribute.fBaseAttackRange = pcdata.Attack_Range;
-		PcProfile.avatarAttribute.wBaseAttackRate = pcdata.Attack_Rate;
-		PcProfile.avatarAttribute.wBaseAttackSpeedRate = pcdata.Attack_Speed_Rate;
-		PcProfile.avatarAttribute.wBaseBlockRate = pcdata.Block_Rate;
-		PcProfile.avatarAttribute.wBaseCurseSuccessRate = pcdata.Curse_Success_Rate;
-		PcProfile.avatarAttribute.wBaseCurseToleranceRate = pcdata.Curse_Tolerance_Rate;
-		PcProfile.avatarAttribute.wBaseDodgeRate = pcdata.Dodge_Rate;
-		PcProfile.avatarAttribute.fLastRunSpeed = (PcProfile.bIsAdult) ? pcdata.Adult_Run_Speed : pcdata.Child_Run_Speed;
-		CalculateAtributes(&pcdata);
+			PcProfile.avatarAttribute.wBaseMaxEP = pServer->ServerDB->getInt("MaxEP");
+			PcProfile.avatarAttribute.wBaseMaxLP = pServer->ServerDB->getInt("MaxLP");
+			PcProfile.avatarAttribute.wBaseMaxRP = pcdata.Basic_RP;
+			PcProfile.avatarAttribute.byBaseStr = pcdata.Str;
+			PcProfile.avatarAttribute.byBaseFoc = pcdata.Foc;
+			PcProfile.avatarAttribute.byBaseSol = pcdata.Sol;
+			PcProfile.avatarAttribute.byBaseDex = pcdata.Dex;
+			PcProfile.avatarAttribute.byBaseCon = pcdata.Con;
+			PcProfile.avatarAttribute.byBaseEng = pcdata.Eng;
+			PcProfile.avatarAttribute.fBaseAttackRange = pcdata.Attack_Range;
+			PcProfile.avatarAttribute.wBaseAttackRate = pcdata.Attack_Rate;
+			PcProfile.avatarAttribute.wBaseAttackSpeedRate = pcdata.Attack_Speed_Rate;
+			PcProfile.avatarAttribute.wBaseBlockRate = pcdata.Block_Rate;
+			PcProfile.avatarAttribute.wBaseCurseSuccessRate = pcdata.Curse_Success_Rate;
+			PcProfile.avatarAttribute.wBaseCurseToleranceRate = pcdata.Curse_Tolerance_Rate;
+			PcProfile.avatarAttribute.wBaseDodgeRate = pcdata.Dodge_Rate;
+			PcProfile.avatarAttribute.fLastRunSpeed = (PcProfile.bIsAdult) ? pcdata.Adult_Run_Speed : pcdata.Child_Run_Speed;
+			CalculateAtributes(&pcdata);
 
-		PcProfile.sPcShape.byFace = pServer->ServerDB->getInt("Face");
-		PcProfile.sPcShape.byHair = pServer->ServerDB->getInt("Hair");
-		PcProfile.sPcShape.byHairColor = pServer->ServerDB->getInt("HairColor");
-		PcProfile.sPcShape.bySkinColor = pServer->ServerDB->getInt("SkinColor");
+			PcProfile.sPcShape.byFace = pServer->ServerDB->getInt("Face");
+			PcProfile.sPcShape.byHair = pServer->ServerDB->getInt("Hair");
+			PcProfile.sPcShape.byHairColor = pServer->ServerDB->getInt("HairColor");
+			PcProfile.sPcShape.bySkinColor = pServer->ServerDB->getInt("SkinColor");
 
-		memset(&CharState, 0, sizeof(CharState));
-		CharState.sCharStateBase.dwConditionFlag = 0;
-		CharState.sCharStateBase.bFightMode = false;
-		CharState.sCharStateBase.byStateID = 0;
-		CharState.sCharStateBase.dwStateTime = (DWORD)time(NULL);
-		CharState.sCharStateBase.aspectState.sAspectStateBase.byAspectStateId = ASPECTSTATE_INVALID;
-		CharState.sCharStateBase.aspectState.sAspectStateDetail.sGreatNamek.bySourceGrade = 0;
-		CharState.sCharStateBase.aspectState.sAspectStateDetail.sKaioken.bySourceGrade = 0;
-		CharState.sCharStateBase.aspectState.sAspectStateDetail.sPureMajin.bySourceGrade = 0;
-		CharState.sCharStateBase.aspectState.sAspectStateDetail.sSuperSaiyan.bySourceGrade = 0;
-		CharState.sCharStateBase.aspectState.sAspectStateDetail.sVehicle.idVehicleTblidx = 0;
+			memset(&CharState, 0, sizeof(CharState));
+			CharState.sCharStateBase.dwConditionFlag = 0;
+			CharState.sCharStateBase.bFightMode = false;
+			CharState.sCharStateBase.byStateID = 0;
+			CharState.sCharStateBase.dwStateTime = (DWORD)time(NULL);
+			CharState.sCharStateBase.aspectState.sAspectStateBase.byAspectStateId = ASPECTSTATE_INVALID;
+			CharState.sCharStateBase.aspectState.sAspectStateDetail.sGreatNamek.bySourceGrade = 0;
+			CharState.sCharStateBase.aspectState.sAspectStateDetail.sKaioken.bySourceGrade = 0;
+			CharState.sCharStateBase.aspectState.sAspectStateDetail.sPureMajin.bySourceGrade = 0;
+			CharState.sCharStateBase.aspectState.sAspectStateDetail.sSuperSaiyan.bySourceGrade = 0;
+			CharState.sCharStateBase.aspectState.sAspectStateDetail.sVehicle.idVehicleTblidx = 0;
 
-		CharState.sCharStateBase.vCurLoc.x = pServer->ServerDB->getFloat("PositionX");
-		CharState.sCharStateBase.vCurLoc.y = pServer->ServerDB->getFloat("PositionY");
-		CharState.sCharStateBase.vCurLoc.z = pServer->ServerDB->getFloat("PositionZ");
-		CharState.sCharStateBase.vCurDir.x = pServer->ServerDB->getFloat("DirectionX");
-		CharState.sCharStateBase.vCurDir.y = pServer->ServerDB->getFloat("DirectionY");
-		CharState.sCharStateBase.vCurDir.z = pServer->ServerDB->getFloat("DirectionZ");
+			CharState.sCharStateBase.vCurLoc.x = pServer->ServerDB->getFloat("PositionX");
+			CharState.sCharStateBase.vCurLoc.y = pServer->ServerDB->getFloat("PositionY");
+			CharState.sCharStateBase.vCurLoc.z = pServer->ServerDB->getFloat("PositionZ");
+			CharState.sCharStateBase.vCurDir.x = pServer->ServerDB->getFloat("DirectionX");
+			CharState.sCharStateBase.vCurDir.y = pServer->ServerDB->getFloat("DirectionY");
+			CharState.sCharStateBase.vCurDir.z = pServer->ServerDB->getFloat("DirectionZ");
+		}
 	}
 }
 

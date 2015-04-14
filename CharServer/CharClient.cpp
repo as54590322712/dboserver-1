@@ -73,13 +73,11 @@ eRESULTCODE CharClient::CheckUsedName(WCHAR* Name)
 {
 	if (pServer->ServerDB->ExecuteSelect("SELECT * FROM `character` WHERE `Name`='%S';", Name))
 	{
-		while (pServer->ServerDB->Fetch())
-		{
-			if (pServer->ServerDB->rowsCount() == 0)
-				return CHARACTER_SUCCESS;
-			else
-				return CHARACTER_SAMENAME_EXIST;
-		}
+		pServer->ServerDB->Fetch();
+		if (pServer->ServerDB->rowsCount() == 0)
+			return CHARACTER_SUCCESS;
+		else
+			return CHARACTER_SAMENAME_EXIST;
 	}
 	return CHARACTER_DB_QUERY_FAIL;
 }
@@ -88,16 +86,14 @@ eRESULTCODE CharClient::DBChangeCharName(WCHAR* Name, int charId)
 {
 	if (pServer->ServerDB->ExecuteSelect("SELECT * FROM `character` WHERE `Name`='%S';", Name))
 	{
-		while (pServer->ServerDB->Fetch())
+		pServer->ServerDB->Fetch();
+		if (pServer->ServerDB->rowsCount() == 0)
 		{
-			if (pServer->ServerDB->rowsCount() == 0)
-			{
-				pServer->ServerDB->ExecuteQuery("UPDATE `character` SET `Name` = '%S' WHERE `ID` = '%d';", Name, charId);
-				return CHARACTER_SUCCESS;
-			}
-			else
-				return CHARACTER_SAMENAME_EXIST;
+			pServer->ServerDB->ExecuteQuery("UPDATE `character` SET `Name` = '%S' WHERE `ID` = '%d';", Name, charId);
+			return CHARACTER_SUCCESS;
 		}
+		else
+			return CHARACTER_SAMENAME_EXIST;
 	}
 	return CHARACTER_DB_QUERY_FAIL;
 }

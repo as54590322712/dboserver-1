@@ -18,6 +18,7 @@ bool GameClient::PacketControl(Packet* pPacket)
 		// Quest List
 		SendCharQuickSlotInfo();
 		SendCharInfoEnd();
+
 		SendAvatarWarFogInfo();
 	} break;
 	case UG_GAME_LEAVE_REQ: SendGameLeaveRes(); break;
@@ -590,9 +591,9 @@ void GameClient::SendSystemText(char* szText, ...)
 {
 	va_list args;
 	va_start(args, szText);
-	GameString text;
-	text.Format(szText, args);
-	SendSystemText(text, SERVER_TEXT_SYSTEM);
+	char text[NTL_MAX_LENGTH_OF_CHAT_MESSAGE_UNICODE];
+	vsprintf_s(text, szText, args);
+	SendSystemText(GameString(text), SERVER_TEXT_SYSTEM);
 	va_end(args);
 }
 
@@ -604,7 +605,7 @@ void GameClient::SendSystemText(GameString msg, eSERVER_TEXT_TYPE type)
 	memcpy(sPkt.awGMChar, charName, NTL_MAX_SIZE_CHAR_NAME_UNICODE);
 	sPkt.byDisplayType = type;
 	sPkt.wMessageLengthInUnicode = NTL_MAX_LENGTH_OF_CHAT_MESSAGE_UNICODE;
-	Logger::Log("MESSAGE LEN[%d]\n", sizeof(msg.c_str()));
+	Logger::Log("MESSAGE LEN[%d]\n", strlen(msg.c_str()));
 	memcpy(sPkt.awchMessage, msg.wc_str(), sPkt.wMessageLengthInUnicode);
 	pServer->GetClientManager()->SendAll(&sPkt, sizeof(sPkt));
 }

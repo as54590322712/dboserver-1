@@ -67,3 +67,16 @@ void GameString::GetToken(std::vector<std::string>& tokens, char token)
 		tokens.push_back(part);
 	}
 }
+
+size_t GameString::GetWCLen()
+{
+	return strlen(m_str.c_str()) + 1;
+}
+
+const WCHAR* GameString::wc_str()
+{
+	size_t conv, size = GetWCLen();
+	WCHAR* wa = new WCHAR[size];
+	mbstowcs_s(&conv, wa, size, m_str.c_str(), size);
+	return wa;
+}

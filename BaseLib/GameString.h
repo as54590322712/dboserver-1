@@ -33,6 +33,8 @@ public:
 	}
 
 	void GetToken(std::vector<std::string>& tokens, char token);
+	size_t GetWCLen();
+	const WCHAR* wc_str();
 
 private:
 	std::string m_str;

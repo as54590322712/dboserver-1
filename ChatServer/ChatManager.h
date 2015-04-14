@@ -13,16 +13,6 @@
 class ChatServer;
 class ChatClient;
 
-class ChatLink
-{
-public:
-	ChatLink(ChatClient* pClient) { m_pClient = pClient; }
-	ChatLink(ChatLink* pLink) { (*this) = *pLink; }
-	ChatClient* GetClient() { return m_pClient; }
-private:
-	ChatClient* m_pClient;
-};
-
 class ChatManager : public RunObject
 {
 public:
@@ -44,7 +34,7 @@ public:
 private:
 	Thread * pThread;
 	ChatServer* pServer;
-	typedef std::map<unsigned int, ChatLink*> clientList;
+	typedef std::map<unsigned int, ChatClient*> clientList;
 	typedef clientList::iterator cliIt;
 	typedef clientList::value_type cliVal;
 	clientList cList;

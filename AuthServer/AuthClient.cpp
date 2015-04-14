@@ -97,60 +97,54 @@ eRESULTCODE AuthClient::LoginVerifyAccount()
 {
 	if (pServer->ServerDB->ExecuteSelect("SELECT `ID` FROM account WHERE userName='%S'", userName))
 	{
-		while (pServer->ServerDB->Fetch())
+		pServer->ServerDB->Fetch();
+		if (pServer->ServerDB->rowsCount() == 0)
 		{
-			if (pServer->ServerDB->rowsCount() == 0)
+			return AUTH_USER_NOT_FOUND;
+		}
+		else
+		{
+			if (pServer->ServerDB->ExecuteSelect("SELECT `ID` FROM account WHERE userName='%S' AND passWord='%S'", userName, passWord))
 			{
-				return AUTH_USER_NOT_FOUND;
-			}
-			else
-			{
-				if (pServer->ServerDB->ExecuteSelect("SELECT `ID` FROM account WHERE userName='%S' AND passWord='%S'", userName, passWord))
+				pServer->ServerDB->Fetch();
+				if (pServer->ServerDB->rowsCount() == 0)
 				{
-					while (pServer->ServerDB->Fetch())
-					{
-						if (pServer->ServerDB->rowsCount() == 0)
-						{
-							return AUTH_WRONG_PASSWORD;
-						}
-						else
-						{
-							if (pServer->ServerDB->ExecuteSelect("SELECT `ID` FROM `account` WHERE `userName`='%S' AND `passWord`='%S' AND `State`='0'", userName, passWord))
-							{
-								while (pServer->ServerDB->Fetch())
-								{
-									if (pServer->ServerDB->rowsCount() == 0)
-									{
-										bool reconnect = true;
-										if (reconnect)
-										{
-											if (pServer->ServerDB->ExecuteQuery("UPDATE `account` SET `State` = '1' WHERE `ID` = '%d';", AccountID))
-											{
-												Logger::Log("Client[%d] Logged In with Account '%S' (%d)\n", this, userName, AccountID);
-												return AUTH_SUCCESS;
-											}
-											else
-												return AUTH_DB_FAIL;
-										}
-										else
-											return AUTH_USER_EXIST;
-									}
-									else
-									{
-										if (pServer->ServerDB->ExecuteQuery("UPDATE `account` SET `State` = '1' WHERE `ID` = '%d';", AccountID))
-											return AUTH_SUCCESS;
-										else
-											return AUTH_DB_FAIL;
-									}
-								}
-							}
-						}
-					}
+					return AUTH_WRONG_PASSWORD;
 				}
 				else
 				{
-					return AUTH_DB_FAIL;
+					if (pServer->ServerDB->ExecuteSelect("SELECT `ID` FROM `account` WHERE `userName`='%S' AND `passWord`='%S' AND `State`='0'", userName, passWord))
+					{
+						pServer->ServerDB->Fetch();
+						if (pServer->ServerDB->rowsCount() == 0)
+						{
+							bool reconnect = true;
+							if (reconnect)
+							{
+								if (pServer->ServerDB->ExecuteQuery("UPDATE `account` SET `State` = '1' WHERE `ID` = '%d';", AccountID))
+								{
+									Logger::Log("Client[%d] Logged In with Account '%S' (%d)\n", this, userName, AccountID);
+									return AUTH_SUCCESS;
+								}
+								else
+									return AUTH_DB_FAIL;
+							}
+							else
+								return AUTH_USER_EXIST;
+						}
+						else
+						{
+							if (pServer->ServerDB->ExecuteQuery("UPDATE `account` SET `State` = '1' WHERE `ID` = '%d';", AccountID))
+								return AUTH_SUCCESS;
+							else
+								return AUTH_DB_FAIL;
+						}
+					}
 				}
+			}
+			else
+			{
+				return AUTH_DB_FAIL;
 			}
 		}
 	}

@@ -105,6 +105,8 @@ public:
 	void SendTSConfirmRes(sUG_TS_CONFIRM_STEP_REQ* pData);
 	void SendSocialAction(sUG_SOCIAL_ACTION* pData);
 	void SendTutoHintUpdateRes(sUG_TUTORIAL_HINT_UPDATE_REQ* pData);
+	void SendSystemText(GameString msg, eSERVER_TEXT_TYPE type);
+	void SendSystemText(char* szText, ...);
 
 	//CASH/EVENT SHOPS
 	void SendEventItemStartRes();

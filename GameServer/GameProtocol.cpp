@@ -125,7 +125,7 @@ void GameClient::SendTSConfirmRes(sUG_TS_CONFIRM_STEP_REQ* pData)
 	sPkt.wResultCode = RESULT_SUCCESS;
 	Send(&sPkt, sizeof(sPkt));
 
-	Logger::Log("Quest[%d] CurID[%d] NextID[%d] Type[%d] EvtType[%d] EvtData[%d] Param[%d]\n",
+	SendSystemText("Quest[%d] CurID[%d] NextID[%d] Type[%d] EvtType[%d] EvtData[%d] Param[%d]",
 		pData->tId, pData->tcCurId, pData->tcNextId, pData->byTsType, pData->byEventType, pData->dwEventData, pData->dwParam);
 }
 
@@ -345,6 +345,30 @@ void GameClient::CheckCommand(sUG_SERVER_COMMAND* pData)
 				SpawnTesteMob(atoi(tok[1].c_str()));
 			}
 		}
+		if (strcmp(tok[0].c_str(), "@notice") == 0)
+		{
+			if (tok.size() > 1)
+			{
+				std::string msg = "";
+				for (unsigned int i = 1; i < tok.size(); i++)
+				{
+					msg.append(tok[i] + " ");
+				}
+				SendSystemText(GameString(msg.c_str()), SERVER_TEXT_SYSNOTICE);
+			}
+		}
+		if (strcmp(tok[0].c_str(), "@emergency") == 0)
+		{
+			if (tok.size() > 1)
+			{
+				std::string msg = "";
+				for (unsigned int i = 1; i < tok.size(); i++)
+				{
+					msg.append(tok[i] + " ");
+				}
+				SendSystemText(GameString(msg.c_str()), SERVER_TEXT_EMERGENCY);
+			}
+		}
 		if (strcmp(tok[0].c_str(), "@cashshop") == 0)
 		{
 			SendNetpyItemStartRes();
@@ -560,4 +584,27 @@ void GameClient::SendCharQuickSlotInfo()
 	int psize = 3;
 	psize += sizeof(sQUICK_SLOT_PROFILE) * qsInfo.byQuickSlotCount;
 	Send(&qsInfo, psize);
+}
+
+void GameClient::SendSystemText(char* szText, ...)
+{
+	va_list args;
+	va_start(args, szText);
+	GameString text;
+	text.Format(szText, args);
+	SendSystemText(text, SERVER_TEXT_SYSTEM);
+	va_end(args);
+}
+
+void GameClient::SendSystemText(GameString msg, eSERVER_TEXT_TYPE type)
+{
+	sGU_SYSTEM_DISPLAY_TEXT sPkt;
+	memset(&sPkt, 0, sizeof(sPkt));
+	sPkt.wOpCode = GU_SYSTEM_DISPLAY_TEXT;
+	memcpy(sPkt.awGMChar, charName, NTL_MAX_SIZE_CHAR_NAME_UNICODE);
+	sPkt.byDisplayType = type;
+	sPkt.wMessageLengthInUnicode = NTL_MAX_LENGTH_OF_CHAT_MESSAGE_UNICODE;
+	Logger::Log("MESSAGE LEN[%d]\n", sizeof(msg.c_str()));
+	memcpy(sPkt.awchMessage, msg.wc_str(), sPkt.wMessageLengthInUnicode);
+	pServer->GetClientManager()->SendAll(&sPkt, sizeof(sPkt));
 }

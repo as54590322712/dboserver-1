@@ -37,8 +37,10 @@ void ChatManager::CreateThread()
 
 bool ChatManager::AddClient(ChatClient* pClient)
 {
-	if (false == cList.insert(cliVal(pClient->GetHandle(), new ChatLink(pClient))).second)
+	if (false == cList.insert(cliVal(pClient->GetHandle(), pClient)).second)
+	{
 		return false;
+	}
 	return true;
 }
 
@@ -46,7 +48,7 @@ void ChatManager::RemoveClient(ChatClient* pClient)
 {
 	for (cliIt it = cList.begin(); it != cList.end(); ++it)
 	{
-		if (pClient == it->second->GetClient())
+		if (pClient->GetHandle() == it->second->GetHandle())
 			cList.erase(it);
 	}
 }
@@ -55,7 +57,8 @@ bool ChatManager::FindClient(ChatClient* pClient)
 {
 	for (cliIt it = cList.begin(); it != cList.end(); ++it)
 	{
-		if (pClient == it->second->GetClient()) return true;
+		if (pClient->GetHandle() == it->second->GetHandle())
+			return true;
 	}
 	return false;
 }
@@ -64,7 +67,7 @@ void ChatManager::SendAll(void* pData, int nSize)
 {
 	for (cliIt it = cList.begin(); it != cList.end(); ++it)
 	{
-		it->second->GetClient()->PushPacket(pData, nSize);
+		it->second->PushPacket(pData, nSize);
 	}
 }
 
@@ -72,8 +75,8 @@ void ChatManager::SendOthers(void* pData, int nSize, ChatClient* pClient, bool d
 {
 	for (cliIt it = cList.begin(); it != cList.end(); ++it)
 	{
-		if (pClient->GetHandle() != it->second->GetClient()->GetHandle())
-			it->second->GetClient()->PushPacket(pData, nSize);
+		if (pClient->GetHandle() != it->second->GetHandle())
+			it->second->PushPacket(pData, nSize);
 	}
 }
 
@@ -81,7 +84,7 @@ void ChatManager::RecvOthers(eOPCODE_TU Opcode, ChatClient* pClient, bool distCh
 {
 	for (cliIt it = cList.begin(); it != cList.end(); ++it)
 	{
-		if (pClient->GetHandle() != it->second->GetClient()->GetHandle())
+		if (pClient->GetHandle() != it->second->GetHandle())
 		{
 			switch (Opcode)
 			{

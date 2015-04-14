@@ -22,7 +22,7 @@ ChatClient::ChatClient(bool IsAliveCheck, bool IsOpcodeCheck)
 
 ChatClient::~ChatClient()
 {
-	OnClose();
+	//OnClose();
 }
 
 int	ChatClient::OnAccept()

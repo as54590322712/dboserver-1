@@ -5,10 +5,10 @@
   <MySQL Host="127.0.0.1" Port="3306" Database="DBO" User="dboserver" Password="dboserver" />
   
   <!-- Chat Server Config -->
-  <ChatServer IP="10.0.0.16" Port="50100" />
+  <ChatServer IP="127.0.0.1" Port="50100" />
   
   <!-- Char Server List Configuration -->
   <CharServerList Count="1">
-    <CharServer1 IP="10.0.0.16" Port="50300" />
+    <CharServer1 IP="127.0.0.1" Port="50300" />
   </CharServerList>
 </GameServer>

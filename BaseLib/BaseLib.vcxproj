@@ -211,7 +211,8 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <PostBuildEvent>
-      <Command>copy "$(SolutionDir)Deps\bin\libmysql.dll" "$(OutDir)"</Command>
+      <Command>copy "$(SolutionDir)Deps\bin\libmysql.dll" "$(OutDir)"
+copy "$(SolutionDir)Deps\bin\Crypto.dll" "$(OutDir)"</Command>
     </PostBuildEvent>
     <Lib>
       <AdditionalDependencies>Crypto.lib;%(AdditionalDependencies)</AdditionalDependencies>

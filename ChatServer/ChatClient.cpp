@@ -22,7 +22,7 @@ ChatClient::ChatClient(bool IsAliveCheck, bool IsOpcodeCheck)
 
 ChatClient::~ChatClient()
 {
-	//OnClose();
+	OnClose();
 }
 
 int	ChatClient::OnAccept()
@@ -32,8 +32,8 @@ int	ChatClient::OnAccept()
 
 void ChatClient::OnClose()
 {
-	if (pServer->GetChatManager()->FindClient(this))
-		pServer->GetChatManager()->RemoveClient(this);
+	/*if (pServer->GetChatManager()->FindClient(this))
+		pServer->GetChatManager()->RemoveClient(this);*/
 }
 
 int ChatClient::OnDispatch(Packet* pPacket)

@@ -1,182 +1,256 @@
-/*
-SQLyog Community v12.09 (64 bit)
-MySQL - 5.0.51b-community-nt-log : Database - dbo
-*********************************************************************
-*/
+-- MySQL Workbench Forward Engineering
 
-/*!40101 SET NAMES utf8 */;
+SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
+SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
+SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='TRADITIONAL,ALLOW_INVALID_DATES';
 
-/*!40101 SET SQL_MODE=''*/;
+-- -----------------------------------------------------
+-- Schema dbo
+-- -----------------------------------------------------
+DROP SCHEMA IF EXISTS `dbo` ;
 
-/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
-/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
-/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
-/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
-/*Table structure for table `account` */
+-- -----------------------------------------------------
+-- Schema dbo
+-- -----------------------------------------------------
+CREATE SCHEMA IF NOT EXISTS `dbo` DEFAULT CHARACTER SET utf8 ;
+USE `dbo` ;
 
-DROP TABLE IF EXISTS `account`;
+-- -----------------------------------------------------
+-- Table `dbo`.`account`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `dbo`.`account` ;
 
-CREATE TABLE `account` (
-  `ID` int(11) NOT NULL auto_increment,
-  `userName` varchar(20) NOT NULL,
-  `passWord` varchar(20) NOT NULL,
-  `AcLevel` int(11) NOT NULL default '0',
-  `AllowedRace` int(11) NOT NULL default '255',
-  `LastServerID` int(11) NOT NULL default '255',
-  `State` int(11) NOT NULL default '0',
-  PRIMARY KEY  (`ID`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;
+CREATE TABLE IF NOT EXISTS `dbo`.`account` (
+  `ID` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `userName` VARCHAR(20) NOT NULL,
+  `passWord` VARCHAR(20) NOT NULL,
+  `AcLevel` INT(11) NOT NULL DEFAULT '0',
+  `AllowedRace` INT(11) NOT NULL DEFAULT '255',
+  `LastServerID` INT(11) NOT NULL DEFAULT '255',
+  `State` INT(11) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`ID`))
+ENGINE = InnoDB
+AUTO_INCREMENT = 9
+DEFAULT CHARACTER SET = utf8;
 
-/*Table structure for table `character` */
 
-DROP TABLE IF EXISTS `character`;
+-- -----------------------------------------------------
+-- Table `dbo`.`character`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `dbo`.`character` ;
 
-CREATE TABLE `character` (
-  `ID` int(11) NOT NULL auto_increment,
-  `AccID` int(11) NOT NULL default '0',
-  `ServerID` int(11) NOT NULL default '0',
-  `Name` varchar(20) NOT NULL,
-  `Race` int(11) NOT NULL default '0',
-  `Class` int(11) NOT NULL default '0',
-  `Gender` int(11) NOT NULL default '0',
-  `Face` int(11) NOT NULL default '0',
-  `Hair` int(11) NOT NULL default '0',
-  `HairColor` int(11) NOT NULL default '0',
-  `SkinColor` int(11) NOT NULL default '0',
-  `Level` int(11) NOT NULL default '1',
-  `CurExp` bigint(20) NOT NULL default '0',
-  `MapInfoId` bigint(20) NOT NULL default '0',
-  `worldTblidx` bigint(11) NOT NULL default '0',
-  `worldId` bigint(11) NOT NULL default '0',
-  `BindType` int(11) NOT NULL default '0',
-  `bindWorldId` bigint(20) NOT NULL default '0',
-  `bindObjectTblid` bigint(20) NOT NULL default '0',
-  `PositionX` float(11,6) NOT NULL default '0.000000',
-  `PositionY` float(11,6) NOT NULL default '0.000000',
-  `PositionZ` float(11,6) NOT NULL default '0.000000',
-  `DirectionX` float(11,6) NOT NULL default '0.000000',
-  `DirectionY` float(11,6) NOT NULL default '0.000000',
-  `DirectionZ` float(11,6) NOT NULL default '0.000000',
-  `Money` bigint(20) NOT NULL default '0',
-  `MoneyBank` bigint(20) NOT NULL default '0',
-  `Marking` int(11) NOT NULL default '0',
-  `Adult` tinyint(1) NOT NULL default '0',
-  `TutorialFlag` tinyint(1) NOT NULL default '0',
-  `NeedNameChange` tinyint(1) NOT NULL default '0',
-  `ToDelete` tinyint(1) NOT NULL default '0',
-  `ChangeClass` tinyint(1) NOT NULL default '0',
-  `IsGameMaster` tinyint(4) NOT NULL default '0',
-  `TutorialHint` bigint(20) NOT NULL default '0',
-  `Reputation` int(11) NOT NULL default '0',
-  `MudosaPoint` int(11) NOT NULL default '0',
-  `SpPoint` int(11) NOT NULL default '0',
-  `CurEP` int(11) NOT NULL default '0',
-  `MaxEP` int(11) NOT NULL default '0',
-  `CurLP` int(11) NOT NULL default '0',
-  `MaxLP` int(11) NOT NULL default '0',
-  PRIMARY KEY  (`ID`)
-) ENGINE=InnoDB AUTO_INCREMENT=49 DEFAULT CHARSET=utf8;
+CREATE TABLE IF NOT EXISTS `dbo`.`character` (
+  `ID` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `AccID` INT(11) UNSIGNED NOT NULL DEFAULT '0',
+  `ServerID` INT(11) NOT NULL DEFAULT '0',
+  `Name` VARCHAR(20) NOT NULL,
+  `Race` INT(11) NOT NULL DEFAULT '0',
+  `Class` INT(11) NOT NULL DEFAULT '0',
+  `Gender` INT(11) NOT NULL DEFAULT '0',
+  `Face` INT(11) NOT NULL DEFAULT '0',
+  `Hair` INT(11) NOT NULL DEFAULT '0',
+  `HairColor` INT(11) NOT NULL DEFAULT '0',
+  `SkinColor` INT(11) NOT NULL DEFAULT '0',
+  `Level` INT(11) NOT NULL DEFAULT '1',
+  `CurExp` BIGINT(20) NOT NULL DEFAULT '0',
+  `MapInfoId` BIGINT(20) NOT NULL DEFAULT '0',
+  `worldTblidx` BIGINT(11) NOT NULL DEFAULT '0',
+  `worldId` BIGINT(11) NOT NULL DEFAULT '0',
+  `BindType` INT(11) NOT NULL DEFAULT '0',
+  `bindWorldId` BIGINT(20) NOT NULL DEFAULT '0',
+  `bindObjectTblid` BIGINT(20) NOT NULL DEFAULT '0',
+  `PositionX` FLOAT(11,6) NOT NULL DEFAULT '0.000000',
+  `PositionY` FLOAT(11,6) NOT NULL DEFAULT '0.000000',
+  `PositionZ` FLOAT(11,6) NOT NULL DEFAULT '0.000000',
+  `DirectionX` FLOAT(11,6) NOT NULL DEFAULT '0.000000',
+  `DirectionY` FLOAT(11,6) NOT NULL DEFAULT '0.000000',
+  `DirectionZ` FLOAT(11,6) NOT NULL DEFAULT '0.000000',
+  `Money` BIGINT(20) NOT NULL DEFAULT '0',
+  `MoneyBank` BIGINT(20) NOT NULL DEFAULT '0',
+  `Marking` INT(11) NOT NULL DEFAULT '0',
+  `Adult` TINYINT(1) NOT NULL DEFAULT '0',
+  `TutorialFlag` TINYINT(1) NOT NULL DEFAULT '0',
+  `NeedNameChange` TINYINT(1) NOT NULL DEFAULT '0',
+  `ToDelete` TINYINT(1) NOT NULL DEFAULT '0',
+  `ChangeClass` TINYINT(1) NOT NULL DEFAULT '0',
+  `IsGameMaster` TINYINT(4) NOT NULL DEFAULT '0',
+  `TutorialHint` BIGINT(20) NOT NULL DEFAULT '0',
+  `Reputation` INT(11) NOT NULL DEFAULT '0',
+  `MudosaPoint` INT(11) NOT NULL DEFAULT '0',
+  `SpPoint` INT(11) NOT NULL DEFAULT '0',
+  `CurEP` INT(11) NOT NULL DEFAULT '0',
+  `MaxEP` INT(11) NOT NULL DEFAULT '0',
+  `CurLP` INT(11) NOT NULL DEFAULT '0',
+  `MaxLP` INT(11) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`ID`, `AccID`),
+  INDEX `fk_character_account_idx` (`AccID` ASC),
+  CONSTRAINT `fk_character_account_id`
+    FOREIGN KEY (`AccID`)
+    REFERENCES `dbo`.`account` (`ID`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB
+AUTO_INCREMENT = 49
+DEFAULT CHARACTER SET = utf8;
 
-/*Table structure for table `inventory` */
 
-DROP TABLE IF EXISTS `inventory`;
+-- -----------------------------------------------------
+-- Table `dbo`.`inventory`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `dbo`.`inventory` ;
 
-CREATE TABLE `inventory` (
-  `ID` int(10) unsigned NOT NULL auto_increment,
-  `ItemID` int(11) NOT NULL,
-  `CharID` int(11) NOT NULL,
-  `Place` tinyint(4) NOT NULL default '0',
-  `Slot` tinyint(4) NOT NULL default '0',
-  `Stack` tinyint(4) NOT NULL default '0',
-  `Rank` tinyint(4) NOT NULL default '1',
-  `CurDur` tinyint(4) NOT NULL default '100',
-  `NeedToIdentify` tinyint(4) NOT NULL default '0',
-  `Grade` tinyint(4) NOT NULL default '0',
-  `BattleAttribute` tinyint(4) NOT NULL default '0',
-  `RestrictType` tinyint(4) NOT NULL default '0',
-  `Maker` varchar(20) default '""',
-  `Opt1` int(11) NOT NULL default '0',
-  `Opt2` int(11) NOT NULL default '0',
-  `DurationType` tinyint(4) NOT NULL default '0',
-  `UseStartTime` timestamp NULL default CURRENT_TIMESTAMP,
-  `UseEndTime` timestamp NULL default NULL,
-  PRIMARY KEY  (`ID`)
-) ENGINE=InnoDB AUTO_INCREMENT=79 DEFAULT CHARSET=utf8;
+CREATE TABLE IF NOT EXISTS `dbo`.`inventory` (
+  `ID` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `CharID` INT(11) UNSIGNED NOT NULL,
+  `ItemID` INT(11) UNSIGNED NOT NULL,
+  `Place` TINYINT(4) NOT NULL DEFAULT '0',
+  `Slot` TINYINT(4) NOT NULL DEFAULT '0',
+  `Stack` TINYINT(4) NOT NULL DEFAULT '0',
+  `Rank` TINYINT(4) NOT NULL DEFAULT '1',
+  `CurDur` TINYINT(4) NOT NULL DEFAULT '100',
+  `NeedToIdentify` TINYINT(4) NOT NULL DEFAULT '0',
+  `Grade` TINYINT(4) NOT NULL DEFAULT '0',
+  `BattleAttribute` TINYINT(4) NOT NULL DEFAULT '0',
+  `RestrictType` TINYINT(4) NOT NULL DEFAULT '0',
+  `Maker` VARCHAR(20) NULL DEFAULT '""',
+  `Opt1` INT(11) NOT NULL DEFAULT '0',
+  `Opt2` INT(11) NOT NULL DEFAULT '0',
+  `DurationType` TINYINT(4) NOT NULL DEFAULT '0',
+  `UseStartTime` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+  `UseEndTime` TIMESTAMP NULL DEFAULT NULL,
+  PRIMARY KEY (`ID`, `CharID`),
+  INDEX `fk_inventory_character_idx` (`CharID` ASC),
+  CONSTRAINT `fk_inventory_character_id`
+    FOREIGN KEY (`CharID`)
+    REFERENCES `dbo`.`character` (`ID`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB
+AUTO_INCREMENT = 79
+DEFAULT CHARACTER SET = utf8;
 
-/*Table structure for table `online` */
 
-DROP TABLE IF EXISTS `online`;
+-- -----------------------------------------------------
+-- Table `dbo`.`quickslot`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `dbo`.`quickslot` ;
 
-CREATE TABLE `online` (
-  `AccountID` int(11) NOT NULL default '0',
-  `CharID` bigint(20) default '0',
-  `ServerID` int(11) default '0',
-  `ChannelID` int(11) default '0',
-  `Handle` bigint(20) default '0',
-  PRIMARY KEY  (`AccountID`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+CREATE TABLE IF NOT EXISTS `dbo`.`quickslot` (
+  `ID` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `CharID` INT(10) UNSIGNED NOT NULL,
+  `TblID` INT(10) UNSIGNED NOT NULL,
+  `Slot` TINYINT(3) UNSIGNED NOT NULL DEFAULT '0',
+  `Type` TINYINT(3) UNSIGNED NOT NULL DEFAULT '0',
+  `Item` INT(10) UNSIGNED NOT NULL DEFAULT '0',
+  PRIMARY KEY (`ID`, `CharID`),
+  INDEX `fk_quickslot_character_id_idx` (`CharID` ASC),
+  CONSTRAINT `fk_quickslot_character_id`
+    FOREIGN KEY (`CharID`)
+    REFERENCES `dbo`.`character` (`ID`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB
+AUTO_INCREMENT = 86
+DEFAULT CHARACTER SET = utf8;
 
-/*Table structure for table `quickslot` */
 
-DROP TABLE IF EXISTS `quickslot`;
+-- -----------------------------------------------------
+-- Table `dbo`.`skills`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `dbo`.`skills` ;
 
-CREATE TABLE `quickslot` (
-  `ID` int(10) unsigned NOT NULL auto_increment,
-  `CharID` int(10) unsigned NOT NULL,
-  `TblID` int(10) unsigned NOT NULL,
-  `Slot` tinyint(3) unsigned NOT NULL default '0',
-  `Type` tinyint(3) unsigned NOT NULL default '0',
-  `Item` int(10) unsigned NOT NULL default '0',
-  PRIMARY KEY  (`ID`)
-) ENGINE=InnoDB AUTO_INCREMENT=86 DEFAULT CHARSET=utf8;
+CREATE TABLE IF NOT EXISTS `dbo`.`skills` (
+  `ID` INT(10) UNSIGNED NOT NULL,
+  `CharID` INT(10) UNSIGNED NOT NULL,
+  `SkillID` INT(10) UNSIGNED NOT NULL,
+  `Slot` TINYINT(3) UNSIGNED NOT NULL DEFAULT '0',
+  `RpBonusType` TINYINT(3) UNSIGNED NOT NULL DEFAULT '0',
+  `IsRpBonusAuto` TINYINT(3) UNSIGNED NOT NULL DEFAULT '0',
+  `RemainSec` INT(10) UNSIGNED NOT NULL DEFAULT '0',
+  `Exp` INT(10) UNSIGNED NOT NULL DEFAULT '0',
+  PRIMARY KEY (`ID`, `CharID`),
+  INDEX `fk_character_id_idx` (`CharID` ASC),
+  CONSTRAINT `fk_character_id`
+    FOREIGN KEY (`CharID`)
+    REFERENCES `dbo`.`character` (`ID`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB
+AUTO_INCREMENT = 18
+DEFAULT CHARACTER SET = utf8;
 
-/*Table structure for table `skills` */
 
-DROP TABLE IF EXISTS `skills`;
+-- -----------------------------------------------------
+-- Table `dbo`.`online`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `dbo`.`online` ;
 
-CREATE TABLE `skills` (
-  `ID` int(10) unsigned NOT NULL auto_increment,
-  `CharID` int(10) unsigned NOT NULL,
-  `SkillID` int(10) unsigned NOT NULL,
-  `Slot` tinyint(3) unsigned NOT NULL default '0',
-  `RpBonusType` tinyint(3) unsigned NOT NULL default '0',
-  `IsRpBonusAuto` tinyint(3) unsigned NOT NULL default '0',
-  `RemainSec` int(10) unsigned NOT NULL default '0',
-  `Exp` int(10) unsigned NOT NULL default '0',
-  PRIMARY KEY  (`ID`)
-) ENGINE=InnoDB AUTO_INCREMENT=18 DEFAULT CHARSET=utf8;
+CREATE TABLE IF NOT EXISTS `dbo`.`online` (
+  `AccountID` INT(11) UNSIGNED NOT NULL,
+  `CharID` INT(11) UNSIGNED NOT NULL,
+  `ServerID` INT NULL,
+  `ChannelID` INT NULL,
+  `Handle` BIGINT NULL,
+  PRIMARY KEY (`AccountID`, `CharID`),
+  INDEX `fk_online_character_idx` (`CharID` ASC),
+  INDEX `fk_online_account_idx` (`AccountID` ASC),
+  CONSTRAINT `fk_online_account_id`
+    FOREIGN KEY (`AccountID`)
+    REFERENCES `dbo`.`account` (`ID`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_online_character_id`
+    FOREIGN KEY (`CharID`)
+    REFERENCES `dbo`.`character` (`ID`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8;
 
-/* Procedure structure for procedure `spClearOnline` */
+USE `dbo` ;
 
-/*!50003 DROP PROCEDURE IF EXISTS  `spClearOnline` */;
+-- -----------------------------------------------------
+-- procedure spClearOnline
+-- -----------------------------------------------------
+
+USE `dbo`;
+DROP procedure IF EXISTS `dbo`.`spClearOnline`;
 
 DELIMITER $$
-
-/*!50003 CREATE DEFINER=`root`@`localhost` PROCEDURE `spClearOnline`(IN SrvID INT)
+USE `dbo`$$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `spClearOnline`(IN SrvID INT)
 BEGIN
 	DELETE FROM `online` WHERE `ServerID` = SrvID;
-    END */$$
+    END$$
+
 DELIMITER ;
 
-/* Procedure structure for procedure `spDeleteOnline` */
+-- -----------------------------------------------------
+-- procedure spDeleteOnline
+-- -----------------------------------------------------
 
-/*!50003 DROP PROCEDURE IF EXISTS  `spDeleteOnline` */;
+USE `dbo`;
+DROP procedure IF EXISTS `dbo`.`spDeleteOnline`;
 
 DELIMITER $$
-
-/*!50003 CREATE DEFINER=`root`@`localhost` PROCEDURE `spDeleteOnline`(in AccId int, in CharId int)
+USE `dbo`$$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `spDeleteOnline`(in AccId int, in CharId int)
 BEGIN
 	DELETE FROM `online` WHERE `AccountID` = AccId AND `CharID` = CharId;
-    END */$$
+    END$$
+
 DELIMITER ;
 
-/* Procedure structure for procedure `spInsertCharacter` */
+-- -----------------------------------------------------
+-- procedure spInsertCharacter
+-- -----------------------------------------------------
 
-/*!50003 DROP PROCEDURE IF EXISTS  `spInsertCharacter` */;
+USE `dbo`;
+DROP procedure IF EXISTS `dbo`.`spInsertCharacter`;
 
 DELIMITER $$
-
-/*!50003 CREATE DEFINER=`root`@`localhost` PROCEDURE `spInsertCharacter`( 
+USE `dbo`$$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `spInsertCharacter`( 
 	in nAccID int, 
 	in nServerID int, 
 	in strName varchar(20), 
@@ -305,16 +379,20 @@ BEGIN
 	nCurLP, 
 	nMaxLP
 	);
-    END */$$
+    END$$
+
 DELIMITER ;
 
-/* Procedure structure for procedure `spInsertItem` */
+-- -----------------------------------------------------
+-- procedure spInsertItem
+-- -----------------------------------------------------
 
-/*!50003 DROP PROCEDURE IF EXISTS  `spInsertItem` */;
+USE `dbo`;
+DROP procedure IF EXISTS `dbo`.`spInsertItem`;
 
 DELIMITER $$
-
-/*!50003 CREATE DEFINER=`root`@`localhost` PROCEDURE `spInsertItem`(
+USE `dbo`$$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `spInsertItem`(
 	IN nItemID INT,
 	IN nCharID INT,
 	IN nPlace INT,
@@ -364,16 +442,20 @@ BEGIN
 	nOpt2,
 	nDurationType);
 	SELECT LAST_INSERT_ID() AS `LastID` LIMIT 1;
-    END */$$
+    END$$
+
 DELIMITER ;
 
-/* Procedure structure for procedure `spInsertOnline` */
+-- -----------------------------------------------------
+-- procedure spInsertOnline
+-- -----------------------------------------------------
 
-/*!50003 DROP PROCEDURE IF EXISTS  `spInsertOnline` */;
+USE `dbo`;
+DROP procedure IF EXISTS `dbo`.`spInsertOnline`;
 
 DELIMITER $$
-
-/*!50003 CREATE DEFINER=`root`@`localhost` PROCEDURE `spInsertOnline`(
+USE `dbo`$$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `spInsertOnline`(
 		in AccId int,
 		in CharId int,
 		in SrvId int,
@@ -394,34 +476,49 @@ BEGIN
 	 ChanId, 
 	 Handle
 	);
-    END */$$
+    END$$
+
 DELIMITER ;
 
-/* Procedure structure for procedure `spUpdateDirection` */
+-- -----------------------------------------------------
+-- procedure spUpdateDirection
+-- -----------------------------------------------------
 
-/*!50003 DROP PROCEDURE IF EXISTS  `spUpdateDirection` */;
+USE `dbo`;
+DROP procedure IF EXISTS `dbo`.`spUpdateDirection`;
 
 DELIMITER $$
-
-/*!50003 CREATE DEFINER=`root`@`localhost` PROCEDURE `spUpdateDirection`(IN CharID INT, IN DirX FLOAT(11,6), IN DirY FLOAT(11,6), IN DirZ FLOAT(11,6))
+USE `dbo`$$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `spUpdateDirection`(IN CharID INT, IN DirX FLOAT(11,6), IN DirY FLOAT(11,6), IN DirZ FLOAT(11,6))
 BEGIN
 	UPDATE `character` SET `DirectionX` = DirX, `DirectionY` = DirY, `DirectionZ` = DirZ WHERE `ID` = CharID;
-    END */$$
+    END$$
+
 DELIMITER ;
 
-/* Procedure structure for procedure `spUpdatePosition` */
+-- -----------------------------------------------------
+-- procedure spUpdatePosition
+-- -----------------------------------------------------
 
-/*!50003 DROP PROCEDURE IF EXISTS  `spUpdatePosition` */;
+USE `dbo`;
+DROP procedure IF EXISTS `dbo`.`spUpdatePosition`;
 
 DELIMITER $$
-
-/*!50003 CREATE DEFINER=`root`@`localhost` PROCEDURE `spUpdatePosition`(in CharID INT, IN PosX float(11,6), in PosY float(11,6), in PosZ float(11,6))
+USE `dbo`$$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `spUpdatePosition`(in CharID INT, IN PosX float(11,6), in PosY float(11,6), in PosZ float(11,6))
 BEGIN
 	update `character` set `PositionX` = PosX, `PositionY` = PosY,`PositionZ` = PosZ where `ID` = CharID;
-    END */$$
-DELIMITER ;
+    END$$
 
-/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
-/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
-/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
-/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+DELIMITER ;
+SET SQL_MODE = '';
+GRANT USAGE ON *.* TO dboserver;
+ DROP USER dboserver;
+SET SQL_MODE='TRADITIONAL,ALLOW_INVALID_DATES';
+CREATE USER 'dboserver' IDENTIFIED BY 'dboserver';
+
+GRANT ALL ON `dbo`.* TO 'dboserver';
+
+SET SQL_MODE=@OLD_SQL_MODE;
+SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
+SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;

@@ -56,10 +56,10 @@
       <UniqueIdentifier>{c318a3a8-4335-4de2-bc4d-08d0b041484f}</UniqueIdentifier>
     </Filter>
     <Filter Include="Header Files\GameLib">
-      <UniqueIdentifier>{d963345b-3104-4d3c-9152-caaace5ad88d}</UniqueIdentifier>
+      <UniqueIdentifier>{16e64cac-94d9-41f9-976b-411de55292e5}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\GameLib">
-      <UniqueIdentifier>{c287d87b-da3b-4984-af15-4ee66b91edcf}</UniqueIdentifier>
+      <UniqueIdentifier>{4a9dc65d-71f3-4a7a-89d5-b0e444214480}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -129,92 +129,92 @@
     <ClCompile Include="stdafx.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="GameLib\NtlWorld.cpp">
-      <Filter>Source Files\GameLib</Filter>
-    </ClCompile>
-    <ClCompile Include="GameLib\NtlVector.cpp">
-      <Filter>Source Files\GameLib</Filter>
-    </ClCompile>
-    <ClCompile Include="GameLib\NtlSvrMath.cpp">
-      <Filter>Source Files\GameLib</Filter>
-    </ClCompile>
-    <ClCompile Include="GameLib\NtlSphere.cpp">
-      <Filter>Source Files\GameLib</Filter>
-    </ClCompile>
-    <ClCompile Include="GameLib\NtlSkill.cpp">
-      <Filter>Source Files\GameLib</Filter>
-    </ClCompile>
-    <ClCompile Include="GameLib\NtlService.cpp">
-      <Filter>Source Files\GameLib</Filter>
-    </ClCompile>
-    <ClCompile Include="GameLib\NtlReport.cpp">
-      <Filter>Source Files\GameLib</Filter>
-    </ClCompile>
-    <ClCompile Include="GameLib\NtlRandom.cpp">
-      <Filter>Source Files\GameLib</Filter>
-    </ClCompile>
-    <ClCompile Include="GameLib\NtlPetition.cpp">
-      <Filter>Source Files\GameLib</Filter>
-    </ClCompile>
-    <ClCompile Include="GameLib\NtlPacketUT.cpp">
-      <Filter>Source Files\GameLib</Filter>
-    </ClCompile>
-    <ClCompile Include="GameLib\NtlPacketUG.cpp">
-      <Filter>Source Files\GameLib</Filter>
-    </ClCompile>
-    <ClCompile Include="GameLib\NtlPacketUC.cpp">
-      <Filter>Source Files\GameLib</Filter>
-    </ClCompile>
-    <ClCompile Include="GameLib\NtlPacketUA.cpp">
-      <Filter>Source Files\GameLib</Filter>
-    </ClCompile>
-    <ClCompile Include="GameLib\NtlPacketTU.cpp">
-      <Filter>Source Files\GameLib</Filter>
-    </ClCompile>
-    <ClCompile Include="GameLib\NtlPacketGU.cpp">
-      <Filter>Source Files\GameLib</Filter>
-    </ClCompile>
-    <ClCompile Include="GameLib\NtlPacketCU.cpp">
-      <Filter>Source Files\GameLib</Filter>
-    </ClCompile>
-    <ClCompile Include="GameLib\NtlPacketAU.cpp">
-      <Filter>Source Files\GameLib</Filter>
-    </ClCompile>
-    <ClCompile Include="GameLib\NtlObject.cpp">
-      <Filter>Source Files\GameLib</Filter>
-    </ClCompile>
-    <ClCompile Include="GameLib\NtlNetP.cpp">
-      <Filter>Source Files\GameLib</Filter>
-    </ClCompile>
-    <ClCompile Include="GameLib\NtlMovement.cpp">
-      <Filter>Source Files\GameLib</Filter>
-    </ClCompile>
-    <ClCompile Include="GameLib\NtlLine.cpp">
-      <Filter>Source Files\GameLib</Filter>
-    </ClCompile>
-    <ClCompile Include="GameLib\NtlItem.cpp">
-      <Filter>Source Files\GameLib</Filter>
-    </ClCompile>
-    <ClCompile Include="GameLib\NtlGuild.cpp">
-      <Filter>Source Files\GameLib</Filter>
-    </ClCompile>
-    <ClCompile Include="GameLib\NtlCharacterState.cpp">
-      <Filter>Source Files\GameLib</Filter>
-    </ClCompile>
-    <ClCompile Include="GameLib\NtlCharacter.cpp">
-      <Filter>Source Files\GameLib</Filter>
-    </ClCompile>
-    <ClCompile Include="GameLib\NtlBudokai.cpp">
-      <Filter>Source Files\GameLib</Filter>
-    </ClCompile>
-    <ClCompile Include="GameLib\NtlBBox.cpp">
-      <Filter>Source Files\GameLib</Filter>
-    </ClCompile>
-    <ClCompile Include="GameLib\NtlBattle.cpp">
-      <Filter>Source Files\GameLib</Filter>
-    </ClCompile>
     <ClCompile Include="SpawnTable.cpp">
       <Filter>Source Files\Table</Filter>
+    </ClCompile>
+    <ClCompile Include="NtlBattle.cpp">
+      <Filter>Source Files\GameLib</Filter>
+    </ClCompile>
+    <ClCompile Include="NtlBBox.cpp">
+      <Filter>Source Files\GameLib</Filter>
+    </ClCompile>
+    <ClCompile Include="NtlBudokai.cpp">
+      <Filter>Source Files\GameLib</Filter>
+    </ClCompile>
+    <ClCompile Include="NtlCharacter.cpp">
+      <Filter>Source Files\GameLib</Filter>
+    </ClCompile>
+    <ClCompile Include="NtlCharacterState.cpp">
+      <Filter>Source Files\GameLib</Filter>
+    </ClCompile>
+    <ClCompile Include="NtlGuild.cpp">
+      <Filter>Source Files\GameLib</Filter>
+    </ClCompile>
+    <ClCompile Include="NtlItem.cpp">
+      <Filter>Source Files\GameLib</Filter>
+    </ClCompile>
+    <ClCompile Include="NtlLine.cpp">
+      <Filter>Source Files\GameLib</Filter>
+    </ClCompile>
+    <ClCompile Include="NtlMovement.cpp">
+      <Filter>Source Files\GameLib</Filter>
+    </ClCompile>
+    <ClCompile Include="NtlNetP.cpp">
+      <Filter>Source Files\GameLib</Filter>
+    </ClCompile>
+    <ClCompile Include="NtlObject.cpp">
+      <Filter>Source Files\GameLib</Filter>
+    </ClCompile>
+    <ClCompile Include="NtlPacketAU.cpp">
+      <Filter>Source Files\GameLib</Filter>
+    </ClCompile>
+    <ClCompile Include="NtlPacketCU.cpp">
+      <Filter>Source Files\GameLib</Filter>
+    </ClCompile>
+    <ClCompile Include="NtlPacketGU.cpp">
+      <Filter>Source Files\GameLib</Filter>
+    </ClCompile>
+    <ClCompile Include="NtlPacketTU.cpp">
+      <Filter>Source Files\GameLib</Filter>
+    </ClCompile>
+    <ClCompile Include="NtlPacketUA.cpp">
+      <Filter>Source Files\GameLib</Filter>
+    </ClCompile>
+    <ClCompile Include="NtlPacketUC.cpp">
+      <Filter>Source Files\GameLib</Filter>
+    </ClCompile>
+    <ClCompile Include="NtlPacketUG.cpp">
+      <Filter>Source Files\GameLib</Filter>
+    </ClCompile>
+    <ClCompile Include="NtlPacketUT.cpp">
+      <Filter>Source Files\GameLib</Filter>
+    </ClCompile>
+    <ClCompile Include="NtlPetition.cpp">
+      <Filter>Source Files\GameLib</Filter>
+    </ClCompile>
+    <ClCompile Include="NtlRandom.cpp">
+      <Filter>Source Files\GameLib</Filter>
+    </ClCompile>
+    <ClCompile Include="NtlReport.cpp">
+      <Filter>Source Files\GameLib</Filter>
+    </ClCompile>
+    <ClCompile Include="NtlService.cpp">
+      <Filter>Source Files\GameLib</Filter>
+    </ClCompile>
+    <ClCompile Include="NtlSkill.cpp">
+      <Filter>Source Files\GameLib</Filter>
+    </ClCompile>
+    <ClCompile Include="NtlSphere.cpp">
+      <Filter>Source Files\GameLib</Filter>
+    </ClCompile>
+    <ClCompile Include="NtlSvrMath.cpp">
+      <Filter>Source Files\GameLib</Filter>
+    </ClCompile>
+    <ClCompile Include="NtlVector.cpp">
+      <Filter>Source Files\GameLib</Filter>
+    </ClCompile>
+    <ClCompile Include="NtlWorld.cpp">
+      <Filter>Source Files\GameLib</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -326,185 +326,185 @@
     <ClInclude Include="Base.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="GameLib\NtlWorld.h">
-      <Filter>Header Files\GameLib</Filter>
-    </ClInclude>
-    <ClInclude Include="GameLib\NtlVector.h">
-      <Filter>Header Files\GameLib</Filter>
-    </ClInclude>
-    <ClInclude Include="GameLib\NtlTLQ.h">
-      <Filter>Header Files\GameLib</Filter>
-    </ClInclude>
-    <ClInclude Include="GameLib\NtlTimeQuest.h">
-      <Filter>Header Files\GameLib</Filter>
-    </ClInclude>
-    <ClInclude Include="GameLib\NtlTeleport.h">
-      <Filter>Header Files\GameLib</Filter>
-    </ClInclude>
-    <ClInclude Include="GameLib\NtlSvrMath.h">
-      <Filter>Header Files\GameLib</Filter>
-    </ClInclude>
-    <ClInclude Include="GameLib\NtlSphere.h">
-      <Filter>Header Files\GameLib</Filter>
-    </ClInclude>
-    <ClInclude Include="GameLib\NtlSkill.h">
-      <Filter>Header Files\GameLib</Filter>
-    </ClInclude>
-    <ClInclude Include="GameLib\NtlService.h">
-      <Filter>Header Files\GameLib</Filter>
-    </ClInclude>
-    <ClInclude Include="GameLib\NtlServer.h">
-      <Filter>Header Files\GameLib</Filter>
-    </ClInclude>
-    <ClInclude Include="GameLib\NtlRide.h">
-      <Filter>Header Files\GameLib</Filter>
-    </ClInclude>
-    <ClInclude Include="GameLib\NtlResultCode.h">
-      <Filter>Header Files\GameLib</Filter>
-    </ClInclude>
-    <ClInclude Include="GameLib\NtlReport.h">
-      <Filter>Header Files\GameLib</Filter>
-    </ClInclude>
-    <ClInclude Include="GameLib\NtlRankBattle.h">
-      <Filter>Header Files\GameLib</Filter>
-    </ClInclude>
-    <ClInclude Include="GameLib\NtlRandom.h">
-      <Filter>Header Files\GameLib</Filter>
-    </ClInclude>
-    <ClInclude Include="GameLib\NtlQuest.h">
-      <Filter>Header Files\GameLib</Filter>
-    </ClInclude>
-    <ClInclude Include="GameLib\NtlPetition.h">
-      <Filter>Header Files\GameLib</Filter>
-    </ClInclude>
-    <ClInclude Include="GameLib\NtlPet.h">
-      <Filter>Header Files\GameLib</Filter>
-    </ClInclude>
-    <ClInclude Include="GameLib\NtlPartyDungeon.h">
-      <Filter>Header Files\GameLib</Filter>
-    </ClInclude>
-    <ClInclude Include="GameLib\NtlParty.h">
-      <Filter>Header Files\GameLib</Filter>
-    </ClInclude>
-    <ClInclude Include="GameLib\NtlPacketUtil.h">
-      <Filter>Header Files\GameLib</Filter>
-    </ClInclude>
-    <ClInclude Include="GameLib\NtlPacketUT.h">
-      <Filter>Header Files\GameLib</Filter>
-    </ClInclude>
-    <ClInclude Include="GameLib\NtlPacketUG.h">
-      <Filter>Header Files\GameLib</Filter>
-    </ClInclude>
-    <ClInclude Include="GameLib\NtlPacketUC.h">
-      <Filter>Header Files\GameLib</Filter>
-    </ClInclude>
-    <ClInclude Include="GameLib\NtlPacketUA.h">
-      <Filter>Header Files\GameLib</Filter>
-    </ClInclude>
-    <ClInclude Include="GameLib\NtlPacketTU.h">
-      <Filter>Header Files\GameLib</Filter>
-    </ClInclude>
-    <ClInclude Include="GameLib\NtlPacketGU.h">
-      <Filter>Header Files\GameLib</Filter>
-    </ClInclude>
-    <ClInclude Include="GameLib\NtlPacketCU.h">
-      <Filter>Header Files\GameLib</Filter>
-    </ClInclude>
-    <ClInclude Include="GameLib\NtlPacketCommon.h">
-      <Filter>Header Files\GameLib</Filter>
-    </ClInclude>
-    <ClInclude Include="GameLib\NtlPacketAU.h">
-      <Filter>Header Files\GameLib</Filter>
-    </ClInclude>
-    <ClInclude Include="GameLib\NtlPacketAll.h">
-      <Filter>Header Files\GameLib</Filter>
-    </ClInclude>
-    <ClInclude Include="GameLib\NtlObject.h">
-      <Filter>Header Files\GameLib</Filter>
-    </ClInclude>
-    <ClInclude Include="GameLib\NtlNetP.h">
-      <Filter>Header Files\GameLib</Filter>
-    </ClInclude>
-    <ClInclude Include="GameLib\NtlMovement.h">
-      <Filter>Header Files\GameLib</Filter>
-    </ClInclude>
-    <ClInclude Include="GameLib\NtlMatch.h">
-      <Filter>Header Files\GameLib</Filter>
-    </ClInclude>
-    <ClInclude Include="GameLib\NtlMail.h">
-      <Filter>Header Files\GameLib</Filter>
-    </ClInclude>
-    <ClInclude Include="GameLib\NtlLine.h">
-      <Filter>Header Files\GameLib</Filter>
-    </ClInclude>
-    <ClInclude Include="GameLib\NtlItem.h">
-      <Filter>Header Files\GameLib</Filter>
-    </ClInclude>
-    <ClInclude Include="GameLib\NtlHlsItem.h">
-      <Filter>Header Files\GameLib</Filter>
-    </ClInclude>
-    <ClInclude Include="GameLib\NtlGuild.h">
-      <Filter>Header Files\GameLib</Filter>
-    </ClInclude>
-    <ClInclude Include="GameLib\NtlFriend.h">
-      <Filter>Header Files\GameLib</Filter>
-    </ClInclude>
-    <ClInclude Include="GameLib\NtlDragonBall.h">
-      <Filter>Header Files\GameLib</Filter>
-    </ClInclude>
-    <ClInclude Include="GameLib\NtlDojo.h">
-      <Filter>Header Files\GameLib</Filter>
-    </ClInclude>
-    <ClInclude Include="GameLib\NtlDirection.h">
-      <Filter>Header Files\GameLib</Filter>
-    </ClInclude>
-    <ClInclude Include="GameLib\NtlCSArchitecture.h">
-      <Filter>Header Files\GameLib</Filter>
-    </ClInclude>
-    <ClInclude Include="GameLib\NtlChat.h">
-      <Filter>Header Files\GameLib</Filter>
-    </ClInclude>
-    <ClInclude Include="GameLib\NtlCharacterState.h">
-      <Filter>Header Files\GameLib</Filter>
-    </ClInclude>
-    <ClInclude Include="GameLib\NtlCharacter.h">
-      <Filter>Header Files\GameLib</Filter>
-    </ClInclude>
-    <ClInclude Include="GameLib\NtlBudokai.h">
-      <Filter>Header Files\GameLib</Filter>
-    </ClInclude>
-    <ClInclude Include="GameLib\NtlBBox.h">
-      <Filter>Header Files\GameLib</Filter>
-    </ClInclude>
-    <ClInclude Include="GameLib\NtlBattle.h">
-      <Filter>Header Files\GameLib</Filter>
-    </ClInclude>
-    <ClInclude Include="GameLib\NtlAvatar.h">
-      <Filter>Header Files\GameLib</Filter>
-    </ClInclude>
-    <ClInclude Include="GameLib\NtlAdmin.h">
-      <Filter>Header Files\GameLib</Filter>
-    </ClInclude>
-    <ClInclude Include="GameLib\NtlActionPattern.h">
-      <Filter>Header Files\GameLib</Filter>
-    </ClInclude>
-    <ClInclude Include="GameLib\NtlSharedBotSystemDef.h">
-      <Filter>Header Files\GameLib</Filter>
-    </ClInclude>
-    <ClInclude Include="GameLib\NtlSharedDef.h">
-      <Filter>Header Files\GameLib</Filter>
-    </ClInclude>
-    <ClInclude Include="GameLib\NtlSharedType.h">
-      <Filter>Header Files\GameLib</Filter>
-    </ClInclude>
     <ClInclude Include="Def.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="GameLib\NtlSystemEffect.h">
-      <Filter>Header Files\GameLib</Filter>
-    </ClInclude>
     <ClInclude Include="SpawnTable.h">
       <Filter>Header Files\Table</Filter>
+    </ClInclude>
+    <ClInclude Include="NtlActionPattern.h">
+      <Filter>Header Files\GameLib</Filter>
+    </ClInclude>
+    <ClInclude Include="NtlAdmin.h">
+      <Filter>Header Files\GameLib</Filter>
+    </ClInclude>
+    <ClInclude Include="NtlAvatar.h">
+      <Filter>Header Files\GameLib</Filter>
+    </ClInclude>
+    <ClInclude Include="NtlBattle.h">
+      <Filter>Header Files\GameLib</Filter>
+    </ClInclude>
+    <ClInclude Include="NtlBBox.h">
+      <Filter>Header Files\GameLib</Filter>
+    </ClInclude>
+    <ClInclude Include="NtlBudokai.h">
+      <Filter>Header Files\GameLib</Filter>
+    </ClInclude>
+    <ClInclude Include="NtlCharacter.h">
+      <Filter>Header Files\GameLib</Filter>
+    </ClInclude>
+    <ClInclude Include="NtlCharacterState.h">
+      <Filter>Header Files\GameLib</Filter>
+    </ClInclude>
+    <ClInclude Include="NtlChat.h">
+      <Filter>Header Files\GameLib</Filter>
+    </ClInclude>
+    <ClInclude Include="NtlCSArchitecture.h">
+      <Filter>Header Files\GameLib</Filter>
+    </ClInclude>
+    <ClInclude Include="NtlDirection.h">
+      <Filter>Header Files\GameLib</Filter>
+    </ClInclude>
+    <ClInclude Include="NtlDojo.h">
+      <Filter>Header Files\GameLib</Filter>
+    </ClInclude>
+    <ClInclude Include="NtlDragonBall.h">
+      <Filter>Header Files\GameLib</Filter>
+    </ClInclude>
+    <ClInclude Include="NtlFriend.h">
+      <Filter>Header Files\GameLib</Filter>
+    </ClInclude>
+    <ClInclude Include="NtlGuild.h">
+      <Filter>Header Files\GameLib</Filter>
+    </ClInclude>
+    <ClInclude Include="NtlHlsItem.h">
+      <Filter>Header Files\GameLib</Filter>
+    </ClInclude>
+    <ClInclude Include="NtlItem.h">
+      <Filter>Header Files\GameLib</Filter>
+    </ClInclude>
+    <ClInclude Include="NtlLine.h">
+      <Filter>Header Files\GameLib</Filter>
+    </ClInclude>
+    <ClInclude Include="NtlMail.h">
+      <Filter>Header Files\GameLib</Filter>
+    </ClInclude>
+    <ClInclude Include="NtlMatch.h">
+      <Filter>Header Files\GameLib</Filter>
+    </ClInclude>
+    <ClInclude Include="NtlMovement.h">
+      <Filter>Header Files\GameLib</Filter>
+    </ClInclude>
+    <ClInclude Include="NtlNetP.h">
+      <Filter>Header Files\GameLib</Filter>
+    </ClInclude>
+    <ClInclude Include="NtlObject.h">
+      <Filter>Header Files\GameLib</Filter>
+    </ClInclude>
+    <ClInclude Include="NtlPacketAll.h">
+      <Filter>Header Files\GameLib</Filter>
+    </ClInclude>
+    <ClInclude Include="NtlPacketAU.h">
+      <Filter>Header Files\GameLib</Filter>
+    </ClInclude>
+    <ClInclude Include="NtlPacketCommon.h">
+      <Filter>Header Files\GameLib</Filter>
+    </ClInclude>
+    <ClInclude Include="NtlPacketCU.h">
+      <Filter>Header Files\GameLib</Filter>
+    </ClInclude>
+    <ClInclude Include="NtlPacketGU.h">
+      <Filter>Header Files\GameLib</Filter>
+    </ClInclude>
+    <ClInclude Include="NtlPacketTU.h">
+      <Filter>Header Files\GameLib</Filter>
+    </ClInclude>
+    <ClInclude Include="NtlPacketUA.h">
+      <Filter>Header Files\GameLib</Filter>
+    </ClInclude>
+    <ClInclude Include="NtlPacketUC.h">
+      <Filter>Header Files\GameLib</Filter>
+    </ClInclude>
+    <ClInclude Include="NtlPacketUG.h">
+      <Filter>Header Files\GameLib</Filter>
+    </ClInclude>
+    <ClInclude Include="NtlPacketUT.h">
+      <Filter>Header Files\GameLib</Filter>
+    </ClInclude>
+    <ClInclude Include="NtlPacketUtil.h">
+      <Filter>Header Files\GameLib</Filter>
+    </ClInclude>
+    <ClInclude Include="NtlParty.h">
+      <Filter>Header Files\GameLib</Filter>
+    </ClInclude>
+    <ClInclude Include="NtlPartyDungeon.h">
+      <Filter>Header Files\GameLib</Filter>
+    </ClInclude>
+    <ClInclude Include="NtlPet.h">
+      <Filter>Header Files\GameLib</Filter>
+    </ClInclude>
+    <ClInclude Include="NtlPetition.h">
+      <Filter>Header Files\GameLib</Filter>
+    </ClInclude>
+    <ClInclude Include="NtlQuest.h">
+      <Filter>Header Files\GameLib</Filter>
+    </ClInclude>
+    <ClInclude Include="NtlRandom.h">
+      <Filter>Header Files\GameLib</Filter>
+    </ClInclude>
+    <ClInclude Include="NtlRankBattle.h">
+      <Filter>Header Files\GameLib</Filter>
+    </ClInclude>
+    <ClInclude Include="NtlReport.h">
+      <Filter>Header Files\GameLib</Filter>
+    </ClInclude>
+    <ClInclude Include="NtlResultCode.h">
+      <Filter>Header Files\GameLib</Filter>
+    </ClInclude>
+    <ClInclude Include="NtlRide.h">
+      <Filter>Header Files\GameLib</Filter>
+    </ClInclude>
+    <ClInclude Include="NtlServer.h">
+      <Filter>Header Files\GameLib</Filter>
+    </ClInclude>
+    <ClInclude Include="NtlService.h">
+      <Filter>Header Files\GameLib</Filter>
+    </ClInclude>
+    <ClInclude Include="NtlSharedBotSystemDef.h">
+      <Filter>Header Files\GameLib</Filter>
+    </ClInclude>
+    <ClInclude Include="NtlSharedDef.h">
+      <Filter>Header Files\GameLib</Filter>
+    </ClInclude>
+    <ClInclude Include="NtlSharedType.h">
+      <Filter>Header Files\GameLib</Filter>
+    </ClInclude>
+    <ClInclude Include="NtlSkill.h">
+      <Filter>Header Files\GameLib</Filter>
+    </ClInclude>
+    <ClInclude Include="NtlSphere.h">
+      <Filter>Header Files\GameLib</Filter>
+    </ClInclude>
+    <ClInclude Include="NtlSvrMath.h">
+      <Filter>Header Files\GameLib</Filter>
+    </ClInclude>
+    <ClInclude Include="NtlSystemEffect.h">
+      <Filter>Header Files\GameLib</Filter>
+    </ClInclude>
+    <ClInclude Include="NtlTeleport.h">
+      <Filter>Header Files\GameLib</Filter>
+    </ClInclude>
+    <ClInclude Include="NtlTimeQuest.h">
+      <Filter>Header Files\GameLib</Filter>
+    </ClInclude>
+    <ClInclude Include="NtlTLQ.h">
+      <Filter>Header Files\GameLib</Filter>
+    </ClInclude>
+    <ClInclude Include="NtlVector.h">
+      <Filter>Header Files\GameLib</Filter>
+    </ClInclude>
+    <ClInclude Include="NtlWorld.h">
+      <Filter>Header Files\GameLib</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

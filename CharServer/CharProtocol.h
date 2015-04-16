@@ -1,8 +1,8 @@
 #ifndef _CHARPROTOCOL_H
 #define _CHARPROTOCOL_H
 
-#include <GameLib\NtlResultCode.h>
-#include <GameLib\NtlPacketCU.h>
-#include <GameLib\NtlPacketUC.h>
+#include <NtlResultCode.h>
+#include <NtlPacketCU.h>
+#include <NtlPacketUC.h>
 
 #endif

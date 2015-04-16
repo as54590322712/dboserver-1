@@ -26,3 +26,17 @@ SpawnData SpawnTable::GetData(unsigned int tblidx)
 	}
 	return tData;
 }
+
+void SpawnTable::GetData(std::list<SpawnData>& sList, SPAWNGROUPID spawnGroupId)
+{
+	SpawnData tData;
+	memset(&tData, 0, sizeof(tData));
+	for (unsigned int x = 0; x < datasize; x += sizeof(SpawnData))
+	{
+		std::vector<unsigned char> record(sizeof(SpawnData));
+		memcpy(record.data(), &filedata.data()[x], sizeof(SpawnData));
+		memcpy(&tData, record.data(), sizeof(tData));
+		if (spawnGroupId == tData.spawnGroupId)
+			sList.push_back(tData);
+	}
+}

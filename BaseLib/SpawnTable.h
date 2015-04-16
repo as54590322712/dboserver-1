@@ -5,6 +5,7 @@
 
 #include "Base.h"
 #include "Table.h"
+#include <list>
 
 #pragma pack(push, 4)
 struct SpawnData
@@ -49,6 +50,7 @@ public:
 	int Load(char* file);
 	int GetCount();
 	SpawnData GetData(unsigned int tblidx);
+	void GetData(std::list<SpawnData>& sList, SPAWNGROUPID spawnGroupId);
 };
 
 #endif

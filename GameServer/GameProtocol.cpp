@@ -18,7 +18,6 @@ bool GameClient::PacketControl(Packet* pPacket)
 		// Quest List
 		SendCharQuickSlotInfo();
 		SendCharInfoEnd();
-
 		SendAvatarWarFogInfo();
 	} break;
 	case UG_GAME_LEAVE_REQ: SendGameLeaveRes(); break;
@@ -42,7 +41,9 @@ bool GameClient::PacketControl(Packet* pPacket)
 	case UG_ITEM_MOVE_REQ: SendIemMoveRes((sUG_ITEM_MOVE_REQ*)data); break;
 	case UG_SOCIAL_ACTION: SendSocialAction((sUG_SOCIAL_ACTION*)data); break;
 	case UG_TS_CONFIRM_STEP_REQ: SendTSConfirmRes((sUG_TS_CONFIRM_STEP_REQ*)data); break;
+	case UG_TS_EXCUTE_TRIGGER_OBJECT: SendTSExecObjectRes((sUG_TS_EXCUTE_TRIGGER_OBJECT*)data); break;
 	case UG_TUTORIAL_HINT_UPDATE_REQ: SendTutoHintUpdateRes((sUG_TUTORIAL_HINT_UPDATE_REQ*)data); break;
+	case UG_WAR_FOG_UPDATE_REQ: SendWarFogUpdateRes((sUG_WAR_FOG_UPDATE_REQ*)data); break;
 
 	//CASH/EVENT SHOPS (not working)
 	case UG_SHOP_EVENTITEM_START_REQ: SendEventItemStartRes(); break;
@@ -59,6 +60,20 @@ bool GameClient::PacketControl(Packet* pPacket)
 		break;
 	}
 	return true;
+}
+
+void GameClient::SendTSExecObjectRes(sUG_TS_EXCUTE_TRIGGER_OBJECT* pData)
+{
+}
+
+void GameClient::SendWarFogUpdateRes(sUG_WAR_FOG_UPDATE_REQ* pData)
+{
+	sGU_WAR_FOG_UPDATE_RES sPkt;
+	memset(&sPkt, 0, sizeof(sPkt));
+	sPkt.wOpCode = GU_WAR_FOG_UPDATE_RES;
+	sPkt.handle = pData->hObject;
+	sPkt.wResultCode = GAME_SUCCESS;
+	Send(&sPkt, sizeof(sPkt));
 }
 
 void GameClient::SendEventItemStartRes()
@@ -101,6 +116,8 @@ void GameClient::SendNetpyItemEndRes()
 
 void GameClient::SendTutoHintUpdateRes(sUG_TUTORIAL_HINT_UPDATE_REQ* pData)
 {
+	pProfile->sPcProfile.dwTutorialHint |= pData->dwTutorialHint;
+	pServer->ServerDB->ExecuteQuery("UPDATE `character` SET `TutorialHint` = '%u' WHERE `ID` = '%u';", pProfile->sPcProfile.dwTutorialHint, pProfile->GetCharID());
 }
 
 void GameClient::SendSocialAction(sUG_SOCIAL_ACTION* pData)
@@ -108,7 +125,7 @@ void GameClient::SendSocialAction(sUG_SOCIAL_ACTION* pData)
 	sGU_SOCIAL_ACTION sPkt;
 	memset(&sPkt, 0, sizeof(sPkt));
 	sPkt.wOpCode = GU_SOCIAL_ACTION;
-	sPkt.hSubject = GetCharSerialID();
+	sPkt.hSubject = pProfile->GetSerialID();
 	sPkt.socialActionId = pData->socialActionId;
 	pServer->GetClientManager()->SendOthers(&sPkt, sizeof(sPkt), this);
 }
@@ -125,9 +142,6 @@ void GameClient::SendTSConfirmRes(sUG_TS_CONFIRM_STEP_REQ* pData)
 	sPkt.tcNextId = pData->tcNextId;
 	sPkt.wResultCode = RESULT_SUCCESS;
 	Send(&sPkt, sizeof(sPkt));
-
-	SendSystemText("Quest[%d] CurID[%d] NextID[%d] Type[%d] EvtType[%d] EvtData[%d] Param[%d]",
-		pData->tId, pData->tcCurId, pData->tcNextId, pData->byTsType, pData->byEventType, pData->dwEventData, pData->dwParam);
 }
 
 void GameClient::UpdateCharObjEquips(HOBJECT hItem, BYTE byPos)
@@ -136,53 +150,96 @@ void GameClient::UpdateCharObjEquips(HOBJECT hItem, BYTE byPos)
 	memset(&sPkt, 0, sizeof(sPkt));
 	sPkt.wOpCode = GU_UPDATE_ITEM_EQUIP;
 	sPkt.byPos = byPos;
-	sPkt.handle = GetCharSerialID();
-	GetItemBrief(sPkt.sItemBrief, hItem);
-	pServer->GetObjectManager()->UpdatePcItemBrief(GetCharSerialID(), sPkt.sItemBrief, byPos);
+	sPkt.handle = pProfile->GetSerialID();
+	pProfile->GetItemBrief(sPkt.sItemBrief, hItem);
+	pServer->GetObjectManager()->UpdatePcItemBrief(pProfile->GetSerialID(), sPkt.sItemBrief, byPos);
 	pServer->GetClientManager()->SendOthers(&sPkt, sizeof(sPkt), this);
 }
 
 void GameClient::SendIemMoveRes(sUG_ITEM_MOVE_REQ* pData)
 {
+	WORD wResult = GAME_SUCCESS;
+	sITEM_TBLDAT* sSrcTbldat = NULL;
+	sITEM_TBLDAT* sDestTbldat = NULL;
+
+	sPC_TBLDAT pcdata = *(sPC_TBLDAT*)pServer->GetTableContainer()->GetPcTable()->GetPcTbldat(pProfile->GetRace(), pProfile->GetClass(), pProfile->GetGender());
+
+	HOBJECT hSrcItem = pProfile->GetInventoryItemSerialID(pData->bySrcPlace, pData->bySrcPos);
+	HOBJECT hDestItem = pProfile->GetInventoryItemSerialID(pData->byDestPlace, pData->byDestPos);
+	TBLIDX SrcTblidx = pProfile->GetInventoryItemID(pData->bySrcPlace, pData->bySrcPos);
+	TBLIDX DestTblidx = pProfile->GetInventoryItemID(pData->byDestPlace, pData->byDestPos);
+
+	if (SrcTblidx != INVALID_TBLIDX)
+		sSrcTbldat = (sITEM_TBLDAT*)pServer->GetTableContainer()->GetItemTable()->FindData(SrcTblidx);
+	if (DestTblidx != INVALID_TBLIDX)
+		sDestTbldat = (sITEM_TBLDAT*)pServer->GetTableContainer()->GetItemTable()->FindData(DestTblidx);
+
+	// Check equipment requeriments
+	if ((pData->byDestPlace == CONTAINER_TYPE_EQUIP) &&
+		((pData->byDestPos >= EQUIP_SLOT_TYPE_FIRST) && (pData->byDestPos <= EQUIP_SLOT_TYPE_LAST)))
+	{
+		if (sSrcTbldat)
+		{
+			if (sSrcTbldat->dwNeed_Class_Bit_Flag != pcdata.dwClass_Bit_Flag && sSrcTbldat->dwNeed_Class_Bit_Flag != INVALID_DWORD)
+				wResult = GAME_ITEM_CLASS_FAIL;
+			else if (sSrcTbldat->byClass_Special != pProfile->GetClass() && sSrcTbldat->byClass_Special != INVALID_BYTE)
+				wResult = GAME_ITEM_CLASS_FAIL;
+			else if (sSrcTbldat->byRace_Special != pProfile->GetRace() && sSrcTbldat->byRace_Special != INVALID_BYTE)
+				wResult = GAME_ITEM_CLASS_FAIL;
+			else if (sSrcTbldat->byNeed_Level > pProfile->sPcProfile.byLevel)
+				wResult = GAME_ITEM_NEED_MORE_LEVEL;
+			else if (sSrcTbldat->byNeed_Con > pProfile->sPcProfile.avatarAttribute.byBaseCon && sSrcTbldat->byNeed_Con != INVALID_BYTE)
+				wResult = GAME_ITEM_NEED_MORE_PARAMETER;
+			else if (sSrcTbldat->byNeed_Dex > pProfile->sPcProfile.avatarAttribute.byBaseDex && sSrcTbldat->byNeed_Dex != INVALID_BYTE)
+				wResult = GAME_ITEM_NEED_MORE_PARAMETER;
+			else if (sSrcTbldat->byNeed_Eng > pProfile->sPcProfile.avatarAttribute.byBaseEng && sSrcTbldat->byNeed_Eng != INVALID_BYTE)
+				wResult = GAME_ITEM_NEED_MORE_PARAMETER;
+			else if (sSrcTbldat->byNeed_Foc > pProfile->sPcProfile.avatarAttribute.byBaseFoc && sSrcTbldat->byNeed_Foc != INVALID_BYTE)
+				wResult = GAME_ITEM_NEED_MORE_PARAMETER;
+			else if (sSrcTbldat->byNeed_Sol > pProfile->sPcProfile.avatarAttribute.byBaseSol && sSrcTbldat->byNeed_Sol != INVALID_BYTE)
+				wResult = GAME_ITEM_NEED_MORE_PARAMETER;
+			else if (sSrcTbldat->byNeed_Str > pProfile->sPcProfile.avatarAttribute.byBaseStr && sSrcTbldat->byNeed_Str != INVALID_BYTE)
+				wResult = GAME_ITEM_NEED_MORE_PARAMETER;
+		}
+	}
+
+	if (wResult == GAME_SUCCESS)
+	{
+		// Update CHARACTER Obj Model Equiped Item (Other Players Char Object Spawn)
+		if ((pData->byDestPlace == CONTAINER_TYPE_EQUIP) &&
+			((pData->byDestPos >= EQUIP_SLOT_TYPE_FIRST) && (pData->byDestPos <= EQUIP_SLOT_TYPE_LAST)))
+		{
+			UpdateCharObjEquips(hSrcItem, pData->byDestPos);
+		}
+
+		if ((pData->bySrcPlace == CONTAINER_TYPE_EQUIP) &&
+			((pData->bySrcPos >= EQUIP_SLOT_TYPE_FIRST) && (pData->bySrcPos <= EQUIP_SLOT_TYPE_LAST)))
+		{
+			UpdateCharObjEquips(hDestItem, pData->bySrcPos);
+		}
+
+		// Update DB
+		if (hSrcItem != INVALID_HOBJECT)
+		{
+			pProfile->UpdateItemInventoryPosition(hSrcItem, pData->byDestPlace, pData->byDestPos);
+		}
+		if (hDestItem != INVALID_HOBJECT)
+		{
+			pProfile->UpdateItemInventoryPosition(hDestItem, pData->bySrcPlace, pData->bySrcPos);
+		}
+	}
+
 	sGU_ITEM_MOVE_RES sPkt;
 	memset(&sPkt, 0, sizeof(sPkt));
 	sPkt.wOpCode = GU_ITEM_MOVE_RES;
-
-	HOBJECT hSrcItem = GetInventoryItemSerialID(pData->bySrcPlace, pData->bySrcPos);
-	HOBJECT hDestItem = GetInventoryItemSerialID(pData->byDestPlace, pData->byDestPos);
-
-	if (hSrcItem != INVALID_HOBJECT)
-	{
-		UpdateItemInventoryPosition(hSrcItem, pData->byDestPlace, pData->byDestPos);
-	}
-	if (hDestItem != INVALID_HOBJECT)
-	{
-		UpdateItemInventoryPosition(hDestItem, pData->bySrcPlace, pData->bySrcPos);
-	}
-
-	Logger::Log("Char[%u] moving item Src[%u] [%d:%d] Dest[%u] [%d:%d]\n",
-		CurrCharID, hSrcItem, pData->bySrcPlace, pData->bySrcPos, hDestItem, pData->byDestPlace, pData->byDestPos);
-
 	sPkt.byDestPlace = pData->byDestPlace;
 	sPkt.byDestPos = pData->byDestPos;
 	sPkt.bySrcPlace = pData->bySrcPlace;
 	sPkt.bySrcPos = pData->bySrcPos;
 	sPkt.hSrcItem = hSrcItem;
 	sPkt.hDestItem = hDestItem;
-	sPkt.wResultCode = GAME_SUCCESS;
+	sPkt.wResultCode = wResult;
 	Send(&sPkt, sizeof(sPkt));
-
-	if ((pData->byDestPlace == CONTAINER_TYPE_EQUIP) && 
-		((pData->byDestPos >= EQUIP_SLOT_TYPE_FIRST) && (pData->byDestPos <= EQUIP_SLOT_TYPE_LAST)))
-	{
-		UpdateCharObjEquips(hSrcItem, pData->byDestPos);
-	}
-
-	if ((pData->bySrcPlace == CONTAINER_TYPE_EQUIP) &&
-		((pData->bySrcPos >= EQUIP_SLOT_TYPE_FIRST) && (pData->bySrcPos <= EQUIP_SLOT_TYPE_LAST)))
-	{
-		UpdateCharObjEquips(hDestItem, pData->bySrcPos);
-	}
 }
 
 void GameClient::SendGameExitRes()
@@ -199,7 +256,7 @@ void GameClient::SendCharExitRes()
 	memset(&sRes, 0, sizeof(sRes));
 	sRes.wOpCode = GU_CHAR_EXIT_RES;
 	sRes.wResultCode = GAME_SUCCESS;
-	memcpy(sRes.achAuthKey, AuthKey, NTL_MAX_SIZE_AUTH_KEY);
+	memcpy(sRes.achAuthKey, pProfile->GetAuthkey(), NTL_MAX_SIZE_AUTH_KEY);
 
 	// servers
 	sRes.byServerInfoCount = pServer->ServerCfg->GetInt("CharServerList", "Count");
@@ -216,7 +273,7 @@ void GameClient::SendCharExitRes()
 
 void GameClient::SendGameLeaveRes()
 {
-	Logger::Log("Client[%u] exist game\n", this);
+	Logger::Log("Client[%u] exit game\n", this);
 	sGU_GAME_LEAVE_RES glRes;
 	memset(&glRes, 0, sizeof(glRes));
 	glRes.wOpCode = GU_GAME_LEAVE_RES;
@@ -229,7 +286,7 @@ void GameClient::SendAuthkeyCommSrvRes()
 	sGU_AUTH_KEY_FOR_COMMUNITY_SERVER_RES auRes;
 	memset(&auRes, 0, sizeof(auRes));
 	auRes.wOpCode = GU_AUTH_KEY_FOR_COMMUNITY_SERVER_RES;
-	memcpy(auRes.abyAuthKey, AuthKey, NTL_MAX_SIZE_AUTH_KEY);
+	memcpy(auRes.abyAuthKey, pProfile->GetAuthkey(), NTL_MAX_SIZE_AUTH_KEY);
 	auRes.wResultCode = GAME_SUCCESS;
 	Send(&auRes, sizeof(auRes));
 }
@@ -267,9 +324,9 @@ void GameClient::SpawnTesteMob(unsigned int id)
 	sPacket.sObjectInfo.mobState.sCharStateBase.byStateID = CHARSTATE_SPAWNING;
 	sPacket.sObjectInfo.mobState.sCharStateBase.bFightMode = FALSE;
 
-	sPacket.sObjectInfo.mobState.sCharStateBase.vCurLoc.x = CharState.sCharStateBase.vCurLoc.x + (float)(rand() % 5);
-	sPacket.sObjectInfo.mobState.sCharStateBase.vCurLoc.y = CharState.sCharStateBase.vCurLoc.y;
-	sPacket.sObjectInfo.mobState.sCharStateBase.vCurLoc.z = CharState.sCharStateBase.vCurLoc.z + (float)(rand() % 5);
+	sPacket.sObjectInfo.mobState.sCharStateBase.vCurLoc.x = pProfile->sCharState.sCharStateBase.vCurLoc.x + (float)(rand() % 5);
+	sPacket.sObjectInfo.mobState.sCharStateBase.vCurLoc.y = pProfile->sCharState.sCharStateBase.vCurLoc.y;
+	sPacket.sObjectInfo.mobState.sCharStateBase.vCurLoc.z = pProfile->sCharState.sCharStateBase.vCurLoc.z + (float)(rand() % 5);
 
 	sPacket.sObjectInfo.mobState.sCharStateBase.vCurDir.x = 0.0f;
 	sPacket.sObjectInfo.mobState.sCharStateBase.vCurDir.y = 0.0f;
@@ -285,7 +342,7 @@ void GameClient::SpawnTesteMob(unsigned int id)
 	if (false == pServer->GetObjectManager()->FindObject(sPacket.handle, sPacket.sObjectInfo.objType))
 	{
 		ObjectInfo obj;
-		obj.worldTblIdx = worldInfo.tblidx;
+		obj.worldTblIdx = pProfile->sWorldInfo.tblidx;
 		obj.ObjData = sPacket;
 		pServer->GetObjectManager()->AddObject(obj);
 	}
@@ -296,12 +353,12 @@ void GameClient::CheckCommand(sUG_SERVER_COMMAND* pData)
 {
 	GameString command(pData->awchCommand);
 
-	Logger::Log("%s typed command: %s\n", GameString(this->charName).c_str(), command.c_str());
+	Logger::Log("%s typed command: %s\n", GameString(pProfile->GetCharname()).c_str(), command.c_str());
 
 	std::vector<std::string> tok;
 	command.GetToken(tok, ' ');
 
-	if (tok.size() != 0 && this->isGameMaster)
+	if (tok.size() != 0 && pProfile->GetGameMaster())
 	{
 		if (strcmp(tok[0].c_str(), "@teste") == 0)
 		{
@@ -326,7 +383,7 @@ void GameClient::CheckCommand(sUG_SERVER_COMMAND* pData)
 				BYTE qtd = 1;
 				ITEMID item = atoi(tok[1].c_str());
 				if (tok.size() == 3) qtd = atoi(tok[2].c_str());
-				sGU_ITEM_CREATE sPkt = InsertNextBagSlot(item, qtd);
+				sGU_ITEM_CREATE sPkt = pProfile->InsertNextBagSlot(item, qtd);
 				Send(&sPkt, sizeof(sPkt));
 			}
 		}
@@ -335,11 +392,11 @@ void GameClient::CheckCommand(sUG_SERVER_COMMAND* pData)
 			if (tok.size() > 1)
 			{
 				float speed = (float)atof(tok[1].c_str());
-				PcProfile.avatarAttribute.fLastRunSpeed = speed;
+				pProfile->sPcProfile.avatarAttribute.fLastRunSpeed = speed;
 				sGU_UPDATE_CHAR_SPEED sPkt;
 				memset(&sPkt, 0, sizeof(sPkt));
 				sPkt.wOpCode = GU_UPDATE_CHAR_SPEED;
-				sPkt.handle = GetCharSerialID();
+				sPkt.handle = pProfile->GetSerialID();
 				sPkt.fLastRunningSpeed = sPkt.fLastWalkingSpeed = speed;
 				pServer->GetClientManager()->SendAll(&sPkt, sizeof(sPkt));
 			}
@@ -388,14 +445,14 @@ void GameClient::CheckCommand(sUG_SERVER_COMMAND* pData)
 
 void GameClient::SendCharReadyRes(sUG_CHAR_READY* pData)
 {
-	byAvatarType = pData->byAvatarType;
-	InsertOnlineData();
+	pProfile->SetAvatartype(pData->byAvatarType);
+	pProfile->InsertOnlineData();
 }
 
 void GameClient::SendCharReadySpawnReq()
 {
-	ObjectInfo charSpawn = GetCharSpawnData();
-	charSpawn.ObjData.handle = CharSerialID;
+	ObjectInfo charSpawn = pProfile->GetCharSpawnData();
+
 	if (pServer->GetClientManager()->AddClient(this))
 	{
 		pServer->GetObjectManager()->AddObject(charSpawn);
@@ -405,14 +462,14 @@ void GameClient::SendCharReadySpawnReq()
 
 void GameClient::SendGameEnterRes(sUG_GAME_ENTER_REQ* data)
 {
-	this->CharSerialID = pServer->AcquireSerialID();
-	this->AccountID = data->accountId;
-	this->CurrCharID = data->charId;
-	this->CurrServerID = pServer->ServerID;
-	this->TutorialMode = data->bTutorialMode;
-	memcpy(this->AuthKey, data->abyAuthKey, NTL_MAX_SIZE_AUTH_KEY);
+	pProfile->Init();
+	pProfile->SetAccountid(data->accountId);
+	pProfile->SetCharid(data->charId);
+	pProfile->SetTutorialmode(data->bTutorialMode);
+	memcpy(pProfile->GetAuthkey(), data->abyAuthKey, NTL_MAX_SIZE_AUTH_KEY);
+	pServer->ServerDB->ExecuteQuery("UPDATE `character` SET `TutorialFlag` = '1' WHERE `ID` = '%u';", pProfile->GetCharID());
 
-	Logger::Log("Client[%d] entering game (%d|%d) handle[%d]\n", this, AccountID, CurrCharID, CharSerialID);
+	Logger::Log("Client[%d] entering game (%d|%d) handle[%d]\n", this, pProfile->GetAccountid(), pProfile->GetCharID(), pProfile->GetSerialID());
 
 	sGU_GAME_ENTER_RES geRes;
 	memset(&geRes, 0, sizeof(geRes));
@@ -437,11 +494,11 @@ void GameClient::SendCharInfo()
 	sGU_AVATAR_CHAR_INFO charInfo;
 	memset(&charInfo, 0, sizeof(charInfo));
 	charInfo.wOpCode = GU_AVATAR_CHAR_INFO;
-	LoadCharacterData();
-	charInfo.handle = this->CharSerialID;
-	memcpy(&charInfo.sPcProfile, &PcProfile, sizeof(PcProfile));
-	memcpy(&charInfo.sCharState, &CharState, sizeof(CharState));
-	charInfo.wCharStateSize = sizeof(CharState);
+	pProfile->LoadCharacterData();
+	charInfo.handle = pProfile->GetSerialID();
+	memcpy(&charInfo.sPcProfile, &pProfile->sPcProfile, sizeof(pProfile->sPcProfile));
+	memcpy(&charInfo.sCharState, &pProfile->sCharState, sizeof(pProfile->sCharState));
+	charInfo.wCharStateSize = sizeof(pProfile->sCharState);
 	Send((unsigned char*)&charInfo, sizeof(charInfo));
 }
 
@@ -450,13 +507,25 @@ void GameClient::SendCharWorldInfo()
 	sGU_AVATAR_WORLD_INFO wInfo;
 	memset(&wInfo, 0, sizeof(wInfo));
 	wInfo.wOpCode = GU_AVATAR_WORLD_INFO;
-	LoadWorldInfoData();
-	memcpy(&wInfo.worldInfo, &worldInfo, sizeof(worldInfo));
-	wInfo.vCurDir = CharState.sCharStateBase.vCurDir;
-	wInfo.vCurLoc = CharState.sCharStateBase.vCurLoc;
-	wInfo.vCurLoc.x += (float)(rand() % 5);
-	wInfo.vCurLoc.y += (float)(rand() % 5);
-	wInfo.vCurLoc.z += (float)(rand() % 5);
+	pProfile->LoadWorldInfoData();
+	memcpy(&wInfo.worldInfo, &pProfile->sWorldInfo, sizeof(pProfile->sWorldInfo));
+
+	// TO DO: TUTOTIAL MODE
+	/*if (TutorialMode)
+	{
+		sNEWBIE_TBLDAT* pTbldat = (sNEWBIE_TBLDAT*)pServer->GetTableContainer()->GetNewbieTable()->GetNewbieTbldat(byRace, byClass);
+		wInfo.worldInfo.tblidx = pTbldat->tutorialWorld;
+		wInfo.worldInfo.worldID = pTbldat->world_Id;
+		CharState.sCharStateBase.vCurLoc.x = (-1)*78.90;
+		CharState.sCharStateBase.vCurLoc.y = 46.95;
+		CharState.sCharStateBase.vCurLoc.z = (-1) * 168.35;
+		CharState.sCharStateBase.vCurDir.x = (-1) * 0.95;
+		CharState.sCharStateBase.vCurDir.y = 0;
+		CharState.sCharStateBase.vCurDir.z = 0.30;
+	}*/
+
+	wInfo.vCurDir = pProfile->sCharState.sCharStateBase.vCurDir;
+	wInfo.vCurLoc = pProfile->sCharState.sCharStateBase.vCurLoc;
 	Send((unsigned char*)&wInfo, sizeof(wInfo));
 }
 
@@ -473,29 +542,29 @@ void GameClient::SendCharJump(sUG_CHAR_JUMP* pData)
 	sGU_CHAR_JUMP pJump;
 	memset(&pJump, 0, sizeof(pJump));
 	pJump.wOpCode = GU_CHAR_JUMP;
-	pJump.handle = GetCharSerialID();
-	pJump.byMoveDirection = byMoveDirection;
+	pJump.handle = pProfile->GetSerialID();
+	pJump.byMoveDirection = pProfile->GetMovedirection();
 	pJump.vCurrentHeading = pData->vCurrentHeading;
-	pJump.vJumpDir = CharState.sCharStateBase.vCurDir;
+	pJump.vJumpDir = pProfile->sCharState.sCharStateBase.vCurDir;
 	pServer->GetClientManager()->SendOthers(&pJump, sizeof(pJump), this);
 }
 
 void GameClient::SendCharJumpEnd()
 {
 	sGU_CHAR_JUMP_END pJEnd;
-	pJEnd.handle = GetCharSerialID();
+	pJEnd.handle = pProfile->GetSerialID();
 	pJEnd.wOpCode = GU_CHAR_JUMP_END;
 	pServer->GetClientManager()->SendOthers(&pJEnd, sizeof(pJEnd), this);
 }
 
 void GameClient::SendCharMove(sUG_CHAR_MOVE* data)
 {
-	UpdatePositions(data->vCurDir, data->vCurLoc);
-	pServer->GetObjectManager()->UpdateCharState(GetCharSerialID(), CharState);
+	pProfile->UpdatePositions(data->vCurDir, data->vCurLoc);
+	pServer->GetObjectManager()->UpdateCharState(pProfile->GetSerialID(), pProfile->sCharState);
 	sGU_CHAR_MOVE mData;
 	memset(&mData, 0, sizeof(mData));
 	mData.wOpCode = GU_CHAR_MOVE;
-	if (data->byAvatarType == byAvatarType)
+	if (data->byAvatarType == pProfile->GetAvatartype())
 	{
 		mData.vCurDir.x = data->vCurDir.x;
 		mData.vCurDir.y = 0.0f;
@@ -503,8 +572,9 @@ void GameClient::SendCharMove(sUG_CHAR_MOVE* data)
 		mData.vCurLoc.x = data->vCurLoc.x;
 		mData.vCurLoc.y = data->vCurLoc.y;
 		mData.vCurLoc.z = data->vCurLoc.z;
-		mData.handle = CharSerialID;
-		byMoveDirection = mData.byMoveDirection = data->byMoveDirection;
+		mData.handle = pProfile->GetSerialID();
+		mData.byMoveDirection = data->byMoveDirection;
+		pProfile->SetMovedirection(data->byMoveDirection);
 	}
 	pServer->GetClientManager()->SendOthers(&mData, sizeof(mData), this);
 }
@@ -514,10 +584,10 @@ void GameClient::SendCharDestMove(sUG_CHAR_DEST_MOVE* pData)
 	sGU_CHAR_DEST_MOVE dMove;
 	memset(&dMove, 0, sizeof(dMove));
 	dMove.wOpCode = GU_CHAR_DEST_MOVE;
-	if (pData->byAvatarType == byAvatarType)
+	if (pData->byAvatarType == pProfile->GetAvatartype())
 	{
 		dMove.vCurLoc = pData->vCurLoc;
-		dMove.handle = GetCharSerialID();
+		dMove.handle = pProfile->GetSerialID();
 		dMove.byDestLocCount = 1;
 		dMove.avDestLoc[0] = pData->vDestLoc;
 		dMove.dwTimeStamp = pData->dwTimeStamp;
@@ -528,14 +598,14 @@ void GameClient::SendCharDestMove(sUG_CHAR_DEST_MOVE* pData)
 
 void GameClient::SendCharMoveSync(sUG_CHAR_MOVE_SYNC* pData)
 {
-	UpdatePositions(pData->vCurDir, pData->vCurLoc);
-	pServer->GetObjectManager()->UpdateCharState(GetCharSerialID(), CharState);
+	pProfile->UpdatePositions(pData->vCurDir, pData->vCurLoc);
+	pServer->GetObjectManager()->UpdateCharState(pProfile->GetSerialID(), pProfile->sCharState);
 	sGU_CHAR_MOVE_SYNC cmSync;
 	memset(&cmSync, 0, sizeof(cmSync));
 	cmSync.wOpCode = GU_CHAR_MOVE_SYNC;
-	if (pData->byAvatarType == byAvatarType)
+	if (pData->byAvatarType == pProfile->GetAvatartype())
 	{
-		cmSync.handle = GetCharSerialID();
+		cmSync.handle = pProfile->GetSerialID();
 		cmSync.vCurDir = pData->vCurDir;
 		cmSync.vCurLoc = pData->vCurLoc;
 		cmSync.dwTimeStamp = pData->dwTimeStamp;
@@ -548,7 +618,7 @@ void GameClient::SendCharChangeHeading(sUG_CHAR_CHANGE_HEADING* pData)
 	sGU_CHAR_CHANGE_HEADING pCHead;
 	memset(&pCHead, 0, sizeof(pCHead));
 	pCHead.wOpCode = GU_CHAR_CHANGE_HEADING;
-	pCHead.handle = GetCharSerialID();
+	pCHead.handle = pProfile->GetSerialID();
 	pCHead.dwTimeStamp = pData->dwTimeStamp;
 	pCHead.vNewHeading = pData->vCurrentHeading;
 	pCHead.vNewLoc = pData->vCurrentPosition;
@@ -560,8 +630,8 @@ void GameClient::SendCharItemInfo()
 	sGU_AVATAR_ITEM_INFO iInfo;
 	memset(&iInfo, 0, sizeof(iInfo));
 	iInfo.wOpCode = GU_AVATAR_ITEM_INFO;
-	iInfo.byItemCount = LoadItemData();
-	memcpy(iInfo.aItemProfile, ItemProfile, sizeof(ItemProfile));
+	iInfo.byItemCount = pProfile->LoadItemData();
+	memcpy(iInfo.aItemProfile, pProfile->asItemProfile, sizeof(pProfile->asItemProfile));
 	int psize = 3;
 	psize += sizeof(sITEM_PROFILE) * iInfo.byItemCount;
 	Send(&iInfo, psize);
@@ -572,8 +642,8 @@ void GameClient::SendCharSkillInfo()
 	sGU_AVATAR_SKILL_INFO sInfo;
 	memset(&sInfo, 0, sizeof(sInfo));
 	sInfo.wOpCode = GU_AVATAR_SKILL_INFO;
-	sInfo.bySkillCount = LoadSkillData();
-	memcpy(sInfo.aSkillInfo, SkillInfo, sizeof(SkillInfo));
+	sInfo.bySkillCount = pProfile->LoadSkillData();
+	memcpy(sInfo.aSkillInfo, pProfile->asSkillInfo, sizeof(pProfile->asSkillInfo));
 	int psize = 3;
 	psize += sizeof(sSKILL_INFO) * sInfo.bySkillCount;
 	Send(&sInfo, psize);
@@ -584,8 +654,8 @@ void GameClient::SendCharQuickSlotInfo()
 	sGU_QUICK_SLOT_INFO qsInfo;
 	memset(&qsInfo, 0, sizeof(qsInfo));
 	qsInfo.wOpCode = GU_QUICK_SLOT_INFO;
-	qsInfo.byQuickSlotCount = LoadQuickslotData();
-	memcpy(qsInfo.asQuickSlotData, QuickSlotData, sizeof(QuickSlotData));
+	qsInfo.byQuickSlotCount = pProfile->LoadQuickslotData();
+	memcpy(qsInfo.asQuickSlotData, pProfile->asQuickSlotData, sizeof(pProfile->asQuickSlotData));
 	int psize = 3;
 	psize += sizeof(sQUICK_SLOT_PROFILE) * qsInfo.byQuickSlotCount;
 	Send(&qsInfo, psize);
@@ -606,10 +676,9 @@ void GameClient::SendSystemText(GameString msg, eSERVER_TEXT_TYPE type)
 	sGU_SYSTEM_DISPLAY_TEXT sPkt;
 	memset(&sPkt, 0, sizeof(sPkt));
 	sPkt.wOpCode = GU_SYSTEM_DISPLAY_TEXT;
-	memcpy(sPkt.awGMChar, charName, NTL_MAX_SIZE_CHAR_NAME_UNICODE);
+	memcpy(sPkt.awGMChar, pProfile->GetCharname(), NTL_MAX_SIZE_CHAR_NAME_UNICODE);
 	sPkt.byDisplayType = type;
 	sPkt.wMessageLengthInUnicode = NTL_MAX_LENGTH_OF_CHAT_MESSAGE_UNICODE;
-	Logger::Log("MESSAGE LEN[%d]\n", strlen(msg.c_str()));
 	memcpy(sPkt.awchMessage, msg.wc_str(), sPkt.wMessageLengthInUnicode);
 	pServer->GetClientManager()->SendAll(&sPkt, sizeof(sPkt));
 }

@@ -113,10 +113,10 @@ void ObjectManager::SpawnToClient(GameClient* pClient)
 	{
 		ObjectInfo obj = it->second;
 
-		if (pClient->GetCharSerialID() == obj.ObjData.handle)
+		if (pClient->GetProfile()->GetSerialID() == obj.ObjData.handle)
 			continue;
 
-		if (pClient->worldInfo.tblidx != obj.worldTblIdx)
+		if (pClient->GetProfile()->sWorldInfo.tblidx != obj.worldTblIdx)
 			continue;
 
 		float x = 0.0f, z = 0.0f;
@@ -136,7 +136,7 @@ void ObjectManager::SpawnToClient(GameClient* pClient)
 			break;
 		}
 
-		float dist = NtlGetDistance(pClient->CharState.sCharStateBase.vCurLoc.x, pClient->CharState.sCharStateBase.vCurLoc.z, x, z);
+		float dist = NtlGetDistance(pClient->GetProfile()->sCharState.sCharStateBase.vCurLoc.x, pClient->GetProfile()->sCharState.sCharStateBase.vCurLoc.z, x, z);
 
 		if (dist < 150)
 		{

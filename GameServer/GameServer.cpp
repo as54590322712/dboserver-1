@@ -46,6 +46,7 @@ int GameServer::OnCreate()
 		return 2;//ERR_DBSERVER_CONNECT
 
 	ServerID = ServerCfg->GetInt("Server", "ID");
+	ChannelID = ServerCfg->GetInt("Server", "ChannelID");
 	chatServerIP = ServerCfg->GetStr("ChatServer", "IP");
 	chatServerPort = ServerCfg->GetInt("ChatServer", "Port");
 	gameDataPath = ServerCfg->GetStr("GameData", "Path");

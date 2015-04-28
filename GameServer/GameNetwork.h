@@ -46,33 +46,12 @@ public:
 	int	OnDispatch(Packet* pPacket);
 	void Send(void* pData, int nSize);
 	void Send(void* pData, int nSize, int nHandle);
-	unsigned int GetCharSerialID() { return CharSerialID; };
-	unsigned int GetCharID() { return CurrCharID; };
-	int GetServerID() { return CurrServerID; }
 	void AddSpawn(unsigned int nHandle, BYTE byType);
 	void RemoveSpawn(unsigned int nHandle);
 	bool FindSpawn(unsigned int nHandle, BYTE byType);
-	void InsertOnlineData();
-	void RemoveOnlineData();
 
 	// Opcode Control
 	bool PacketControl(Packet* pPacket);
-
-	// FUNCTIONS
-	void LoadCharacterData();
-	void LoadWorldInfoData();
-	unsigned int GetPCTblidx(BYTE Race, BYTE Gender, BYTE Class);
-	void UpdatePositions(sVECTOR2 Dir, sVECTOR3 Loc);
-	void UpdatePositions(sVECTOR3 Dir, sVECTOR3 Loc);
-	int LoadItemData();
-	int LoadSkillData();
-	int LoadQuickslotData();
-	void CalculateAtributes(sPC_TBLDAT* pcdata);
-	ObjectInfo GetCharSpawnData();
-	sGU_ITEM_CREATE InsertNextBagSlot(ITEMID item, BYTE qtd = 1);
-	HOBJECT GetInventoryItemSerialID(BYTE byPlace, BYTE byPos);
-	void UpdateItemInventoryPosition(HOBJECT hItem, BYTE byPlace, BYTE byPos);
-	void GetItemBrief(sITEM_BRIEF& sBrief, HOBJECT hItem);
 
 	// PROTOCOL
 	void SendGameEnterRes(sUG_GAME_ENTER_REQ* data);
@@ -106,6 +85,8 @@ public:
 	void SendTutoHintUpdateRes(sUG_TUTORIAL_HINT_UPDATE_REQ* pData);
 	void SendSystemText(GameString msg, eSERVER_TEXT_TYPE type);
 	void SendSystemText(char* szText, ...);
+	void SendWarFogUpdateRes(sUG_WAR_FOG_UPDATE_REQ* pData);
+	void SendTSExecObjectRes(sUG_TS_EXCUTE_TRIGGER_OBJECT* pData);
 
 	//CASH/EVENT SHOPS
 	void SendEventItemStartRes();
@@ -113,38 +94,16 @@ public:
 	void SendNetpyItemStartRes();
 	void SendNetpyItemEndRes();
 
+	CharacterProfile* GetProfile() { return pProfile; }
+
 private:
 	PacketEncoder _packetEncoder;
 	GameServer* pServer;
+	CharacterProfile* pProfile;
 
-	WCHAR userName[NTL_MAX_SIZE_USERID_UNICODE + 1];
-	WCHAR passWord[NTL_MAX_SIZE_USERPW_UNICODE + 1];
-	WCHAR charName[NTL_MAX_SIZE_CHAR_NAME_UNICODE + 1];
-	WCHAR guildName[NTL_MAX_SIZE_GUILD_NAME_IN_UNICODE + 1];
-	BYTE AuthKey[NTL_MAX_SIZE_AUTH_KEY];
-	int AccountID;
-	BYTE LastServerID;
-	DWORD AcLevel;
-	BYTE CurrServerID;
-	BYTE CurrChannelID;
-	unsigned int CurrCharID;
+	bool bIsClosed;
 	bool goCharServer;
-	bool isGameMaster;
-	bool TutorialMode;
-	unsigned int CharSerialID;
 
-	BYTE byMoveDirection;
-	BYTE byAvatarType;
-
-public:
-	sPC_PROFILE PcProfile;
-	sCHARSTATE CharState;
-	sWORLD_INFO worldInfo;
-	sITEM_PROFILE ItemProfile[NTL_MAX_COUNT_USER_HAVE_INVEN_ITEM];
-	sSKILL_INFO SkillInfo[NTL_MAX_PC_HAVE_SKILL];
-	sQUICK_SLOT_PROFILE QuickSlotData[NTL_CHAR_QUICK_SLOT_MAX_COUNT];
-
-private:
 	std::map<unsigned int, BYTE>  objSpawn;
 	typedef std::pair<unsigned int, BYTE> objSp;
 };
@@ -224,6 +183,7 @@ public:
 	Config* ServerCfg;
 	Database* ServerDB;
 	int ServerID;
+	int ChannelID;
 	unsigned int m_uiSerialID;
 	char* chatServerIP;
 	int chatServerPort;

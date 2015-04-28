@@ -25,6 +25,12 @@
     <Filter Include="Header Files\Thread">
       <UniqueIdentifier>{32a66972-3639-445e-9aa4-bf44a1865c5f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Profile">
+      <UniqueIdentifier>{9b25b6f9-95f1-4054-bc7f-f383f70256ad}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Profile">
+      <UniqueIdentifier>{c4f657d2-4d7c-430c-ad5a-755265beb0ce}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -48,6 +54,9 @@
     <ClCompile Include="ObjectManager.cpp">
       <Filter>Source Files\Thread</Filter>
     </ClCompile>
+    <ClCompile Include="CharacterProfile.cpp">
+      <Filter>Source Files\Profile</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GameProtocol.h">
@@ -58,6 +67,9 @@
     </ClInclude>
     <ClInclude Include="ObjectManager.h">
       <Filter>Header Files\Thread</Filter>
+    </ClInclude>
+    <ClInclude Include="CharacterProfile.h">
+      <Filter>Header Files\Profile</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

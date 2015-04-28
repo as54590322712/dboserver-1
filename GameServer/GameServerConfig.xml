@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <GameServer>
   <!-- Server Configuration -->
-  <Server ID="0" IP="0.0.0.0" Port="50400" />
+  <Server ID="0" ChannelID="0" IP="0.0.0.0" Port="50400" />
   <MySQL Host="127.0.0.1" Port="3306" Database="DBO" User="dboserver" Password="dboserver" />
   
   <!-- Game Data Tables Folder Location -->

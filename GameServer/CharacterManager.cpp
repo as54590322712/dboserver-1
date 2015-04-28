@@ -102,8 +102,8 @@ void CharacterManager::RecvOthers(eOPCODE_GU Opcode, GameClient* pClient, bool d
 			{
 			case GU_OBJECT_CREATE:
 				{
-					ObjectInfo obj = it->second->GetCharSpawnData();
-					obj.ObjData.handle = it->second->GetCharSerialID();
+					ObjectInfo obj = it->second->GetProfile()->GetCharSpawnData();
+					obj.ObjData.handle = it->second->GetProfile()->GetSerialID();
 					pClient->PushPacket(&obj.ObjData, sizeof(obj.ObjData));
 				} break;
 			}

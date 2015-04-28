@@ -7,6 +7,8 @@
 
 #include <map>
 
+#include "CharacterProfile.h"
+
 class GameServer;
 class GameClient;
 

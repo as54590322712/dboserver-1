@@ -153,9 +153,9 @@ void CharClient::SendCharCreateRes(sUC_CHARACTER_ADD_REQ* data)
 		Res.sPcDataSummary.dwMapInfoIndex = nbdata.mapNameTblidx;
 		Res.sPcDataSummary.worldId = nbdata.world_Id;
 		Res.sPcDataSummary.worldTblidx = nbdata.world_Id;
-		Res.sPcDataSummary.fPositionX = nbdata.vSpawn_Loc.x;
-		Res.sPcDataSummary.fPositionY = nbdata.vSpawn_Loc.y;
-		Res.sPcDataSummary.fPositionZ = nbdata.vSpawn_Loc.z;
+		Res.sPcDataSummary.fPositionX = nbdata.vSpawn_Loc.x + (float)(rand() % 5);
+		Res.sPcDataSummary.fPositionY = nbdata.vSpawn_Loc.y + (float)(rand() % 5);
+		Res.sPcDataSummary.fPositionZ = nbdata.vSpawn_Loc.z + (float)(rand() % 5);
 		Res.sPcDataSummary.bTutorialFlag = false;
 		Res.sPcDataSummary.dwMoney = 10000;
 		Res.sPcDataSummary.dwMoneyBank = 100000;

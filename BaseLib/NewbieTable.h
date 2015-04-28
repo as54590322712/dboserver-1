@@ -1,42 +1,69 @@
-#ifndef _NEWBIETABLE
-#define _NEWBIETABLE
-
 #pragma once
 
-#include "Base.h"
 #include "Table.h"
+#include "NtlVector.h"
+#include "NtlCharacter.h"
 
 #pragma pack(push, 4)
-typedef struct NewbieData {
-	unsigned int tblIndex;
-	BYTE Race;
-	BYTE Class;
-	unsigned int worldId;
-	unsigned int tut_worldId;
-	sVECTOR3 spawnLoc;
-	sVECTOR3 spawnDir;
-	sVECTOR3 bindLoc;
-	sVECTOR3 bindDir;
-	unsigned int itemId[NTL_MAX_NEWBIE_ITEM];
-	BYTE itemSlot[NTL_MAX_NEWBIE_ITEM];
-	BYTE itemStack[NTL_MAX_NEWBIE_ITEM];
-	unsigned int mapNameTblId;
-	unsigned int SkillsIds[NTL_MAX_NEWBIE_SKILL];
-	sNEWBIE_QUICKSLOT_DATA QuickSlotData[NTL_MAX_NEWBIE_QUICKSLOT_COUNT];
-	BYTE defaultPortalTblId;
-	unsigned int qItemTblidx1;
-	BYTE QPosition1;
-	BYTE QStackQuantity1;
-} NewbieData;
-#pragma pack(pop)
-
-class NewbieTable : public Table
+struct sNEWBIE_TBLDAT : public sTBLDAT
 {
 public:
-	NewbieTable() {};
-	~NewbieTable() {};
-	int Load(char* file);
-	NewbieData GetData(BYTE Race, BYTE Class);
-};
 
-#endif
+	BYTE			byRace;
+	BYTE			byClass;
+	WORLDID			world_Id;
+	TBLIDX			tutorialWorld;
+	CNtlVector      vSpawn_Loc;
+	CNtlVector      vSpawn_Dir;
+	CNtlVector      vBind_Loc;
+	CNtlVector      vBind_Dir;
+	TBLIDX			aitem_Tblidx[NTL_MAX_NEWBIE_ITEM];
+	BYTE			abyPos[NTL_MAX_NEWBIE_ITEM];
+	BYTE			abyStack_Quantity[NTL_MAX_NEWBIE_ITEM];
+	TBLIDX			mapNameTblidx;
+	TBLIDX			aSkillTblidx[NTL_MAX_NEWBIE_SKILL];
+	sNEWBIE_QUICKSLOT_DATA	asQuickData[NTL_MAX_NEWBIE_QUICKSLOT_COUNT];
+	PORTALID		defaultPortalTblidx;
+	TBLIDX			qItemTblidx1;
+	BYTE			byQPosition1;
+	BYTE			byQStackQuantity1;
+protected:
+
+	virtual int GetDataSize()
+	{
+		return sizeof(*this) - sizeof(void*);
+	}
+};
+#pragma pack(pop)
+
+class NewbieTable :
+	public Table
+{
+public:
+	NewbieTable(void);
+	virtual ~NewbieTable(void);
+
+	bool Create(DWORD dwCodePage);
+	void Destroy();
+
+	sTBLDAT* FindData(TBLIDX tblidx);
+	sTBLDAT* GetNewbieTbldat(BYTE byRace, BYTE byClass);
+	bool SetNewbieTbldat(BYTE byRace, BYTE byClass, sTBLDAT * pTbldat);
+
+	virtual bool LoadFromBinary(Serializer& serializer, bool bReload);
+	virtual bool SaveToBinary(Serializer& serializer);
+
+protected:
+	void Init();
+
+	WCHAR** GetSheetListInWChar() { return &(NewbieTable::m_pwszSheetList[0]); }
+	void* AllocNewTable(WCHAR* pwszSheetName, DWORD dwCodePage);
+	bool DeallocNewTable(void* pvTable, WCHAR* pwszSheetName);
+	bool AddTable(void * pvTable, bool bReload);
+	bool SetTableData(void* pvTable, WCHAR* pwszSheetName, std::wstring* pstrDataName, BSTR bstrData);
+
+	sTBLDAT* m_aNewbieTbldat[RACE_COUNT][PC_CLASS_COUNT];
+
+private:
+	static WCHAR* m_pwszSheetList[];
+};

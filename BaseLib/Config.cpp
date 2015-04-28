@@ -3,15 +3,25 @@
 
 Config::Config(const char* rname)
 {
-	char filename[MAX_PATH];
-	sprintf_s(filename, MAX_PATH, "%sConfig.xml", rname);
-	doc = xmlParseFile(filename);
 	rootname = _strdup(rname);
+	filename = new char[MAX_PATH];
+	sprintf_s(filename, MAX_PATH, "%sConfig.xml", rootname);
 }
 
 Config::~Config()
 {
-	xmlFreeDoc(doc);
+	Free();
+}
+
+void Config::Init()
+{
+	doc = std::make_unique<xmlDocPtr>(xmlParseFile(filename));
+}
+
+void Config::Free()
+{
+	xmlFreeDoc(*doc.get());
+	doc.release();
 }
 
 int Config::GetInt(char* fieldname)
@@ -21,11 +31,13 @@ int Config::GetInt(char* fieldname)
 
 int Config::GetInt(char* fieldname, char* valuename)
 {
+	Init();
 	if (doc)
 	{
-		root = xmlDocGetRootElement(doc);
-		if (xmlStrcmp(root->name, (const xmlChar*)rootname) != 0){
-			xmlFreeDoc(doc);
+		root = xmlDocGetRootElement(*doc.get());
+		if (xmlStrcmp(root->name, (const xmlChar*)rootname) != 0)
+		{
+			Free();
 			Logger::Log("Error on Loading Config xml File, Root node not found (%s)\n", rootname);
 		}
 
@@ -36,16 +48,19 @@ int Config::GetInt(char* fieldname, char* valuename)
 				xmlChar* xres = xmlGetProp(node, (const xmlChar*)valuename);
 				if (xres)
 				{
+					Free();
 					return atoi((const char*)xres);
 					xmlFree(xres);
 				}
 			}
 		}
+		Free();
 		return -1;
 	}
 	else
 	{
 		Logger::Log("Error on Loading Config xml File\n");
+		Free();
 		return -1;
 	}
 }
@@ -57,11 +72,12 @@ char* Config::GetStr(char* fieldname)
 
 char* Config::GetStr(char* fieldname, char* valuename)
 {
+	Init();
 	if (doc)
 	{
-		root = xmlDocGetRootElement(doc);
+		root = xmlDocGetRootElement(*doc.get());
 		if (xmlStrcmp(root->name, (const xmlChar*)rootname) != 0){
-			xmlFreeDoc(doc);
+			Free();
 			Logger::Log("Error on Loading Config xml File, Root node not found (%s)\n", rootname);
 		}
 
@@ -72,6 +88,7 @@ char* Config::GetStr(char* fieldname, char* valuename)
 				xmlChar* xres = xmlGetProp(node, (const xmlChar*)valuename);
 				if (xres)
 				{
+					Free();
 					return (char*)xres;
 					xmlFree(xres);
 				}
@@ -82,6 +99,7 @@ char* Config::GetStr(char* fieldname, char* valuename)
 	else
 	{
 		Logger::Log("Error on Loading Config xml File\n");
+		Free();
 		return "";
 	}
 }
@@ -93,11 +111,12 @@ int Config::GetChildInt(char* child, char* fieldname)
 
 int Config::GetChildInt(char* child, char* fieldname, char* valuename)
 {
+	Init();
 	if (doc)
 	{
-		root = xmlDocGetRootElement(doc);
+		root = xmlDocGetRootElement(*doc.get());
 		if (xmlStrcmp(root->name, (const xmlChar*)rootname) != 0){
-			xmlFreeDoc(doc);
+			Free();
 			Logger::Log("Error on Loading Config xml File, Root node not found (%s)\n", rootname);
 		}
 
@@ -113,6 +132,7 @@ int Config::GetChildInt(char* child, char* fieldname, char* valuename)
 						xmlChar* xres = xmlGetProp(cnode, (const xmlChar*)valuename);
 						if (xres)
 						{
+							Free();
 							return atoi((const char*)xres);
 							xmlFree(xres);
 						}
@@ -125,6 +145,7 @@ int Config::GetChildInt(char* child, char* fieldname, char* valuename)
 	else
 	{
 		Logger::Log("Error on Loading Config xml File\n");
+		Free();
 		return -1;
 	}
 }
@@ -136,11 +157,12 @@ char* Config::GetChildStr(char* child, char* fieldname)
 
 char* Config::GetChildStr(char* child, char* fieldname, char* valuename)
 {
+	Init();
 	if (doc)
 	{
-		root = xmlDocGetRootElement(doc);
+		root = xmlDocGetRootElement(*doc.get());
 		if (xmlStrcmp(root->name, (const xmlChar*)rootname) != 0){
-			xmlFreeDoc(doc);
+			Free();
 			Logger::Log("Error on Loading Config xml File, Root node not found (%s)\n", rootname);
 		}
 
@@ -156,6 +178,7 @@ char* Config::GetChildStr(char* child, char* fieldname, char* valuename)
 						xmlChar* xres = xmlGetProp(cnode, (const xmlChar*)valuename);
 						if (xres)
 						{
+							Free();
 							return (char*)xres;
 							xmlFree(xres);
 						}
@@ -163,11 +186,13 @@ char* Config::GetChildStr(char* child, char* fieldname, char* valuename)
 				}
 			}
 		}
+		Free();
 		return "";
 	}
 	else
 	{
 		Logger::Log("Error on Loading Config xml File\n");
+		Free();
 		return "";
 	}
 }

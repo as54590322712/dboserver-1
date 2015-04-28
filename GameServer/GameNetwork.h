@@ -15,8 +15,7 @@
 #include <ServerApp.h>
 #include <Database.h>
 #include <Encoder.h>
-#include <PCTable.h>
-#include <SpawnTable.h>
+#include <TableAll.h>
 
 #include "GameProtocol.h"
 #include "CharacterManager.h"
@@ -68,7 +67,7 @@ public:
 	int LoadItemData();
 	int LoadSkillData();
 	int LoadQuickslotData();
-	void CalculateAtributes(PCData* pcdata);
+	void CalculateAtributes(sPC_TBLDAT* pcdata);
 	sGU_OBJECT_CREATE GetCharSpawnData();
 	sGU_ITEM_CREATE InsertNextBagSlot(ITEMID item, BYTE qtd = 1);
 	HOBJECT GetInventoryItemSerialID(BYTE byPlace, BYTE byPos);
@@ -195,8 +194,11 @@ public:
 
 	CharacterManager* GetClientManager() { return _charManager; }
 	ObjectManager* GetObjectManager() { return _objManager; }
+	TableContainer* GetTableContainer() { return m_pTableContainer; }
 
-	void AddSpawn(SpawnData data, eOBJTYPE type);
+	bool LoadTableData();
+	void AddSpawn(sSPAWN_TBLDAT data, eOBJTYPE type);
+	void LoadSpawns(TBLIDX worldTblidx, bool bIsNpc);
 
 	void Run()
 	{
@@ -216,15 +218,16 @@ private:
 	Acceptor _clientAcceptor;
 	CharacterManager* _charManager;
 	ObjectManager* _objManager;
+	TableContainer* m_pTableContainer;
 
 public:
 	Config* ServerCfg;
 	Database* ServerDB;
 	int ServerID;
-	PCTable* pcTblData;
-	SpawnTable* npcspawnTblData;
-	SpawnTable* mobspawnTblData;
 	unsigned int m_uiSerialID;
+	char* chatServerIP;
+	int chatServerPort;
+	char* gameDataPath;
 };
 
 #endif

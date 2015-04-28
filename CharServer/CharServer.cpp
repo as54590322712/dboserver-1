@@ -40,18 +40,13 @@ int CharServer::OnCreate()
 		ServerCfg->GetInt("MySQL", "Port")))
 		return 2;//ERR_DBSERVER_CONNECT
 
-	nbTblData = new NewbieTable();
-	if (nbTblData->Load("..\\Tables\\table_newbie_data.edf") != 0)
-	{
-		Logger::Log("Failed to load Newbie Table!\n");
-		return 3;//ERR_LOADTABLE
-	}
-	pcTblData = new PCTable();
-	if (pcTblData->Load("..\\Tables\\table_pc_data.edf") != 0)
-	{
-		Logger::Log("Failed to load PC Table!\n");
-		return 3;//ERR_LOADTABLE
-	}
+	// TABLE CONTAINER LOAD
+	gameDataPath = ServerCfg->GetStr("GameData", "Path");
+	Logger::Log("Loading Game Data Tables ... PLEASE WAIT\n");
+	if (LoadTableData())
+		Logger::Log("LOADED!\n");
+	else
+		return 3;//ERR_TABLE_LOAD
 
 	return 0;
 }
@@ -66,4 +61,42 @@ int CharServer::OnAppStart()
 {
 	Logger::Log("Server listening on %s:%d\n", _clientAcceptor.GetListenIP(), _clientAcceptor.GetListenPort());
 	return 0;
+}
+
+bool CharServer::LoadTableData()
+{
+	CNtlBitFlagManager flagManager;
+	if (false == flagManager.Create(TableContainer::TABLE_COUNT)) return false;
+
+	TableFileNameList fileNameList;
+	if (false == fileNameList.Create())	return false;
+
+	flagManager.Set(TableContainer::TABLE_WORLD);
+	flagManager.Set(TableContainer::TABLE_PC);
+	flagManager.Set(TableContainer::TABLE_MOB);
+	flagManager.Set(TableContainer::TABLE_NPC);
+	flagManager.Set(TableContainer::TABLE_ITEM);
+	flagManager.Set(TableContainer::TABLE_ITEM_OPTION);
+	flagManager.Set(TableContainer::TABLE_SKILL);
+	flagManager.Set(TableContainer::TABLE_NEWBIE);
+	flagManager.Set(TableContainer::TABLE_WORLD_MAP);
+	flagManager.Set(TableContainer::TABLE_WORLD_ZONE);
+	flagManager.Set(TableContainer::TABLE_FORMULA);
+	flagManager.Set(TableContainer::TABLE_EXP);
+
+	fileNameList.SetFileName(TableContainer::TABLE_WORLD, "Table_World_Data");
+	fileNameList.SetFileName(TableContainer::TABLE_PC, "Table_PC_Data");
+	fileNameList.SetFileName(TableContainer::TABLE_ITEM, "Table_Item_Data");
+	fileNameList.SetFileName(TableContainer::TABLE_ITEM_OPTION, "Table_Item_Option_Data");
+	fileNameList.SetFileName(TableContainer::TABLE_SKILL, "Table_Skill_Data");
+	fileNameList.SetFileName(TableContainer::TABLE_NEWBIE, "Table_Newbie_Data");
+	fileNameList.SetFileName(TableContainer::TABLE_WORLD_MAP, "Table_Worldmap_Data");
+	fileNameList.SetFileName(TableContainer::TABLE_WORLD_ZONE, "Table_World_Zone_Data");
+	fileNameList.SetFileName(TableContainer::TABLE_FORMULA, "TD_Formula");
+	fileNameList.SetFileName(TableContainer::TABLE_GAME_MANIA_TIME, "Table_GameManiaTime_Data");
+	fileNameList.SetFileName(TableContainer::TABLE_EXP, "table_exp_data");
+
+	m_pTableContainer = new TableContainer();
+
+	return m_pTableContainer->Create(flagManager, gameDataPath, &fileNameList, eLOADING_METHOD::LOADING_METHOD_SECURED_BINARY, GetACP(), NULL);
 }

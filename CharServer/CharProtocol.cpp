@@ -140,7 +140,7 @@ void CharClient::SendCharCreateRes(sUC_CHARACTER_ADD_REQ* data)
 	Res.wResultCode = CheckUsedName(data->awchCharName);
 	if (Res.wResultCode == CHARACTER_SUCCESS)
 	{
-		NewbieData nbdata = pServer->nbTblData->GetData(data->byRace, data->byClass);
+		sNEWBIE_TBLDAT nbdata = *(sNEWBIE_TBLDAT*)pServer->GetTableContainer()->GetNewbieTable()->GetNewbieTbldat(data->byRace, data->byClass);
 		memcpy(Res.sPcDataSummary.awchName, data->awchCharName, NTL_MAX_SIZE_CHAR_NAME_UNICODE);
 		Res.sPcDataSummary.byClass = data->byClass;
 		Res.sPcDataSummary.byFace = data->byFace;
@@ -150,12 +150,12 @@ void CharClient::SendCharCreateRes(sUC_CHARACTER_ADD_REQ* data)
 		Res.sPcDataSummary.byRace = data->byRace;
 		Res.sPcDataSummary.bySkinColor = data->bySkinColor;
 		Res.sPcDataSummary.byLevel = 1;
-		Res.sPcDataSummary.dwMapInfoIndex = nbdata.mapNameTblId;
-		Res.sPcDataSummary.worldId = nbdata.worldId;
-		Res.sPcDataSummary.worldTblidx = nbdata.worldId;
-		Res.sPcDataSummary.fPositionX = nbdata.spawnLoc.x;
-		Res.sPcDataSummary.fPositionY = nbdata.spawnLoc.y;
-		Res.sPcDataSummary.fPositionZ = nbdata.spawnLoc.z;
+		Res.sPcDataSummary.dwMapInfoIndex = nbdata.mapNameTblidx;
+		Res.sPcDataSummary.worldId = nbdata.world_Id;
+		Res.sPcDataSummary.worldTblidx = nbdata.world_Id;
+		Res.sPcDataSummary.fPositionX = nbdata.vSpawn_Loc.x;
+		Res.sPcDataSummary.fPositionY = nbdata.vSpawn_Loc.y;
+		Res.sPcDataSummary.fPositionZ = nbdata.vSpawn_Loc.z;
 		Res.sPcDataSummary.bTutorialFlag = false;
 		Res.sPcDataSummary.dwMoney = 10000;
 		Res.sPcDataSummary.dwMoneyBank = 100000;
@@ -167,9 +167,9 @@ void CharClient::SendCharCreateRes(sUC_CHARACTER_ADD_REQ* data)
 		}
 		for (int i = 0; i < NTL_MAX_NEWBIE_ITEM; i++)
 		{
-			int slot = nbdata.itemSlot[i];
+			int slot = nbdata.abyPos[i];
 			if ((slot >= 0) && (slot <= 12)) { 
-				Res.sPcDataSummary.sItem[slot].tblidx = nbdata.itemId[i];
+				Res.sPcDataSummary.sItem[slot].tblidx = nbdata.aitem_Tblidx[i];
 			}
 		}
 		Res.sPcDataSummary.charId = DBInsertCharData(Res.sPcDataSummary, nbdata);

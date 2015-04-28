@@ -311,21 +311,21 @@ void GameClient::LoadWorldInfoData()
 	}
 }
 
-void GameClient::CalculateAtributes(PCData* pcdata)
+void GameClient::CalculateAtributes(sPC_TBLDAT* pcdata)
 {
-	PcProfile.avatarAttribute.wBaseMaxEP += (pcdata->Level_Up_EP * PcProfile.byLevel);
-	PcProfile.avatarAttribute.wBaseMaxLP += (pcdata->Level_Up_LP * PcProfile.byLevel);
-	PcProfile.avatarAttribute.wBaseMaxRP += (pcdata->Level_Up_RP * PcProfile.byLevel);
-	PcProfile.avatarAttribute.byBaseStr += (BYTE)(pcdata->Level_Up_Str * PcProfile.byLevel);
-	PcProfile.avatarAttribute.byBaseDex += (BYTE)(pcdata->Level_Up_Dex * PcProfile.byLevel);
-	PcProfile.avatarAttribute.byBaseFoc += (BYTE)(pcdata->Level_Up_Foc * PcProfile.byLevel);
-	PcProfile.avatarAttribute.byBaseEng += (BYTE)(pcdata->Level_Up_Eng * PcProfile.byLevel);
-	PcProfile.avatarAttribute.byBaseCon += (BYTE)(pcdata->Level_Up_Con * PcProfile.byLevel);
-	PcProfile.avatarAttribute.byBaseSol += (BYTE)(pcdata->Level_Up_Sol * PcProfile.byLevel);
-	PcProfile.avatarAttribute.wBasePhysicalOffence += (pcdata->Level_Up_Physical_Offence * PcProfile.byLevel);
-	PcProfile.avatarAttribute.wBasePhysicalDefence += (pcdata->Level_Up_Physical_Defence * PcProfile.byLevel);
-	PcProfile.avatarAttribute.wBaseEnergyOffence += (pcdata->Level_Up_Energy_Offence * PcProfile.byLevel);
-	PcProfile.avatarAttribute.wBaseEnergyDefence += (pcdata->Level_Up_Energy_Defence * PcProfile.byLevel);
+	PcProfile.avatarAttribute.wBaseMaxEP += (pcdata->byLevel_Up_EP * PcProfile.byLevel);
+	PcProfile.avatarAttribute.wBaseMaxLP += (pcdata->byLevel_Up_LP * PcProfile.byLevel);
+	PcProfile.avatarAttribute.wBaseMaxRP += (pcdata->byLevel_Up_RP * PcProfile.byLevel);
+	PcProfile.avatarAttribute.byBaseStr += (BYTE)(pcdata->fLevel_Up_Str * PcProfile.byLevel);
+	PcProfile.avatarAttribute.byBaseDex += (BYTE)(pcdata->fLevel_Up_Dex * PcProfile.byLevel);
+	PcProfile.avatarAttribute.byBaseFoc += (BYTE)(pcdata->fLevel_Up_Foc * PcProfile.byLevel);
+	PcProfile.avatarAttribute.byBaseEng += (BYTE)(pcdata->fLevel_Up_Eng * PcProfile.byLevel);
+	PcProfile.avatarAttribute.byBaseCon += (BYTE)(pcdata->fLevel_Up_Con * PcProfile.byLevel);
+	PcProfile.avatarAttribute.byBaseSol += (BYTE)(pcdata->fLevel_Up_Sol * PcProfile.byLevel);
+	PcProfile.avatarAttribute.wBasePhysicalOffence += (pcdata->byLevel_Up_Physical_Offence * PcProfile.byLevel);
+	PcProfile.avatarAttribute.wBasePhysicalDefence += (pcdata->byLevel_Up_Physical_Defence * PcProfile.byLevel);
+	PcProfile.avatarAttribute.wBaseEnergyOffence += (pcdata->byLevel_Up_Energy_Offence * PcProfile.byLevel);
+	PcProfile.avatarAttribute.wBaseEnergyDefence += (pcdata->byLevel_Up_Energy_Defence * PcProfile.byLevel);
 
 	PcProfile.avatarAttribute.wLastMaxEP = PcProfile.avatarAttribute.wBaseMaxEP;
 	PcProfile.avatarAttribute.wLastMaxLP = PcProfile.avatarAttribute.wBaseMaxLP;
@@ -351,12 +351,12 @@ void GameClient::LoadCharacterData()
 			int Race = pServer->ServerDB->getInt("Race");
 			int Class = pServer->ServerDB->getInt("Class");
 			int Gender = pServer->ServerDB->getInt("Gender");
-			PCData pcdata = pServer->pcTblData->GetData(Race, Class, Gender);
-			Logger::Log("Loaded PC TblInfo: Idx(%u) Race(%u) Class(%u) Gender(%u)\n", pcdata.TblIndex, pcdata.Race, pcdata.Class, pcdata.Gender);
+			sPC_TBLDAT pcdata = *(sPC_TBLDAT*)pServer->GetTableContainer()->GetPcTable()->GetPcTbldat(Race, Class, Gender);
+			Logger::Log("Loaded PC TblInfo: Idx(%u) Race(%u) Class(%u) Gender(%u)\n", pcdata.tblidx, pcdata.byRace, pcdata.byClass, pcdata.byGender);
 			memset(&PcProfile, 0, sizeof(PcProfile));
 			memcpy(PcProfile.awchName, charToWChar(pServer->ServerDB->getString("Name")), NTL_MAX_SIZE_CHAR_NAME_UNICODE);
 			memcpy(this->charName, charToWChar(pServer->ServerDB->getString("Name")), NTL_MAX_SIZE_CHAR_NAME_UNICODE);
-			PcProfile.tblidx = pcdata.TblIndex;
+			PcProfile.tblidx = pcdata.tblidx;
 			PcProfile.charId = pServer->ServerDB->getInt("ID");
 			this->isGameMaster = PcProfile.bIsGameMaster = pServer->ServerDB->getBoolean("IsGameMaster");
 			PcProfile.byLevel = pServer->ServerDB->getInt("Level");
@@ -366,27 +366,27 @@ void GameClient::LoadCharacterData()
 			PcProfile.dwTutorialHint = pServer->ServerDB->getInt("TutorialHint");
 			PcProfile.wCurEP = pServer->ServerDB->getInt("CurEP");;
 			PcProfile.wCurLP = pServer->ServerDB->getInt("CurLP");;
-			PcProfile.wCurRP = pcdata.Basic_RP;
+			PcProfile.wCurRP = pcdata.wBasic_RP;
 			PcProfile.dwZenny = pServer->ServerDB->getInt("Money");
 			PcProfile.sMarking.byCode = INVALID_MARKING_TYPE;
 
 			PcProfile.avatarAttribute.wBaseMaxEP = pServer->ServerDB->getInt("MaxEP");
 			PcProfile.avatarAttribute.wBaseMaxLP = pServer->ServerDB->getInt("MaxLP");
-			PcProfile.avatarAttribute.wBaseMaxRP = pcdata.Basic_RP;
-			PcProfile.avatarAttribute.byBaseStr = pcdata.Str;
-			PcProfile.avatarAttribute.byBaseFoc = pcdata.Foc;
-			PcProfile.avatarAttribute.byBaseSol = pcdata.Sol;
-			PcProfile.avatarAttribute.byBaseDex = pcdata.Dex;
-			PcProfile.avatarAttribute.byBaseCon = pcdata.Con;
-			PcProfile.avatarAttribute.byBaseEng = pcdata.Eng;
-			PcProfile.avatarAttribute.fBaseAttackRange = pcdata.Attack_Range;
-			PcProfile.avatarAttribute.wBaseAttackRate = pcdata.Attack_Rate;
-			PcProfile.avatarAttribute.wBaseAttackSpeedRate = pcdata.Attack_Speed_Rate;
-			PcProfile.avatarAttribute.wBaseBlockRate = pcdata.Block_Rate;
-			PcProfile.avatarAttribute.wBaseCurseSuccessRate = pcdata.Curse_Success_Rate;
-			PcProfile.avatarAttribute.wBaseCurseToleranceRate = pcdata.Curse_Tolerance_Rate;
-			PcProfile.avatarAttribute.wBaseDodgeRate = pcdata.Dodge_Rate;
-			PcProfile.avatarAttribute.fLastRunSpeed = (PcProfile.bIsAdult) ? pcdata.Adult_Run_Speed : pcdata.Child_Run_Speed;
+			PcProfile.avatarAttribute.wBaseMaxRP = pcdata.wBasic_RP;
+			PcProfile.avatarAttribute.byBaseStr = pcdata.byStr;
+			PcProfile.avatarAttribute.byBaseFoc = pcdata.byFoc;
+			PcProfile.avatarAttribute.byBaseSol = pcdata.bySol;
+			PcProfile.avatarAttribute.byBaseDex = pcdata.byDex;
+			PcProfile.avatarAttribute.byBaseCon = pcdata.byCon;
+			PcProfile.avatarAttribute.byBaseEng = pcdata.byEng;
+			PcProfile.avatarAttribute.fBaseAttackRange = pcdata.fAttack_Range;
+			PcProfile.avatarAttribute.wBaseAttackRate = pcdata.wAttack_Rate;
+			PcProfile.avatarAttribute.wBaseAttackSpeedRate = pcdata.wAttack_Speed_Rate;
+			PcProfile.avatarAttribute.wBaseBlockRate = pcdata.wBlock_Rate;
+			PcProfile.avatarAttribute.wBaseCurseSuccessRate = pcdata.wCurse_Success_Rate;
+			PcProfile.avatarAttribute.wBaseCurseToleranceRate = pcdata.wCurse_Tolerance_Rate;
+			PcProfile.avatarAttribute.wBaseDodgeRate = pcdata.wDodge_Rate;
+			PcProfile.avatarAttribute.fLastRunSpeed = (PcProfile.bIsAdult) ? pcdata.fAdult_Run_Speed : pcdata.fChild_Run_Speed;
 			CalculateAtributes(&pcdata);
 
 			PcProfile.sPcShape.byFace = pServer->ServerDB->getInt("Face");

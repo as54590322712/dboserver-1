@@ -413,8 +413,8 @@ void GameClient::SendGameEnterRes(sUG_GAME_ENTER_REQ* data)
 	sGU_GAME_ENTER_RES geRes;
 	memset(&geRes, 0, sizeof(geRes));
 	geRes.wOpCode = GU_GAME_ENTER_RES;
-	memcpy(geRes.achCommunityServerIP, pServer->ServerCfg->GetStr("ChatServer", "IP"), NTL_MAX_LENGTH_OF_IP);
-	geRes.wCommunityServerPort = pServer->ServerCfg->GetInt("ChatServer", "Port");
+	memcpy(geRes.achCommunityServerIP, pServer->chatServerIP, NTL_MAX_LENGTH_OF_IP);
+	geRes.wCommunityServerPort = pServer->chatServerPort;
 	geRes.timeDBOEnter = time(NULL);
 	geRes.wResultCode = GAME_SUCCESS;
 	Send((unsigned char*)&geRes, sizeof(geRes));

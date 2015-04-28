@@ -13,8 +13,7 @@
 #include <ServerApp.h>
 #include <Database.h>
 #include <Encoder.h>
-#include <NewbieTable.h>
-#include <PCTable.h>
+#include <TableAll.h>
 #include "CharProtocol.h"
 
 enum CHAR_SESSION
@@ -47,7 +46,7 @@ public:
 
 	// DATA FUNCTIONS
 	int GetDBAccCharListData(sCU_CHARACTER_INFO* outdata);
-	int DBInsertCharData(sPC_SUMMARY data, NewbieData nbdata);
+	int DBInsertCharData(sPC_SUMMARY data, sNEWBIE_TBLDAT nbdata);
 	eRESULTCODE CheckUsedName(WCHAR* Name);
 	eRESULTCODE DBChangeCharName(WCHAR* Name, int charId);
 	int GetDBAllowedRaces();
@@ -126,15 +125,18 @@ public:
 		}
 	}
 
+	TableContainer* GetTableContainer() { return m_pTableContainer; }
+	bool LoadTableData();
+
 private:
 	Acceptor _clientAcceptor;
+	TableContainer* m_pTableContainer;
 
 public:
 	Config* ServerCfg;
 	Database* ServerDB;
 	int ServerID;
-	NewbieTable* nbTblData;
-	PCTable* pcTblData;
+	char* gameDataPath;
 };
 
 #endif

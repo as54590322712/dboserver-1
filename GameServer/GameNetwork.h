@@ -68,7 +68,7 @@ public:
 	int LoadSkillData();
 	int LoadQuickslotData();
 	void CalculateAtributes(sPC_TBLDAT* pcdata);
-	sGU_OBJECT_CREATE GetCharSpawnData();
+	ObjectInfo GetCharSpawnData();
 	sGU_ITEM_CREATE InsertNextBagSlot(ITEMID item, BYTE qtd = 1);
 	HOBJECT GetInventoryItemSerialID(BYTE byPlace, BYTE byPos);
 	void UpdateItemInventoryPosition(HOBJECT hItem, BYTE byPlace, BYTE byPos);
@@ -197,8 +197,8 @@ public:
 	TableContainer* GetTableContainer() { return m_pTableContainer; }
 
 	bool LoadTableData();
-	void AddSpawn(sSPAWN_TBLDAT data, eOBJTYPE type);
-	void LoadSpawns(TBLIDX worldTblidx, bool bIsNpc);
+	void LoadSpawns();
+	int LoadSpawns(TBLIDX worldTblidx, bool bIsNpc);
 
 	void Run()
 	{

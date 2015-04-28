@@ -45,10 +45,10 @@ int GameServer::OnCreate()
 		ServerCfg->GetInt("MySQL", "Port")))
 		return 2;//ERR_DBSERVER_CONNECT
 
-	this->ServerID = ServerCfg->GetInt("Server", "ID");
-
+	ServerID = ServerCfg->GetInt("Server", "ID");
 	chatServerIP = ServerCfg->GetStr("ChatServer", "IP");
 	chatServerPort = ServerCfg->GetInt("ChatServer", "Port");
+	gameDataPath = ServerCfg->GetStr("GameData", "Path");
 
 	m_uiSerialID = INVALID_DWORD;
 
@@ -65,15 +65,14 @@ int GameServer::OnConfiguration(const char* ConfigFile)
 int GameServer::OnAppStart()
 {
 	// TABLE CONTAINER LOAD
-	gameDataPath = ServerCfg->GetStr("GameData", "Path");
 	Logger::Log("Loading Game Data Tables ... PLEASE WAIT\n");
 	if (LoadTableData())
 		Logger::Log("LOADED!\n");
 	else
 		return 3;//ERR_TABLE_LOAD
 
-	// Load NPC Spawns
-	LoadSpawns(1, true);
+	// Load MOBs/NPCs Spawns
+	LoadSpawns();
 
 	Logger::Log("Server listening on %s:%d\n", _clientAcceptor.GetListenIP(), _clientAcceptor.GetListenPort());
 	return 0;
@@ -88,56 +87,6 @@ unsigned int GameServer::AcquireSerialID()
 	}
 
 	return m_uiSerialID;
-}
-
-void GameServer::AddSpawn(sSPAWN_TBLDAT data, eOBJTYPE type)
-{
-	sGU_OBJECT_CREATE sPacket;
-	memset(&sPacket, 0, sizeof(sGU_OBJECT_CREATE));
-	sPacket.wOpCode = GU_OBJECT_CREATE;
-	sPacket.handle = AcquireSerialID();
-	switch (type)
-	{
-	case OBJTYPE_NPC:
-		sPacket.sObjectInfo.objType = OBJTYPE_NPC;
-		sPacket.sObjectInfo.npcBrief.tblidx = data.mob_Tblidx;
-		sPacket.sObjectInfo.npcBrief.wCurLP = 100;
-		sPacket.sObjectInfo.npcBrief.wMaxLP = 100;
-		sPacket.sObjectInfo.npcBrief.fLastWalkingSpeed = 3.0f;
-		sPacket.sObjectInfo.npcBrief.fLastRunningSpeed = 7.0f;
-
-		sPacket.sObjectInfo.npcState.sCharStateBase.byStateID = CHARSTATE_SPAWNING;
-		sPacket.sObjectInfo.npcState.sCharStateBase.bFightMode = FALSE;
-
-		sPacket.sObjectInfo.npcState.sCharStateBase.vCurLoc.x = data.vSpawn_Loc.x;
-		sPacket.sObjectInfo.npcState.sCharStateBase.vCurLoc.y = data.vSpawn_Loc.y;
-		sPacket.sObjectInfo.npcState.sCharStateBase.vCurLoc.z = data.vSpawn_Loc.z;
-
-		sPacket.sObjectInfo.npcState.sCharStateBase.vCurDir.x = data.vSpawn_Dir.x;
-		sPacket.sObjectInfo.npcState.sCharStateBase.vCurDir.y = data.vSpawn_Dir.y;
-		sPacket.sObjectInfo.npcState.sCharStateBase.vCurDir.z = data.vSpawn_Dir.z;
-		break;
-	case OBJTYPE_MOB:
-		sPacket.sObjectInfo.objType = OBJTYPE_MOB;
-		sPacket.sObjectInfo.mobBrief.tblidx = data.mob_Tblidx;
-		sPacket.sObjectInfo.mobBrief.wCurLP = 100;
-		sPacket.sObjectInfo.mobBrief.wMaxLP = 100;
-		sPacket.sObjectInfo.mobBrief.fLastWalkingSpeed = 3.0f;
-		sPacket.sObjectInfo.mobBrief.fLastRunningSpeed = 7.0f;
-
-		sPacket.sObjectInfo.mobState.sCharStateBase.byStateID = CHARSTATE_SPAWNING;
-		sPacket.sObjectInfo.mobState.sCharStateBase.bFightMode = FALSE;
-
-		sPacket.sObjectInfo.mobState.sCharStateBase.vCurLoc.x = data.vSpawn_Loc.x + (float)(rand() % data.bySpawn_Loc_Range);
-		sPacket.sObjectInfo.mobState.sCharStateBase.vCurLoc.y = data.vSpawn_Loc.y;
-		sPacket.sObjectInfo.mobState.sCharStateBase.vCurLoc.z = data.vSpawn_Loc.z + (float)(rand() % data.bySpawn_Loc_Range);
-
-		sPacket.sObjectInfo.mobState.sCharStateBase.vCurDir.x = data.vSpawn_Dir.x;
-		sPacket.sObjectInfo.mobState.sCharStateBase.vCurDir.y = data.vSpawn_Dir.y;
-		sPacket.sObjectInfo.mobState.sCharStateBase.vCurDir.z = data.vSpawn_Dir.z;
-		break;
-	}
-	GetObjectManager()->AddObject(sPacket);
 }
 
 bool GameServer::LoadTableData()
@@ -263,15 +212,34 @@ bool GameServer::LoadTableData()
 	return m_pTableContainer->Create(flagManager, gameDataPath, &fileNameList, eLOADING_METHOD::LOADING_METHOD_SECURED_BINARY, GetACP(), NULL);
 }
 
-void GameServer::LoadSpawns(TBLIDX worldTblidx, bool bIsNpc)
+void GameServer::LoadSpawns()
 {
-	SpawnTable* pSpawnTbl = NULL;
+	int count = 0;
+
+	Logger::Log("Loading NPCs spawns ...\n");
+	for (TableContainer::SPAWNTABLEIT it = GetTableContainer()->BeginNpcSpawnTable(); GetTableContainer()->EndNpcSpawnTable() != it; ++it)
+	{
+		count += LoadSpawns(it->first, true);
+	}
+	Logger::Log("Loaded %d NPCs Spawns.\n", count);
+	count = 0;
+	Logger::Log("Loading MOBs spawns ...\n");
+	for (TableContainer::SPAWNTABLEIT it = GetTableContainer()->BeginMobSpawnTable(); GetTableContainer()->EndMobSpawnTable() != it; ++it)
+	{
+		count += LoadSpawns(it->first, false);
+	}
+	Logger::Log("Loaded %d MOBs Spawns.\n", count);
+}
+
+int GameServer::LoadSpawns(TBLIDX worldTblidx, bool bIsNpc)
+{
+	int count = 0;
 
 	if (bIsNpc)
 	{
-		pSpawnTbl = GetTableContainer()->GetNpcSpawnTable(worldTblidx);
-
-		for (Table::TABLEIT it = pSpawnTbl->Begin(); it != pSpawnTbl->End(); ++it)
+		SpawnTable* pSpawnTbl = GetTableContainer()->GetNpcSpawnTable(worldTblidx);
+		
+		for (Table::TABLEIT it = pSpawnTbl->Begin(); it != pSpawnTbl->End(); ++it, ++count)
 		{
 			sSPAWN_TBLDAT* pSpawnData = (sSPAWN_TBLDAT*)it->second;
 			sNPC_TBLDAT* pTblData = (sNPC_TBLDAT*)GetTableContainer()->GetNpcTable()->FindData(pSpawnData->mob_Tblidx);
@@ -282,7 +250,6 @@ void GameServer::LoadSpawns(TBLIDX worldTblidx, bool bIsNpc)
 
 			if (pTblData)
 			{
-				Logger::Log("NPC[%s] ID[%d]\n", pTblData->szNameText, pTblData->tblidx);
 				sPacket.handle = AcquireSerialID();
 				sPacket.sObjectInfo.objType = OBJTYPE_NPC;
 				sPacket.sObjectInfo.npcBrief.tblidx = pTblData->tblidx;
@@ -304,8 +271,56 @@ void GameServer::LoadSpawns(TBLIDX worldTblidx, bool bIsNpc)
 				sPacket.sObjectInfo.npcState.sCharStateBase.vCurDir.x = pSpawnData->vSpawn_Dir.x;
 				sPacket.sObjectInfo.npcState.sCharStateBase.vCurDir.y = pSpawnData->vSpawn_Dir.y;
 				sPacket.sObjectInfo.npcState.sCharStateBase.vCurDir.z = pSpawnData->vSpawn_Dir.z;
-				GetObjectManager()->AddObject(sPacket);
+
+				ObjectInfo obj;
+				obj.worldTblIdx = worldTblidx;
+				obj.ObjData = sPacket;
+				GetObjectManager()->AddObject(obj);
 			}
 		}
 	}
+	else
+	{
+		SpawnTable* pSpawnTbl = GetTableContainer()->GetMobSpawnTable(worldTblidx);
+		
+		for (Table::TABLEIT it = pSpawnTbl->Begin(); it != pSpawnTbl->End(); ++it, ++count)
+		{
+			sSPAWN_TBLDAT* pSpawnData = (sSPAWN_TBLDAT*)it->second;
+			sMOB_TBLDAT* pTblData = (sMOB_TBLDAT*)GetTableContainer()->GetMobTable()->FindData(pSpawnData->mob_Tblidx);
+
+			sGU_OBJECT_CREATE sPacket;
+			memset(&sPacket, 0, sizeof(sGU_OBJECT_CREATE));
+			sPacket.wOpCode = GU_OBJECT_CREATE;
+
+			if (pTblData)
+			{
+				sPacket.handle = AcquireSerialID();
+				sPacket.sObjectInfo.objType = OBJTYPE_MOB;
+				sPacket.sObjectInfo.mobBrief.tblidx = pTblData->tblidx;
+				sPacket.sObjectInfo.mobBrief.wCurLP = pTblData->wBasic_LP;
+				sPacket.sObjectInfo.mobBrief.wMaxLP = pTblData->wBasic_LP;
+				sPacket.sObjectInfo.mobBrief.wCurEP = pTblData->wBasic_EP;
+				sPacket.sObjectInfo.mobBrief.wMaxEP = pTblData->wBasic_EP;
+				sPacket.sObjectInfo.mobBrief.fLastWalkingSpeed = pTblData->fWalk_Speed;
+				sPacket.sObjectInfo.mobBrief.fLastRunningSpeed = pTblData->fRun_Speed;
+
+				sPacket.sObjectInfo.mobState.sCharStateBase.byStateID = CHARSTATE_SPAWNING;
+				sPacket.sObjectInfo.mobState.sCharStateBase.bFightMode = FALSE;
+
+				sPacket.sObjectInfo.mobState.sCharStateBase.vCurLoc.x = pSpawnData->vSpawn_Loc.x;
+				sPacket.sObjectInfo.mobState.sCharStateBase.vCurLoc.y = pSpawnData->vSpawn_Loc.y;
+				sPacket.sObjectInfo.mobState.sCharStateBase.vCurLoc.z = pSpawnData->vSpawn_Loc.z;
+
+				sPacket.sObjectInfo.mobState.sCharStateBase.vCurDir.x = pSpawnData->vSpawn_Dir.x;
+				sPacket.sObjectInfo.mobState.sCharStateBase.vCurDir.y = pSpawnData->vSpawn_Dir.y;
+				sPacket.sObjectInfo.mobState.sCharStateBase.vCurDir.z = pSpawnData->vSpawn_Dir.z;
+
+				ObjectInfo obj;
+				obj.worldTblIdx = worldTblidx;
+				obj.ObjData = sPacket;
+				GetObjectManager()->AddObject(obj);
+			}
+		}
+	}
+	return count;
 }

@@ -27,7 +27,7 @@ public:
 	int LoadQuickslotData();
 	void CalculateAtributes(sPC_TBLDAT* pcdata);
 	void GetObjectCreate(sGU_OBJECT_CREATE& sPacket);
-	sGU_ITEM_CREATE InsertNextBagSlot(ITEMID item, BYTE qtd = 1);
+	bool InsertNextBagSlot(sGU_ITEM_CREATE& sPacket, ITEMID item, BYTE qtd = 1);
 	HOBJECT GetInventoryItemSerialID(BYTE byPlace, BYTE byPos);
 	TBLIDX GetInventoryItemID(BYTE byPlace, BYTE byPos);
 	void UpdateItemInventoryPosition(HOBJECT hItem, BYTE byPlace, BYTE byPos);

@@ -176,28 +176,63 @@ int CharacterProfile::LoadSkillData()
 	return count;
 }
 
-sGU_ITEM_CREATE CharacterProfile::InsertNextBagSlot(ITEMID item, BYTE qtd)
+bool CharacterProfile::InsertNextBagSlot(sGU_ITEM_CREATE& sPacket, ITEMID item, BYTE qtd)
 {
-	sGU_ITEM_CREATE itemdata;
-	memset(&itemdata, 0, sizeof(itemdata));
-	HOBJECT hItem = INVALID_HOBJECT;
-	int lastbagslot = 0;
-	int lastbag = 1;
-	bool found = false;
+	memset(&sPacket, 0, sizeof(sPacket));
+
+	sITEM_TBLDAT* sItem = (sITEM_TBLDAT*)pServer->GetTableContainer()->GetItemTable()->FindData(item);
+
+	if (!sItem)
+		return false;
+
+	TBLIDX bags[6];
+	memset(bags, 0, 6);
+	int bagscount[6];
+	memset(bagscount, 0, 6);
+
 	for (int i = 0; i < NTL_MAX_COUNT_USER_HAVE_INVEN_ITEM; ++i)
 	{
-		if (asItemProfile[i].byPlace >= CONTAINER_TYPE_BAG_FIRST && asItemProfile[i].byPlace <= CONTAINER_TYPE_BAG_LAST)
-		{
-			if (lastbagslot < asItemProfile[i].byPos)
+		if (asItemProfile[i].byPlace == CONTAINER_TYPE_BAGSLOT)
+		{			
+			switch (asItemProfile[i].byPos)
 			{
-				lastbagslot = asItemProfile[i].byPos;
-				lastbag = asItemProfile[i].byPlace;
+				case 0: bags[0] = asItemProfile[i].tblidx; break;
+				case 1: bags[1] = asItemProfile[i].tblidx; break;
+				case 2: bags[2] = asItemProfile[i].tblidx; break;
+				case 3: bags[3] = asItemProfile[i].tblidx; break;
+				case 4: bags[4] = asItemProfile[i].tblidx; break;
+				case 6: bags[5] = asItemProfile[i].tblidx; break;
 			}
 		}
+	}
 
+	HOBJECT hItem = INVALID_HOBJECT;
+	int lastbagslot = 0;
+	int lastbag = 0;
+	
+	for (int i = 0; i < NTL_MAX_COUNT_USER_HAVE_INVEN_ITEM; ++i)
+	{
+		if (asItemProfile[i].byPlace == (lastbag + 1) && lastbag < 6)
+		{
+			sITEM_TBLDAT* sBag = (sITEM_TBLDAT*)pServer->GetTableContainer()->GetItemTable()->FindData(bags[lastbag]);
+
+			if (asItemProfile[i].handle != INVALID_HOBJECT && asItemProfile[i].tblidx != INVALID_TBLIDX)
+			{
+				bagscount[lastbag]++;
+				lastbagslot = asItemProfile[i].byPos;
+			}
+
+			if (bagscount[lastbag] == sBag->byBag_Size) lastbag++;
+		}
+	}
+
+	// Bags start from 1 to 6, and array os bags from 0 to 5, add 1 to fix
+	lastbag++;
+	
+	for (int i = 0; i < NTL_MAX_COUNT_USER_HAVE_INVEN_ITEM; ++i)
+	{
 		if (asItemProfile[i].handle == INVALID_HOBJECT && asItemProfile[i].tblidx == INVALID_TBLIDX)
 		{
-			if (lastbagslot != 0) lastbagslot++;
 			if (pServer->ServerDB->ExecuteSp("CALL `spInsertItem`('%u','%u','%d','%d','%d','1','100','0','0','0','0','','0','0','0');",
 				item, hCharID, lastbag, lastbagslot, qtd))
 			{
@@ -209,29 +244,30 @@ sGU_ITEM_CREATE CharacterProfile::InsertNextBagSlot(ITEMID item, BYTE qtd)
 				} while (pServer->ServerDB->GetMoreResults());
 			}
 
-			itemdata.bIsNew = true;
-			itemdata.wOpCode = GU_ITEM_CREATE;
-			itemdata.handle = hItem;
-			itemdata.sItemData.itemId = hItem;
-			itemdata.sItemData.charId = hCharID;
-			itemdata.sItemData.itemNo = item;
-			itemdata.sItemData.byCurrentDurability = 100;
-			itemdata.sItemData.byPlace = lastbag;
-			itemdata.sItemData.byPosition = lastbagslot;
-			itemdata.sItemData.byStackcount = qtd;
-			itemdata.sItemData.byRank = 1;
+			sPacket.bIsNew = true;
+			sPacket.wOpCode = GU_ITEM_CREATE;
+			sPacket.handle = hItem;
+			sPacket.sItemData.itemId = hItem;
+			sPacket.sItemData.charId = hCharID;
+			sPacket.sItemData.itemNo = item;
+			sPacket.sItemData.byCurrentDurability = 100;
+			sPacket.sItemData.byPlace = lastbag;
+			sPacket.sItemData.byPosition = lastbagslot;
+			sPacket.sItemData.byStackcount = qtd;
+			sPacket.sItemData.byRank = 1;
 
-			asItemProfile[i].handle = itemdata.sItemData.itemId;
+			asItemProfile[i].handle = sPacket.sItemData.itemId;
 			asItemProfile[i].tblidx = item;
-			asItemProfile[i].byCurDur = itemdata.sItemData.byCurrentDurability;
-			asItemProfile[i].byPlace = itemdata.sItemData.byPlace;
-			asItemProfile[i].byPos = itemdata.sItemData.byPosition;
-			asItemProfile[i].byStackcount = itemdata.sItemData.byStackcount;
-			asItemProfile[i].byRank = itemdata.sItemData.byRank;
+			asItemProfile[i].byCurDur = sPacket.sItemData.byCurrentDurability;
+			asItemProfile[i].byPlace = sPacket.sItemData.byPlace;
+			asItemProfile[i].byPos = sPacket.sItemData.byPosition;
+			asItemProfile[i].byStackcount = sPacket.sItemData.byStackcount;
+			asItemProfile[i].byRank = sPacket.sItemData.byRank;
 			break;
 		}
 	}
-	return itemdata;
+
+	return true;
 }
 
 int CharacterProfile::LoadItemData()

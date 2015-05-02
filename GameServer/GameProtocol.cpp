@@ -373,8 +373,15 @@ void GameClient::CheckCommand(sUG_SERVER_COMMAND* pData)
 				BYTE qtd = 1;
 				ITEMID item = atoi(tok[1].c_str());
 				if (tok.size() == 3) qtd = atoi(tok[2].c_str());
-				sGU_ITEM_CREATE sPkt = pProfile->InsertNextBagSlot(item, qtd);
-				Send(&sPkt, sizeof(sPkt));
+				sGU_ITEM_CREATE sPkt;
+				if (pProfile->InsertNextBagSlot(sPkt, item, qtd))
+				{
+					Send(&sPkt, sizeof(sPkt));
+				}
+				else
+				{
+					SendSystemText("Invalid Item Index");
+				}
 			}
 		}
 		if (strcmp(tok[0].c_str(), "@setspeed") == 0)

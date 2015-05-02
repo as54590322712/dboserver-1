@@ -64,6 +64,8 @@ bool GameClient::PacketControl(Packet* pPacket)
 
 void GameClient::SendTSExecObjectRes(sUG_TS_EXCUTE_TRIGGER_OBJECT* pData)
 {
+	SendSystemText("hSrc[%u] hTgt[%u] EvtType[%u] uiParam[%u]",
+					pData->hSource, pData->hTarget, pData->byEvtGenType, pData->uiParam);
 }
 
 void GameClient::SendWarFogUpdateRes(sUG_WAR_FOG_UPDATE_REQ* pData)
@@ -72,7 +74,15 @@ void GameClient::SendWarFogUpdateRes(sUG_WAR_FOG_UPDATE_REQ* pData)
 	memset(&sPkt, 0, sizeof(sPkt));
 	sPkt.wOpCode = GU_WAR_FOG_UPDATE_RES;
 	sPkt.handle = pData->hObject;
-	sPkt.wResultCode = GAME_SUCCESS;
+
+	/*if (pProfile->AddWarFogFlags(pData->hObject))
+	{
+		sPkt.wResultCode = eRESULTCODE::GAME_SUCCESS;
+	}
+	else
+	{*/
+		sPkt.wResultCode = eRESULTCODE::GAME_WARFOG_ARLEADY_ADDED;
+	//}
 	Send(&sPkt, sizeof(sPkt));
 }
 
@@ -82,7 +92,7 @@ void GameClient::SendEventItemStartRes()
 	memset(&sPkt, 0, sizeof(sPkt));
 	sPkt.wOpCode = GU_SHOP_NETPYITEM_START_RES;
 	sPkt.byType = 0; // 0 Normal - 1 Especial Event NPC
-	sPkt.wResultCode = GAME_SUCCESS;
+	sPkt.wResultCode = eRESULTCODE::GAME_SUCCESS;
 	Send(&sPkt, sizeof(sPkt));
 }
 
@@ -91,7 +101,7 @@ void GameClient::SendEventItemEndRes()
 	sGU_SHOP_EVENTITEM_END_RES sPkt;
 	memset(&sPkt, 0, sizeof(sPkt));
 	sPkt.wOpCode = GU_SHOP_NETPYITEM_START_RES;
-	sPkt.wResultCode = GAME_SUCCESS;
+	sPkt.wResultCode = eRESULTCODE::GAME_SUCCESS;
 	Send(&sPkt, sizeof(sPkt));
 }
 
@@ -101,7 +111,7 @@ void GameClient::SendNetpyItemStartRes()
 	memset(&sPkt, 0, sizeof(sPkt));
 	sPkt.wOpCode = GU_SHOP_NETPYITEM_START_RES;
 	sPkt.byType = 0; // 0 Normal - 1 Especial Event NPC
-	sPkt.wResultCode = GAME_SUCCESS;
+	sPkt.wResultCode = eRESULTCODE::GAME_SUCCESS;
 	Send(&sPkt, sizeof(sPkt));
 }
 
@@ -110,7 +120,7 @@ void GameClient::SendNetpyItemEndRes()
 	sGU_SHOP_NETPYITEM_END_RES sPkt;
 	memset(&sPkt, 0, sizeof(sPkt));
 	sPkt.wOpCode = GU_SHOP_NETPYITEM_START_RES;
-	sPkt.wResultCode = GAME_SUCCESS;
+	sPkt.wResultCode = eRESULTCODE::GAME_SUCCESS;
 	Send(&sPkt, sizeof(sPkt));
 }
 
@@ -152,13 +162,12 @@ void GameClient::UpdateCharObjEquips(HOBJECT hItem, BYTE byPos)
 	sPkt.byPos = byPos;
 	sPkt.handle = pProfile->GetSerialID();
 	pProfile->GetItemBrief(sPkt.sItemBrief, hItem);
-	pServer->GetObjectManager()->UpdatePcItemBrief(pProfile->GetSerialID(), sPkt.sItemBrief, byPos);
 	pServer->GetClientManager()->SendOthers(&sPkt, sizeof(sPkt), this);
 }
 
 void GameClient::SendIemMoveRes(sUG_ITEM_MOVE_REQ* pData)
 {
-	WORD wResult = GAME_SUCCESS;
+	WORD wResult = eRESULTCODE::GAME_SUCCESS;
 	sITEM_TBLDAT* sSrcTbldat = NULL;
 	sITEM_TBLDAT* sDestTbldat = NULL;
 
@@ -181,29 +190,29 @@ void GameClient::SendIemMoveRes(sUG_ITEM_MOVE_REQ* pData)
 		if (sSrcTbldat)
 		{
 			if (sSrcTbldat->dwNeed_Class_Bit_Flag != pcdata.dwClass_Bit_Flag && sSrcTbldat->dwNeed_Class_Bit_Flag != INVALID_DWORD)
-				wResult = GAME_ITEM_CLASS_FAIL;
+				wResult = eRESULTCODE::GAME_ITEM_CLASS_FAIL;
 			else if (sSrcTbldat->byClass_Special != pProfile->GetClass() && sSrcTbldat->byClass_Special != INVALID_BYTE)
-				wResult = GAME_ITEM_CLASS_FAIL;
+				wResult = eRESULTCODE::GAME_ITEM_CLASS_FAIL;
 			else if (sSrcTbldat->byRace_Special != pProfile->GetRace() && sSrcTbldat->byRace_Special != INVALID_BYTE)
-				wResult = GAME_ITEM_CLASS_FAIL;
+				wResult = eRESULTCODE::GAME_ITEM_CLASS_FAIL;
 			else if (sSrcTbldat->byNeed_Level > pProfile->sPcProfile.byLevel)
-				wResult = GAME_ITEM_NEED_MORE_LEVEL;
+				wResult = eRESULTCODE::GAME_ITEM_NEED_MORE_LEVEL;
 			else if (sSrcTbldat->byNeed_Con > pProfile->sPcProfile.avatarAttribute.byBaseCon && sSrcTbldat->byNeed_Con != INVALID_BYTE)
-				wResult = GAME_ITEM_NEED_MORE_PARAMETER;
+				wResult = eRESULTCODE::GAME_ITEM_NEED_MORE_PARAMETER;
 			else if (sSrcTbldat->byNeed_Dex > pProfile->sPcProfile.avatarAttribute.byBaseDex && sSrcTbldat->byNeed_Dex != INVALID_BYTE)
-				wResult = GAME_ITEM_NEED_MORE_PARAMETER;
+				wResult = eRESULTCODE::GAME_ITEM_NEED_MORE_PARAMETER;
 			else if (sSrcTbldat->byNeed_Eng > pProfile->sPcProfile.avatarAttribute.byBaseEng && sSrcTbldat->byNeed_Eng != INVALID_BYTE)
-				wResult = GAME_ITEM_NEED_MORE_PARAMETER;
+				wResult = eRESULTCODE::GAME_ITEM_NEED_MORE_PARAMETER;
 			else if (sSrcTbldat->byNeed_Foc > pProfile->sPcProfile.avatarAttribute.byBaseFoc && sSrcTbldat->byNeed_Foc != INVALID_BYTE)
-				wResult = GAME_ITEM_NEED_MORE_PARAMETER;
+				wResult = eRESULTCODE::GAME_ITEM_NEED_MORE_PARAMETER;
 			else if (sSrcTbldat->byNeed_Sol > pProfile->sPcProfile.avatarAttribute.byBaseSol && sSrcTbldat->byNeed_Sol != INVALID_BYTE)
-				wResult = GAME_ITEM_NEED_MORE_PARAMETER;
+				wResult = eRESULTCODE::GAME_ITEM_NEED_MORE_PARAMETER;
 			else if (sSrcTbldat->byNeed_Str > pProfile->sPcProfile.avatarAttribute.byBaseStr && sSrcTbldat->byNeed_Str != INVALID_BYTE)
-				wResult = GAME_ITEM_NEED_MORE_PARAMETER;
+				wResult = eRESULTCODE::GAME_ITEM_NEED_MORE_PARAMETER;
 		}
 	}
 
-	if (wResult == GAME_SUCCESS)
+	if (wResult == eRESULTCODE::GAME_SUCCESS)
 	{
 		// Update CHARACTER Obj Model Equiped Item (Other Players Char Object Spawn)
 		if ((pData->byDestPlace == CONTAINER_TYPE_EQUIP) &&
@@ -255,7 +264,7 @@ void GameClient::SendCharExitRes()
 	sGU_CHAR_EXIT_RES sRes;
 	memset(&sRes, 0, sizeof(sRes));
 	sRes.wOpCode = GU_CHAR_EXIT_RES;
-	sRes.wResultCode = GAME_SUCCESS;
+	sRes.wResultCode = eRESULTCODE::GAME_SUCCESS;
 	memcpy(sRes.achAuthKey, pProfile->GetAuthkey(), NTL_MAX_SIZE_AUTH_KEY);
 
 	// servers
@@ -277,7 +286,7 @@ void GameClient::SendGameLeaveRes()
 	sGU_GAME_LEAVE_RES glRes;
 	memset(&glRes, 0, sizeof(glRes));
 	glRes.wOpCode = GU_GAME_LEAVE_RES;
-	glRes.wResultCode = GAME_SUCCESS;
+	glRes.wResultCode = eRESULTCODE::GAME_SUCCESS;
 	Send(&glRes, sizeof(glRes));
 }
 
@@ -287,16 +296,18 @@ void GameClient::SendAuthkeyCommSrvRes()
 	memset(&auRes, 0, sizeof(auRes));
 	auRes.wOpCode = GU_AUTH_KEY_FOR_COMMUNITY_SERVER_RES;
 	memcpy(auRes.abyAuthKey, pProfile->GetAuthkey(), NTL_MAX_SIZE_AUTH_KEY);
-	auRes.wResultCode = GAME_SUCCESS;
+	auRes.wResultCode = eRESULTCODE::GAME_SUCCESS;
 	Send(&auRes, sizeof(auRes));
 }
 
 void GameClient::SendAvatarWarFogInfo()
 {
-	sGU_WAR_FOG_INFO wfInfo;
-	memset(&wfInfo, 0, sizeof(wfInfo));
-	wfInfo.wOpCode = GU_WAR_FOG_INFO;
-	Send(&wfInfo, sizeof(wfInfo));
+	sGU_WAR_FOG_INFO sPkt;
+	memset(&sPkt, 0, sizeof(sPkt));
+	sPkt.wOpCode = GU_WAR_FOG_INFO;
+	pProfile->LoadWarFogFlags();
+	memcpy(sPkt.abyWarFogInfo, pProfile->acWarFogFlag, NTL_MAX_SIZE_WAR_FOG);
+	Send(&sPkt, sizeof(sPkt));
 }
 
 void GameClient::SendCharBuffsInfo()
@@ -310,41 +321,20 @@ void GameClient::SendCharBuffsInfo()
 
 void GameClient::SpawnTesteMob(unsigned int id)
 {
-	sGU_OBJECT_CREATE sPacket;
-	memset(&sPacket, 0, sizeof(sGU_OBJECT_CREATE));
-	sPacket.wOpCode = GU_OBJECT_CREATE;
-	sPacket.handle = pServer->AcquireSerialID();
-	sPacket.sObjectInfo.objType = OBJTYPE_MOB;
-	sPacket.sObjectInfo.mobBrief.tblidx = id;
-	sPacket.sObjectInfo.mobBrief.wCurLP = 100;
-	sPacket.sObjectInfo.mobBrief.wMaxLP = 100;
-	sPacket.sObjectInfo.mobBrief.fLastWalkingSpeed = 3.0f;
-	sPacket.sObjectInfo.mobBrief.fLastRunningSpeed = 7.0f;
+	MobProfile* mob = new MobProfile(pProfile->sWorldInfo.tblidx, 0, id, true);
+	mob->Init();
 
-	sPacket.sObjectInfo.mobState.sCharStateBase.byStateID = CHARSTATE_SPAWNING;
-	sPacket.sObjectInfo.mobState.sCharStateBase.bFightMode = FALSE;
+	mob->sCharState.sCharStateBase.vCurLoc = pProfile->sCharState.sCharStateBase.vCurLoc;
+	mob->sCharState.sCharStateBase.vCurLoc.x = +(float)(rand() % 5);
+	mob->sCharState.sCharStateBase.vCurLoc.z = +(float)(rand() % 5);
 
-	sPacket.sObjectInfo.mobState.sCharStateBase.vCurLoc.x = pProfile->sCharState.sCharStateBase.vCurLoc.x + (float)(rand() % 5);
-	sPacket.sObjectInfo.mobState.sCharStateBase.vCurLoc.y = pProfile->sCharState.sCharStateBase.vCurLoc.y;
-	sPacket.sObjectInfo.mobState.sCharStateBase.vCurLoc.z = pProfile->sCharState.sCharStateBase.vCurLoc.z + (float)(rand() % 5);
+	mob->sCharState.sCharStateBase.vCurDir.x = 0.0f;
+	mob->sCharState.sCharStateBase.vCurDir.y = 0.0f;
+	mob->sCharState.sCharStateBase.vCurDir.z = 1.0f;
 
-	sPacket.sObjectInfo.mobState.sCharStateBase.vCurDir.x = 0.0f;
-	sPacket.sObjectInfo.mobState.sCharStateBase.vCurDir.y = 0.0f;
-	sPacket.sObjectInfo.mobState.sCharStateBase.vCurDir.z = 1.0f;
-
-	if (sPacket.sObjectInfo.mobState.sCharStateBase.byStateID == CHARSTATE_DESTMOVE)
+	if (false == pServer->GetObjectManager()->FindObject(mob->GetSerialID(), eOBJTYPE::OBJTYPE_MOB))
 	{
-		sPacket.sObjectInfo.mobState.sCharStateDetail.sCharStateDestMove.byDestLocCount = 1;
-		sPacket.sObjectInfo.mobState.sCharStateDetail.sCharStateDestMove.avDestLoc[0].x = sPacket.sObjectInfo.mobState.sCharStateBase.vCurLoc.x + 100;
-		sPacket.sObjectInfo.mobState.sCharStateDetail.sCharStateDestMove.avDestLoc[0].y = sPacket.sObjectInfo.mobState.sCharStateBase.vCurLoc.y;
-		sPacket.sObjectInfo.mobState.sCharStateDetail.sCharStateDestMove.avDestLoc[0].z = sPacket.sObjectInfo.mobState.sCharStateBase.vCurLoc.z;
-	}
-	if (false == pServer->GetObjectManager()->FindObject(sPacket.handle, sPacket.sObjectInfo.objType))
-	{
-		ObjectInfo obj;
-		obj.worldTblIdx = pProfile->sWorldInfo.tblidx;
-		obj.ObjData = sPacket;
-		pServer->GetObjectManager()->AddObject(obj);
+		pServer->GetObjectManager()->AddObject(mob->GetSerialID(), mob, eOBJTYPE::OBJTYPE_MOB);
 	}
 	pServer->GetClientManager()->SpawnObjects();
 }
@@ -451,11 +441,9 @@ void GameClient::SendCharReadyRes(sUG_CHAR_READY* pData)
 
 void GameClient::SendCharReadySpawnReq()
 {
-	ObjectInfo charSpawn = pProfile->GetCharSpawnData();
-
 	if (pServer->GetClientManager()->AddClient(this))
 	{
-		pServer->GetObjectManager()->AddObject(charSpawn);
+		pServer->GetObjectManager()->AddObject(pProfile->GetSerialID(), pProfile, eOBJTYPE::OBJTYPE_PC);
 		pServer->GetClientManager()->SpawnObjects();
 	}
 }
@@ -477,7 +465,7 @@ void GameClient::SendGameEnterRes(sUG_GAME_ENTER_REQ* data)
 	memcpy(geRes.achCommunityServerIP, pServer->chatServerIP, NTL_MAX_LENGTH_OF_IP);
 	geRes.wCommunityServerPort = pServer->chatServerPort;
 	geRes.timeDBOEnter = time(NULL);
-	geRes.wResultCode = GAME_SUCCESS;
+	geRes.wResultCode = eRESULTCODE::GAME_SUCCESS;
 	Send((unsigned char*)&geRes, sizeof(geRes));
 }
 

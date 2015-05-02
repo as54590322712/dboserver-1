@@ -21,6 +21,48 @@ CharacterProfile::~CharacterProfile()
 	this->pServer = NULL;
 }
 
+void CharacterProfile::LoadWarFogFlags()
+{
+	memset(&acWarFogFlag, 0xFF, NTL_MAX_SIZE_WAR_FOG);
+	// NEED MORE RESEARCH
+	/*if (pServer->ServerDB->ExecuteSelect("SELECT `Object` FROM `warfog` WHERE `CharID` = '%u';", hCharID))
+	{
+		while (pServer->ServerDB->Fetch())
+		{
+			HOBJECT Obj = pServer->ServerDB->getInt("Object");
+			int uiArrayPos = Obj / 8;
+			BYTE byCurBit = (BYTE)(Obj % 8);
+
+			acWarFogFlag[uiArrayPos] |= 0x01ui8 << byCurBit;
+		}
+	}*/
+}
+
+bool CharacterProfile::CheckWarFogFlags(HOBJECT hObject)
+{
+	bool ret = false;
+	if (pServer->ServerDB->ExecuteSelect("SELECT `Object` FROM `warfog` WHERE `CharID` = '%u';", hCharID))
+	{
+		while (pServer->ServerDB->Fetch())
+		{
+			if (hObject == pServer->ServerDB->getInt("Object")) ret = true;
+		}
+	}
+	return ret;
+}
+
+bool CharacterProfile::AddWarFogFlags(HOBJECT hObject)
+{
+	bool ret = CheckWarFogFlags(hObject);
+
+	if (false == ret)
+	{
+		pServer->ServerDB->ExecuteQuery("INSERT INTO `warfog` (`CharID`,`Object`) VALUES ('%u','%u');", hCharID, hObject);
+	}
+
+	return !ret;
+}
+
 void CharacterProfile::GetItemBrief(sITEM_BRIEF& sBrief, HOBJECT hItem)
 {
 	if (hItem == INVALID_HOBJECT)
@@ -364,42 +406,33 @@ void CharacterProfile::LoadCharacterData()
 	}
 }
 
-ObjectInfo CharacterProfile::GetCharSpawnData()
+void CharacterProfile::GetObjectCreate(sGU_OBJECT_CREATE& sPacket)
 {
-	sGU_OBJECT_CREATE charSpawn;
-	memset(&charSpawn, 0, sizeof(charSpawn));
-	charSpawn.wOpCode = GU_OBJECT_CREATE;
-	charSpawn.handle = GetSerialID();
-	charSpawn.sObjectInfo.objType = OBJTYPE_PC;
-	charSpawn.sObjectInfo.pcBrief.charId = hCharID;
-	charSpawn.sObjectInfo.pcBrief.tblidx = sPcProfile.tblidx;
-	charSpawn.sObjectInfo.pcBrief.byLevel = sPcProfile.byLevel;
-	charSpawn.sObjectInfo.pcBrief.wAttackSpeedRate = sPcProfile.avatarAttribute.wLastAttackSpeedRate;
-	charSpawn.sObjectInfo.pcBrief.wCurEP = sPcProfile.wCurEP;
-	charSpawn.sObjectInfo.pcBrief.wCurLP = sPcProfile.wCurLP;
-	charSpawn.sObjectInfo.pcBrief.wMaxEP = sPcProfile.avatarAttribute.wLastMaxEP;
-	charSpawn.sObjectInfo.pcBrief.wMaxLP = sPcProfile.avatarAttribute.wLastMaxLP;
-	charSpawn.sObjectInfo.pcBrief.fSpeed = sPcProfile.avatarAttribute.fLastRunSpeed;
-	memcpy(charSpawn.sObjectInfo.pcBrief.awchName, sPcProfile.awchName, NTL_MAX_SIZE_CHAR_NAME_UNICODE);
-	charSpawn.sObjectInfo.pcBrief.sMarking.byCode = INVALID_MARKING_TYPE;
-	charSpawn.sObjectInfo.pcBrief.bIsAdult = sPcProfile.bIsAdult;
-	memcpy(&charSpawn.sObjectInfo.pcBrief.sPcShape, &sPcProfile.sPcShape, sizeof(sPcProfile.sPcShape));
-	memcpy(&charSpawn.sObjectInfo.pcState, &sCharState, sizeof(sCharState));
-	charSpawn.sObjectInfo.pcState.sCharStateBase.byStateID = CHARSTATE_SPAWNING;
-	charSpawn.sObjectInfo.pcState.sCharStateBase.dwStateTime = (DWORD)time(NULL);
-	charSpawn.sObjectInfo.pcState.sCharStateDetail.sCharStateSpawning.byTeleportType = TELEPORT_TYPE_GAME_IN;
-	charSpawn.sObjectInfo.pcState.sCharStateBase.dwConditionFlag = 0;
-	charSpawn.sObjectInfo.pcState.sCharStateBase.bFightMode = false;
-	charSpawn.sObjectInfo.pcState.sCharStateBase.aspectState.sAspectStateBase.byAspectStateId = ASPECTSTATE_INVALID;
-	charSpawn.sObjectInfo.pcState.sCharStateBase.aspectState.sAspectStateDetail.sGreatNamek.bySourceGrade = 0;
-	charSpawn.sObjectInfo.pcState.sCharStateBase.aspectState.sAspectStateDetail.sKaioken.bySourceGrade = 0;
-	charSpawn.sObjectInfo.pcState.sCharStateBase.aspectState.sAspectStateDetail.sPureMajin.bySourceGrade = 0;
-	charSpawn.sObjectInfo.pcState.sCharStateBase.aspectState.sAspectStateDetail.sSuperSaiyan.bySourceGrade = 0;
-	charSpawn.sObjectInfo.pcState.sCharStateBase.aspectState.sAspectStateDetail.sVehicle.idVehicleTblidx = 0;
+	memset(&sPacket, 0, sizeof(sPacket));
+	sPacket.wOpCode = GU_OBJECT_CREATE;
+	sPacket.handle = GetSerialID();
+	sPacket.sObjectInfo.objType = OBJTYPE_PC;
+	sPacket.sObjectInfo.pcBrief.charId = hCharID;
+	sPacket.sObjectInfo.pcBrief.tblidx = sPcProfile.tblidx;
+	sPacket.sObjectInfo.pcBrief.byLevel = sPcProfile.byLevel;
+	sPacket.sObjectInfo.pcBrief.wAttackSpeedRate = sPcProfile.avatarAttribute.wLastAttackSpeedRate;
+	sPacket.sObjectInfo.pcBrief.wCurEP = sPcProfile.wCurEP;
+	sPacket.sObjectInfo.pcBrief.wCurLP = sPcProfile.wCurLP;
+	sPacket.sObjectInfo.pcBrief.wMaxEP = sPcProfile.avatarAttribute.wLastMaxEP;
+	sPacket.sObjectInfo.pcBrief.wMaxLP = sPcProfile.avatarAttribute.wLastMaxLP;
+	sPacket.sObjectInfo.pcBrief.fSpeed = sPcProfile.avatarAttribute.fLastRunSpeed;
+	memcpy(sPacket.sObjectInfo.pcBrief.awchName, sPcProfile.awchName, NTL_MAX_SIZE_CHAR_NAME_UNICODE);
+	sPacket.sObjectInfo.pcBrief.sMarking.byCode = INVALID_MARKING_TYPE;
+	sPacket.sObjectInfo.pcBrief.bIsAdult = sPcProfile.bIsAdult;
+	memcpy(&sPacket.sObjectInfo.pcBrief.sPcShape, &sPcProfile.sPcShape, sizeof(sPcProfile.sPcShape));
+	memcpy(&sPacket.sObjectInfo.pcState, &sCharState, sizeof(sCharState));
+	sPacket.sObjectInfo.pcState.sCharStateBase.byStateID = CHARSTATE_SPAWNING;
+	sPacket.sObjectInfo.pcState.sCharStateBase.dwStateTime = (DWORD)time(NULL);
+	sPacket.sObjectInfo.pcState.sCharStateDetail.sCharStateSpawning.byTeleportType = TELEPORT_TYPE_GAME_IN;
 
 	for (int i = 0; i < EQUIP_SLOT_TYPE_COUNT; i++)
 	{
-		charSpawn.sObjectInfo.pcBrief.sItemBrief[i].tblidx = INVALID_ITEMID;
+		sPacket.sObjectInfo.pcBrief.sItemBrief[i].tblidx = INVALID_ITEMID;
 	}
 
 	for (int i = 0; i < NTL_MAX_COUNT_USER_HAVE_INVEN_ITEM; i++)
@@ -408,15 +441,11 @@ ObjectInfo CharacterProfile::GetCharSpawnData()
 		if (asItemProfile[i].byPlace == CONTAINER_TYPE_EQUIP &&
 			((slot >= EQUIP_SLOT_TYPE_FIRST) && (slot <= EQUIP_SLOT_TYPE_LAST)))
 		{
-			charSpawn.sObjectInfo.pcBrief.sItemBrief[slot].tblidx = asItemProfile[i].tblidx;
-			charSpawn.sObjectInfo.pcBrief.sItemBrief[slot].byBattleAttribute = asItemProfile[i].byBattleAttribute;
-			charSpawn.sObjectInfo.pcBrief.sItemBrief[slot].byGrade = asItemProfile[i].byGrade;
-			memcpy(charSpawn.sObjectInfo.pcBrief.sItemBrief[slot].aOptionTblidx, asItemProfile[i].aOptionTblidx, 2);
-			charSpawn.sObjectInfo.pcBrief.sItemBrief[slot].byRank = asItemProfile[i].byRank;
+			sPacket.sObjectInfo.pcBrief.sItemBrief[slot].tblidx = asItemProfile[i].tblidx;
+			sPacket.sObjectInfo.pcBrief.sItemBrief[slot].byBattleAttribute = asItemProfile[i].byBattleAttribute;
+			sPacket.sObjectInfo.pcBrief.sItemBrief[slot].byGrade = asItemProfile[i].byGrade;
+			memcpy(sPacket.sObjectInfo.pcBrief.sItemBrief[slot].aOptionTblidx, asItemProfile[i].aOptionTblidx, 2);
+			sPacket.sObjectInfo.pcBrief.sItemBrief[slot].byRank = asItemProfile[i].byRank;
 		}
 	}
-	ObjectInfo obj;
-	obj.worldTblIdx = sWorldInfo.tblidx;
-	obj.ObjData = charSpawn;
-	return obj;
 }

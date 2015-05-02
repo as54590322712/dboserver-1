@@ -3,8 +3,9 @@
 
 #include "Base.h"
 #include "Def.h"
-#include "ObjectManager.h"
 #include <TableAll.h>
+
+class GameServer;
 
 class CharacterProfile
 {
@@ -25,12 +26,15 @@ public:
 	int LoadSkillData();
 	int LoadQuickslotData();
 	void CalculateAtributes(sPC_TBLDAT* pcdata);
-	ObjectInfo GetCharSpawnData();
+	void GetObjectCreate(sGU_OBJECT_CREATE& sPacket);
 	sGU_ITEM_CREATE InsertNextBagSlot(ITEMID item, BYTE qtd = 1);
 	HOBJECT GetInventoryItemSerialID(BYTE byPlace, BYTE byPos);
 	TBLIDX GetInventoryItemID(BYTE byPlace, BYTE byPos);
 	void UpdateItemInventoryPosition(HOBJECT hItem, BYTE byPlace, BYTE byPos);
 	void GetItemBrief(sITEM_BRIEF& sBrief, HOBJECT hItem);
+	void LoadWarFogFlags();
+	bool CheckWarFogFlags(HOBJECT hObject);
+	bool AddWarFogFlags(HOBJECT hObject);
 
 	// Set
 	void SetAvatartype(BYTE byAvatarType) { this->byAvatarType = byAvatarType; }
@@ -63,10 +67,31 @@ public:
 	// Structs
 	sPC_PROFILE sPcProfile;
 	sCHARSTATE sCharState;
+	sWORLD_INFO	sOldWorldInfo;
 	sWORLD_INFO sWorldInfo;
+	BYTE byItemCount;
 	sITEM_PROFILE asItemProfile[NTL_MAX_COUNT_USER_HAVE_INVEN_ITEM];
+	BYTE bySkillCount;
 	sSKILL_INFO asSkillInfo[NTL_MAX_PC_HAVE_SKILL];
+	BYTE byHTBCount;
+	sHTB_SKILL_INFO asHTBInfo[NTL_HTB_MAX_PC_HAVE_HTB_SKILL];
+	BYTE byBuffCount;
+	sBUFF_INFO asBuffInfo[NTL_MAX_BLESS_BUFF_CHARACTER_HAS + NTL_MAX_CURSE_BUFF_CHARACTER_HAS];
+	bool bSetQuickSlotInfo;
+	BYTE byQuickSlotInfoCount;
 	sQUICK_SLOT_PROFILE asQuickSlotData[NTL_CHAR_QUICK_SLOT_MAX_COUNT];
+	sQUEST_COMPLETE_INFO sQuestCompleteInfo;
+	BYTE byQuestProgressInfoCount;
+	sQUEST_PROGRESS_INFO sQuestProgressInfo[eMAX_CAN_PROGRESS_QUEST_NUM];
+	sQUEST_INVENTORY_FULLDATA sQuestInventoryInfo;
+	BYTE byMaxRpStock;
+	BYTE byMailCount;
+	BYTE byUnreadMailCountNormal;
+	BYTE byUnreadMailCountManager;
+	char acWarFogFlag[NTL_MAX_SIZE_WAR_FOG];   
+	sRANKBATTLE_SCORE_INFO sRankBattleScoreInfo;
+	BYTE byDojoBriefCount;
+	sDBO_DOJO_BRIEF sDojoBrief[DBO_MAX_COUNT_DOJO_IN_WORLD];
 
 private:
 	WCHAR wszUserName[NTL_MAX_SIZE_USERID_UNICODE + 1];

@@ -57,6 +57,12 @@
     <ClCompile Include="CharacterProfile.cpp">
       <Filter>Source Files\Profile</Filter>
     </ClCompile>
+    <ClCompile Include="MobProfile.cpp">
+      <Filter>Source Files\Profile</Filter>
+    </ClCompile>
+    <ClCompile Include="NpcProfile.cpp">
+      <Filter>Source Files\Profile</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GameProtocol.h">
@@ -69,6 +75,12 @@
       <Filter>Header Files\Thread</Filter>
     </ClInclude>
     <ClInclude Include="CharacterProfile.h">
+      <Filter>Header Files\Profile</Filter>
+    </ClInclude>
+    <ClInclude Include="MobProfile.h">
+      <Filter>Header Files\Profile</Filter>
+    </ClInclude>
+    <ClInclude Include="NpcProfile.h">
       <Filter>Header Files\Profile</Filter>
     </ClInclude>
   </ItemGroup>

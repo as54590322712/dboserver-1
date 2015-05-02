@@ -243,41 +243,10 @@ int GameServer::LoadSpawns(TBLIDX worldTblidx, bool bIsNpc)
 		for (Table::TABLEIT it = pSpawnTbl->Begin(); it != pSpawnTbl->End(); ++it, ++count)
 		{
 			sSPAWN_TBLDAT* pSpawnData = (sSPAWN_TBLDAT*)it->second;
-			sNPC_TBLDAT* pTblData = (sNPC_TBLDAT*)GetTableContainer()->GetNpcTable()->FindData(pSpawnData->mob_Tblidx);
 
-			sGU_OBJECT_CREATE sPacket;
-			memset(&sPacket, 0, sizeof(sGU_OBJECT_CREATE));
-			sPacket.wOpCode = GU_OBJECT_CREATE;
-
-			if (pTblData)
-			{
-				sPacket.handle = AcquireSerialID();
-				sPacket.sObjectInfo.objType = OBJTYPE_NPC;
-				sPacket.sObjectInfo.npcBrief.tblidx = pTblData->tblidx;
-				sPacket.sObjectInfo.npcBrief.wCurLP = pTblData->wBasic_LP;
-				sPacket.sObjectInfo.npcBrief.wMaxLP = pTblData->wBasic_LP;
-				sPacket.sObjectInfo.npcBrief.wCurEP = pTblData->wBasic_EP;
-				sPacket.sObjectInfo.npcBrief.wMaxEP = pTblData->wBasic_EP;
-				sPacket.sObjectInfo.npcBrief.fLastWalkingSpeed = pTblData->fWalk_Speed;
-				sPacket.sObjectInfo.npcBrief.fLastRunningSpeed = pTblData->fRun_Speed;
-				sPacket.sObjectInfo.npcBrief.nicknameTblidx = pTblData->Name;
-
-				sPacket.sObjectInfo.npcState.sCharStateBase.byStateID = CHARSTATE_SPAWNING;
-				sPacket.sObjectInfo.npcState.sCharStateBase.bFightMode = FALSE;
-
-				sPacket.sObjectInfo.npcState.sCharStateBase.vCurLoc.x = pSpawnData->vSpawn_Loc.x;
-				sPacket.sObjectInfo.npcState.sCharStateBase.vCurLoc.y = pSpawnData->vSpawn_Loc.y;
-				sPacket.sObjectInfo.npcState.sCharStateBase.vCurLoc.z = pSpawnData->vSpawn_Loc.z;
-
-				sPacket.sObjectInfo.npcState.sCharStateBase.vCurDir.x = pSpawnData->vSpawn_Dir.x;
-				sPacket.sObjectInfo.npcState.sCharStateBase.vCurDir.y = pSpawnData->vSpawn_Dir.y;
-				sPacket.sObjectInfo.npcState.sCharStateBase.vCurDir.z = pSpawnData->vSpawn_Dir.z;
-
-				ObjectInfo obj;
-				obj.worldTblIdx = worldTblidx;
-				obj.ObjData = sPacket;
-				GetObjectManager()->AddObject(obj);
-			}
+			NpcProfile* obj = new NpcProfile(worldTblidx, pSpawnData->tblidx);
+			obj->Init();
+			GetObjectManager()->AddObject(obj->GetSerialID(), obj, eOBJTYPE::OBJTYPE_NPC);
 		}
 	}
 	else
@@ -287,40 +256,10 @@ int GameServer::LoadSpawns(TBLIDX worldTblidx, bool bIsNpc)
 		for (Table::TABLEIT it = pSpawnTbl->Begin(); it != pSpawnTbl->End(); ++it, ++count)
 		{
 			sSPAWN_TBLDAT* pSpawnData = (sSPAWN_TBLDAT*)it->second;
-			sMOB_TBLDAT* pTblData = (sMOB_TBLDAT*)GetTableContainer()->GetMobTable()->FindData(pSpawnData->mob_Tblidx);
 
-			sGU_OBJECT_CREATE sPacket;
-			memset(&sPacket, 0, sizeof(sGU_OBJECT_CREATE));
-			sPacket.wOpCode = GU_OBJECT_CREATE;
-
-			if (pTblData)
-			{
-				sPacket.handle = AcquireSerialID();
-				sPacket.sObjectInfo.objType = OBJTYPE_MOB;
-				sPacket.sObjectInfo.mobBrief.tblidx = pTblData->tblidx;
-				sPacket.sObjectInfo.mobBrief.wCurLP = pTblData->wBasic_LP;
-				sPacket.sObjectInfo.mobBrief.wMaxLP = pTblData->wBasic_LP;
-				sPacket.sObjectInfo.mobBrief.wCurEP = pTblData->wBasic_EP;
-				sPacket.sObjectInfo.mobBrief.wMaxEP = pTblData->wBasic_EP;
-				sPacket.sObjectInfo.mobBrief.fLastWalkingSpeed = pTblData->fWalk_Speed;
-				sPacket.sObjectInfo.mobBrief.fLastRunningSpeed = pTblData->fRun_Speed;
-
-				sPacket.sObjectInfo.mobState.sCharStateBase.byStateID = CHARSTATE_SPAWNING;
-				sPacket.sObjectInfo.mobState.sCharStateBase.bFightMode = FALSE;
-
-				sPacket.sObjectInfo.mobState.sCharStateBase.vCurLoc.x = pSpawnData->vSpawn_Loc.x;
-				sPacket.sObjectInfo.mobState.sCharStateBase.vCurLoc.y = pSpawnData->vSpawn_Loc.y;
-				sPacket.sObjectInfo.mobState.sCharStateBase.vCurLoc.z = pSpawnData->vSpawn_Loc.z;
-
-				sPacket.sObjectInfo.mobState.sCharStateBase.vCurDir.x = pSpawnData->vSpawn_Dir.x;
-				sPacket.sObjectInfo.mobState.sCharStateBase.vCurDir.y = pSpawnData->vSpawn_Dir.y;
-				sPacket.sObjectInfo.mobState.sCharStateBase.vCurDir.z = pSpawnData->vSpawn_Dir.z;
-
-				ObjectInfo obj;
-				obj.worldTblIdx = worldTblidx;
-				obj.ObjData = sPacket;
-				GetObjectManager()->AddObject(obj);
-			}
+			MobProfile* obj = new MobProfile(worldTblidx, pSpawnData->tblidx);
+			obj->Init();
+			GetObjectManager()->AddObject(obj->GetSerialID(), obj, eOBJTYPE::OBJTYPE_MOB);
 		}
 	}
 	return count;

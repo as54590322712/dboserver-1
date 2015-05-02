@@ -17,6 +17,7 @@ GameClient::GameClient(bool IsAliveCheck, bool IsOpcodeCheck)
 	SetPacketEncoder(&_packetEncoder);
 	pServer = (GameServer*)_GetApp();
 	pProfile = new CharacterProfile();
+	bIsClosed = false;
 }
 
 GameClient::~GameClient()
@@ -35,8 +36,6 @@ void GameClient::OnClose()
 	{
 		if (goCharServer) pServer->ServerDB->ExecuteQuery("UPDATE `account` SET `State` = '2' WHERE `ID` = '%d';", pProfile->GetAccountid());
 		else pServer->ServerDB->ExecuteQuery("UPDATE `account` SET `State` = '0' WHERE `ID` = '%d';", pProfile->GetAccountid());
-		if (pServer->GetClientManager()->FindClient(this))
-			pServer->GetClientManager()->RemoveClient(this);
 		if (pServer->GetObjectManager()->FindObject(pProfile->GetSerialID(), OBJTYPE_PC))
 		{
 			pServer->GetObjectManager()->RemoveObject(pProfile->GetSerialID(), OBJTYPE_PC);
@@ -47,6 +46,8 @@ void GameClient::OnClose()
 			pServer->GetClientManager()->SendOthers(&obDes, sizeof(obDes), this);
 		}
 		pProfile->RemoveOnlineData();
+		if (pServer->GetClientManager()->FindClient(this))
+			pServer->GetClientManager()->RemoveClient(this);
 		bIsClosed = true;
 	}
 }
@@ -84,11 +85,11 @@ void GameClient::RemoveSpawn(unsigned int nHandle)
 
 bool GameClient::FindSpawn(unsigned int nHandle, BYTE byType)
 {
-	for each (objSp var in objSpawn)
-	{
-		if (var.first == nHandle && var.second == byType)
-			return true;
-	}
+	OBJSPAWNLISTIT it = objSpawn.find(nHandle);
+	if (it == objSpawn.end())
+		return false;
+	if (it->first == nHandle && it->second == byType)
+		return true;
 	return false;
 }
 

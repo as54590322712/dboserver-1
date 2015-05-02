@@ -1,5 +1,8 @@
 #include "ObjectManager.h"
 #include "GameNetwork.h"
+#include "CharacterProfile.h"
+#include "NpcProfile.h"
+#include "MobProfile.h"
 
 ObjectManager::ObjectManager()
 {
@@ -36,126 +39,224 @@ void ObjectManager::CreateThread()
 	pThread->Start();
 }
 
-bool ObjectManager::AddObject(ObjectInfo pObj)
+bool ObjectManager::AddObject(HOBJECT hObject, void* pObj, eOBJTYPE eType)
 {
-	if (false == objList.insert(objVal(pObj.ObjData.handle, pObj)).second)
+	if (eType == eOBJTYPE::OBJTYPE_PC)
 	{
-		return false;
+		if (false == pcList.insert(OBJPCLISTVAL(hObject, (CharacterProfile*)pObj)).second)
+			return false;
+		return true;
 	}
-	return true;
-}
-
-void ObjectManager::RemoveObject(unsigned int nHandle, BYTE byType)
-{
-	objIt it = objList.find(nHandle);
-	if (it != objList.end())
+	if (eType == eOBJTYPE::OBJTYPE_NPC)
 	{
-		if ((nHandle == it->second.ObjData.handle) &&
-			(byType == it->second.ObjData.sObjectInfo.objType))
-		{
-			objList.erase(it);
-		}
+		if (false == npcList.insert(OBJNPCLISTVAL(hObject, (NpcProfile*)pObj)).second)
+			return false;
+		return true;
 	}
-}
-
-bool ObjectManager::FindObject(unsigned int nHandle, BYTE byType)
-{
-	for (objIt it = objList.begin(); it != objList.end(); ++it)
+	if (eType == eOBJTYPE::OBJTYPE_MOB)
 	{
-		if ((nHandle == it->second.ObjData.handle) &&
-			(byType == it->second.ObjData.sObjectInfo.objType))
-			return true;
+		if (false == mobList.insert(OBJMOBLISTVAL(hObject, (MobProfile*)pObj)).second)
+			return false;
+		return true;
 	}
 	return false;
 }
 
-void ObjectManager::UpdatePcItemBrief(unsigned int nHandle, sITEM_BRIEF sBrief, BYTE byPos)
+void ObjectManager::RemoveObject(HOBJECT hObject, eOBJTYPE eType)
 {
-	for (objIt it = objList.begin(); it != objList.end(); it++)
+	if (eType == eOBJTYPE::OBJTYPE_PC)
 	{
-		if (nHandle == it->second.ObjData.handle)
-		{
-			switch (it->second.ObjData.sObjectInfo.objType)
-			{
-			case OBJTYPE_PC:
-				memcpy(&it->second.ObjData.sObjectInfo.pcBrief.sItemBrief[byPos], &sBrief, sizeof(sITEM_BRIEF));
-				break;
-			}
-		}
+		OBJPCLISTIT it = pcList.find(hObject);
+		if (it != pcList.end())
+			pcList.erase(it);
+	}
+	if (eType == eOBJTYPE::OBJTYPE_NPC)
+	{
+		OBJNPCLISTIT it = npcList.find(hObject);
+		if (it != npcList.end())
+			npcList.erase(it);
+	}
+	if (eType == eOBJTYPE::OBJTYPE_MOB)
+	{
+		OBJMOBLISTIT it = mobList.find(hObject);
+		if (it != mobList.end())
+			mobList.erase(it);
 	}
 }
 
-void ObjectManager::UpdateCharState(unsigned int nHandle, sCHARSTATE CharState)
+bool ObjectManager::FindObject(HOBJECT hObject, eOBJTYPE eType)
 {
-	for (objIt it = objList.begin(); it != objList.end(); it++)
+	if (eType == eOBJTYPE::OBJTYPE_PC)
 	{
-		if (nHandle == it->second.ObjData.handle)
+		OBJPCLISTIT it = pcList.find(hObject);
+		if (it == pcList.end())
+			return false;
+		return true;
+	}
+	if (eType == eOBJTYPE::OBJTYPE_NPC)
+	{
+		OBJNPCLISTIT it = npcList.find(hObject);
+		if (it == npcList.end())
+			return false;
+		return true;
+	}
+	if (eType == eOBJTYPE::OBJTYPE_MOB)
+	{
+		OBJMOBLISTIT it = mobList.find(hObject);
+		if (it == mobList.end())
+			return false;
+		return true;
+	}
+	return false;
+}
+
+void ObjectManager::UpdateCharState(HOBJECT hObject, sCHARSTATE CharState)
+{
+	for (OBJPCLISTIT it = pcList.begin(); it != pcList.end(); it++)
+	{
+		if (hObject == it->second->GetSerialID())
 		{
-			switch (it->second.ObjData.sObjectInfo.objType)
-			{
-			case OBJTYPE_PC:
-				memcpy(&it->second.ObjData.sObjectInfo.pcState, &CharState, sizeof(sCHARSTATE));
-				break;
-			case OBJTYPE_NPC:
-				memcpy(&it->second.ObjData.sObjectInfo.npcState, &CharState, sizeof(sCHARSTATE));
-				break;
-			case OBJTYPE_MOB:
-				memcpy(&it->second.ObjData.sObjectInfo.mobState, &CharState, sizeof(sCHARSTATE));
-				break;
-			}
+			memcpy(&it->second->sCharState, &CharState, sizeof(sCHARSTATE));
+		}
+	}
+	for (OBJNPCLISTIT it = npcList.begin(); it != npcList.end(); it++)
+	{
+		if (hObject == it->second->GetSerialID())
+		{
+			memcpy(&it->second->sCharState, &CharState, sizeof(sCHARSTATE));
+		}
+	}
+	for (OBJMOBLISTIT it = mobList.begin(); it != mobList.end(); it++)
+	{
+		if (hObject == it->second->GetSerialID())
+		{
+			memcpy(&it->second->sCharState, &CharState, sizeof(sCHARSTATE));
 		}
 	}
 }
 
 void ObjectManager::SpawnToClient(GameClient* pClient)
 {
-	for (objIt it = objList.begin(); it != objList.end(); it++)
+	if (false == pClient->IsClosed() && pClient->IsConnected())
 	{
-		ObjectInfo obj = it->second;
-
-		if (pClient->GetProfile()->GetSerialID() == obj.ObjData.handle)
-			continue;
-
-		if (pClient->GetProfile()->sWorldInfo.tblidx != obj.worldTblIdx)
-			continue;
-
-		float x = 0.0f, z = 0.0f;
-		switch (obj.ObjData.sObjectInfo.objType)
+		for (OBJPCLISTIT it = pcList.begin(); it != pcList.end(); it++)
 		{
-		case OBJTYPE_PC:
-			x = obj.ObjData.sObjectInfo.pcState.sCharStateBase.vCurLoc.x;
-			z = obj.ObjData.sObjectInfo.pcState.sCharStateBase.vCurLoc.z;
-			break;
-		case OBJTYPE_NPC:
-			x = obj.ObjData.sObjectInfo.npcState.sCharStateBase.vCurLoc.x;
-			z = obj.ObjData.sObjectInfo.npcState.sCharStateBase.vCurLoc.z;
-			break;
-		case OBJTYPE_MOB:
-			x = obj.ObjData.sObjectInfo.mobState.sCharStateBase.vCurLoc.x;
-			z = obj.ObjData.sObjectInfo.mobState.sCharStateBase.vCurLoc.z;
-			break;
-		}
+			CharacterProfile* obj = it->second;
 
-		float dist = NtlGetDistance(pClient->GetProfile()->sCharState.sCharStateBase.vCurLoc.x, pClient->GetProfile()->sCharState.sCharStateBase.vCurLoc.z, x, z);
+			if (pClient->GetProfile()->GetSerialID() == obj->GetSerialID())
+				continue;
 
-		if (dist < 150)
-		{
-			if (false == pClient->FindSpawn(obj.ObjData.handle, obj.ObjData.sObjectInfo.objType))
+			if (pClient->GetProfile()->sWorldInfo.tblidx != obj->sWorldInfo.tblidx)
+				continue;
+
+			float objx = obj->sCharState.sCharStateBase.vCurLoc.x;
+			float objz = obj->sCharState.sCharStateBase.vCurLoc.z;
+			float pcx = pClient->GetProfile()->sCharState.sCharStateBase.vCurLoc.x;
+			float pcz = pClient->GetProfile()->sCharState.sCharStateBase.vCurLoc.z;
+
+			float dist = NtlGetDistance(pcx, pcz, objx, objz);
+
+			if (dist < 100)
 			{
-				pClient->AddSpawn(obj.ObjData.handle, obj.ObjData.sObjectInfo.objType);
-				pClient->PushPacket(&obj.ObjData, sizeof(obj.ObjData));
+				if (false == pClient->FindSpawn(obj->GetSerialID(), eOBJTYPE::OBJTYPE_PC))
+				{
+					pClient->AddSpawn(obj->GetSerialID(), eOBJTYPE::OBJTYPE_PC);
+					sGU_OBJECT_CREATE sPacket;
+					obj->GetObjectCreate(sPacket);
+					pClient->PushPacket(&sPacket, sizeof(sPacket));
+				}
+			}
+			else
+			{
+				if (pClient->FindSpawn(obj->GetSerialID(), eOBJTYPE::OBJTYPE_PC))
+				{
+					pClient->RemoveSpawn(obj->GetSerialID());
+					sGU_OBJECT_DESTROY sPacket;
+					memset(&sPacket, 0, sizeof(sPacket));
+					sPacket.wOpCode = GU_OBJECT_DESTROY;
+					sPacket.handle = obj->GetSerialID();
+					pClient->PushPacket(&sPacket, sizeof(sPacket));
+				}
 			}
 		}
-		else
+		for (OBJNPCLISTIT it = npcList.begin(); it != npcList.end(); it++)
 		{
-			if (pClient->FindSpawn(obj.ObjData.handle, obj.ObjData.sObjectInfo.objType))
+			NpcProfile* obj = it->second;
+
+			if (pClient->GetProfile()->GetSerialID() == obj->GetSerialID())
+				continue;
+
+			if (pClient->GetProfile()->sWorldInfo.tblidx != obj->GetWorldID())
+				continue;
+
+			float objx = obj->sCharState.sCharStateBase.vCurLoc.x;
+			float objz = obj->sCharState.sCharStateBase.vCurLoc.z;
+			float pcx = pClient->GetProfile()->sCharState.sCharStateBase.vCurLoc.x;
+			float pcz = pClient->GetProfile()->sCharState.sCharStateBase.vCurLoc.z;
+
+			float dist = NtlGetDistance(pcx, pcz, objx, objz);
+
+			if (dist < 100)
 			{
-				pClient->RemoveSpawn(obj.ObjData.handle);
-				sGU_OBJECT_DESTROY obDes;
-				memset(&obDes, 0, sizeof(obDes));
-				obDes.wOpCode = GU_OBJECT_DESTROY;
-				obDes.handle = obj.ObjData.handle;
-				pClient->PushPacket(&obDes, sizeof(obDes));
+				if (false == pClient->FindSpawn(obj->GetSerialID(), eOBJTYPE::OBJTYPE_NPC))
+				{
+					pClient->AddSpawn(obj->GetSerialID(), eOBJTYPE::OBJTYPE_NPC);
+					sGU_OBJECT_CREATE sPacket;
+					obj->GetObjectCreate(sPacket);
+					pClient->PushPacket(&sPacket, sizeof(sPacket));
+				}
+			}
+			else
+			{
+				if (pClient->FindSpawn(obj->GetSerialID(), eOBJTYPE::OBJTYPE_NPC))
+				{
+					pClient->RemoveSpawn(obj->GetSerialID());
+					sGU_OBJECT_DESTROY sPacket;
+					memset(&sPacket, 0, sizeof(sPacket));
+					sPacket.wOpCode = GU_OBJECT_DESTROY;
+					sPacket.handle = obj->GetSerialID();
+					pClient->PushPacket(&sPacket, sizeof(sPacket));
+				}
+			}
+		}
+		for (OBJMOBLISTIT it = mobList.begin(); it != mobList.end(); it++)
+		{
+			MobProfile* obj = it->second;
+
+			if (pClient->GetProfile()->GetSerialID() == obj->GetSerialID())
+				continue;
+
+			if (pClient->GetProfile()->sWorldInfo.tblidx != obj->GetWorldID())
+				continue;
+
+			float objx = obj->sCharState.sCharStateBase.vCurLoc.x;
+			float objz = obj->sCharState.sCharStateBase.vCurLoc.z;
+			float pcx = pClient->GetProfile()->sCharState.sCharStateBase.vCurLoc.x;
+			float pcz = pClient->GetProfile()->sCharState.sCharStateBase.vCurLoc.z;
+
+			float dist = NtlGetDistance(pcx, pcz, objx, objz);
+
+			if (dist < 100)
+			{
+				if (false == pClient->FindSpawn(obj->GetSerialID(), eOBJTYPE::OBJTYPE_MOB))
+				{
+					pClient->AddSpawn(obj->GetSerialID(), eOBJTYPE::OBJTYPE_MOB);
+					sGU_OBJECT_CREATE sPacket;
+					obj->GetObjectCreate(sPacket);
+					pClient->PushPacket(&sPacket, sizeof(sPacket));
+				}
+			}
+			else
+			{
+				if (pClient->FindSpawn(obj->GetSerialID(), eOBJTYPE::OBJTYPE_MOB))
+				{
+					pClient->RemoveSpawn(obj->GetSerialID());
+					sGU_OBJECT_DESTROY sPacket;
+					memset(&sPacket, 0, sizeof(sPacket));
+					sPacket.wOpCode = GU_OBJECT_DESTROY;
+					sPacket.handle = obj->GetSerialID();
+					pClient->PushPacket(&sPacket, sizeof(sPacket));
+				}
 			}
 		}
 	}

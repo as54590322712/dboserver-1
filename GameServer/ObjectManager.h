@@ -11,13 +11,12 @@
 
 #include "GameProtocol.h"
 
-typedef struct _Object {
-	TBLIDX worldTblIdx;
-	sGU_OBJECT_CREATE ObjData;
-} ObjectInfo;
-
 class GameServer;
 class GameClient;
+
+class CharacterProfile;
+class NpcProfile;
+class MobProfile;
 
 class ObjectManager : public RunObject
 {
@@ -30,19 +29,27 @@ public:
 	void CreateThread();
 	void Run();
 
-	bool AddObject(ObjectInfo pObj);
-	void RemoveObject(unsigned int nHandle, BYTE byType);
-	bool FindObject(unsigned int nHandle, BYTE byType);
+	bool AddObject(HOBJECT hObject, void* pObj, eOBJTYPE eType);
+	void RemoveObject(HOBJECT hObject, eOBJTYPE eType);
+	bool FindObject(HOBJECT hObject, eOBJTYPE eType);
 
-	void UpdatePcItemBrief(unsigned int nHandle, sITEM_BRIEF sBrief, BYTE byPos);
-	void UpdateCharState(unsigned int nHandle, sCHARSTATE CharState);
+	void UpdateCharState(HOBJECT hObject, sCHARSTATE CharState);
 	void SpawnToClient(GameClient* pClient);
 
-	typedef std::map<HOBJECT, ObjectInfo> objectList;
-	typedef objectList::iterator objIt;
-	typedef objectList::value_type objVal;
+	typedef std::map<HOBJECT, NpcProfile*> OBJNPCLIST;
+	typedef OBJNPCLIST::iterator OBJNPCLISTIT;
+	typedef OBJNPCLIST::value_type OBJNPCLISTVAL;
+	OBJNPCLIST npcList;
 
-	objectList objList;
+	typedef std::map<HOBJECT, MobProfile*> OBJMOBLIST;
+	typedef OBJMOBLIST::iterator OBJMOBLISTIT;
+	typedef OBJMOBLIST::value_type OBJMOBLISTVAL;
+	OBJMOBLIST mobList;
+
+	typedef std::map<HOBJECT, CharacterProfile*> OBJPCLIST;
+	typedef OBJPCLIST::iterator OBJPCLISTIT;
+	typedef OBJPCLIST::value_type OBJPCLISTVAL;
+	OBJPCLIST pcList;
 
 private:
 	Thread* pThread;

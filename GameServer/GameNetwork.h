@@ -21,6 +21,10 @@
 #include "CharacterManager.h"
 #include "ObjectManager.h"
 
+#include "CharacterProfile.h"
+#include "NpcProfile.h"
+#include "MobProfile.h"
+
 enum GAME_SESSION
 {
 	SESSION_CLIENT,
@@ -94,6 +98,7 @@ public:
 	void SendNetpyItemStartRes();
 	void SendNetpyItemEndRes();
 
+	bool IsClosed() { return bIsClosed; }
 	CharacterProfile* GetProfile() { return pProfile; }
 
 private:
@@ -104,8 +109,10 @@ private:
 	bool bIsClosed;
 	bool goCharServer;
 
-	std::map<unsigned int, BYTE>  objSpawn;
-	typedef std::pair<unsigned int, BYTE> objSp;
+	typedef std::map<unsigned int, BYTE> OBJSPAWNLIST;
+	typedef OBJSPAWNLIST::iterator OBJSPAWNLISTIT;
+	typedef OBJSPAWNLIST::value_type OBJSPAWNLISTVAL;
+	OBJSPAWNLIST objSpawn;
 };
 
 class GameClientFactory : public SessionFactory

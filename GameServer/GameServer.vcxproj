@@ -104,6 +104,8 @@
     <ClCompile Include="GameProtocol.cpp" />
     <ClCompile Include="GameServer.cpp" />
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="MobProfile.cpp" />
+    <ClCompile Include="NpcProfile.cpp" />
     <ClCompile Include="ObjectManager.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -115,6 +117,8 @@
     <ClInclude Include="CharacterManager.h" />
     <ClInclude Include="CharacterProfile.h" />
     <ClInclude Include="GameProtocol.h" />
+    <ClInclude Include="MobProfile.h" />
+    <ClInclude Include="NpcProfile.h" />
     <ClInclude Include="ObjectManager.h" />
   </ItemGroup>
   <ItemGroup>

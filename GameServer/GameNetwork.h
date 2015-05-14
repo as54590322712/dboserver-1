@@ -91,6 +91,9 @@ public:
 	void SendSystemText(char* szText, ...);
 	void SendWarFogUpdateRes(sUG_WAR_FOG_UPDATE_REQ* pData);
 	void SendTSExecObjectRes(sUG_TS_EXCUTE_TRIGGER_OBJECT* pData);
+	void SendTargetSelect(sUG_CHAR_TARGET_SELECT* pData);
+	void SendCharLevelUp(BYTE byToUp = 1);
+	void SendCharStateUpdate();
 
 	//CASH/EVENT SHOPS
 	void SendEventItemStartRes();

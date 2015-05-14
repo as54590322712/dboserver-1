@@ -25,7 +25,7 @@ public:
 	int LoadItemData();
 	int LoadSkillData();
 	int LoadQuickslotData();
-	void CalculateAtributes(sPC_TBLDAT* pcdata);
+	void CalculateAtributes();
 	void GetObjectCreate(sGU_OBJECT_CREATE& sPacket);
 	bool InsertNextBagSlot(sGU_ITEM_CREATE& sPacket, ITEMID item, BYTE qtd = 1);
 	HOBJECT GetInventoryItemSerialID(BYTE byPlace, BYTE byPos);
@@ -35,6 +35,7 @@ public:
 	void LoadWarFogFlags();
 	bool CheckWarFogFlags(HOBJECT hObject);
 	bool AddWarFogFlags(HOBJECT hObject);
+	void UpdateCharLevel();
 
 	// Set
 	void SetAvatartype(BYTE byAvatarType) { this->byAvatarType = byAvatarType; }
@@ -42,6 +43,7 @@ public:
 	void SetCharid(HOBJECT hCharID) { this->hCharID = hCharID; }
 	void SetTutorialmode(bool bTutorialMode) { this->bTutorialMode = bTutorialMode; }
 	void SetMovedirection(BYTE byMoveDirection) { this->byMoveDirection = byMoveDirection; }
+	void SetTarget(HOBJECT hTarget) { this->hTarget = hTarget; }
 
 	// Get
 	WCHAR* GetUsername() { return wszUserName; }
@@ -63,6 +65,7 @@ public:
 	BYTE GetGender() { return byGender; }
 	BYTE GetAvatartype() { return byAvatarType; }
 	BYTE GetMovedirection() { return byMoveDirection; }
+	HOBJECT GetTarget() { return hTarget; }
 
 	// Structs
 	sPC_PROFILE sPcProfile;
@@ -93,6 +96,9 @@ public:
 	BYTE byDojoBriefCount;
 	sDBO_DOJO_BRIEF sDojoBrief[DBO_MAX_COUNT_DOJO_IN_WORLD];
 
+	bool bIsSit;
+	bool bIsMoving;
+
 private:
 	WCHAR wszUserName[NTL_MAX_SIZE_USERID_UNICODE + 1];
 	WCHAR wszPassWord[NTL_MAX_SIZE_USERPW_UNICODE + 1];
@@ -113,6 +119,7 @@ private:
 	BYTE byRace;
 	BYTE byClass;
 	BYTE byGender;
+	HOBJECT hTarget;
 
 	GameServer* pServer;
 };

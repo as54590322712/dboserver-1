@@ -16,6 +16,7 @@ CharClient::CharClient(bool IsAliveCheck, bool IsOpcodeCheck)
 
 	SetPacketEncoder(&_packetEncoder);
 	pServer = (CharServer*)_GetApp();
+	bIsGM = false;
 }
 
 CharClient::~CharClient()
@@ -47,6 +48,17 @@ void CharClient::Send(void* pData, int nSize)
 	if (0 != rc)
 	{
 		Logger::Log("Failed to send packet %d\n", rc);
+	}
+}
+
+void CharClient::DBGetGMAccess()
+{
+	if (pServer->ServerDB->ExecuteSelect("SELECT `isGameMaster` FROM `account` WHERE ID='%d'", AccountID))
+	{
+		while (pServer->ServerDB->Fetch())
+		{
+			bIsGM = pServer->ServerDB->getBoolean("isGameMaster");
+		}
 	}
 }
 
@@ -101,12 +113,13 @@ eRESULTCODE CharClient::DBChangeCharName(WCHAR* Name, int charId)
 int CharClient::DBInsertCharData(sPC_SUMMARY data, sNEWBIE_TBLDAT nbdata)
 {
 	int charid = 0;
+	sITEM_TBLDAT sItem;
 	sPC_TBLDAT pcdata = *(sPC_TBLDAT*)pServer->GetTableContainer()->GetPcTable()->GetPcTbldat(data.byRace, data.byClass, data.byGender);
-	// CALL `spInsertCharacter` ('AccID','ServerID','Name','Race','Class','Gender','Face','Hair','HairColor','SkinColor','Level','0','MapInfoId', 'worldTblidx', 'worldId', '0', '0', '0', 'PositionX', 'PositionY', 'PositionZ', 'DirectionX', 'DirectionY', 'DirectionZ', 'Money', 'MoneyBank', 'Marking', 'Adult', 'TutorialFlag', 'NeedNameChange', 'ToDelete', 'ChangeClass', 'IsGameMaster', 'TutorialHint', 'Reputation', 'MudosaPoint', 'SpPoint', 'CurEP', 'MaxEP', 'CurLP', 'MaxLP');
+	// CALL `spInsertCharacter` ('AccID','ServerID','Name','Race','Class','Gender','Face','Hair','HairColor','SkinColor','Level','0','MapInfoId', 'worldTblidx', 'worldId', '0', '0', '0', 'PositionX', 'PositionY', 'PositionZ', 'DirectionX', 'DirectionY', 'DirectionZ', 'Money', 'MoneyBank', 'Marking', 'Adult', 'TutorialFlag', 'NeedNameChange', 'ToDelete', 'ChangeClass', 'IsGameMaster', 'TutorialHint', 'Reputation', 'MudosaPoint', 'SpPoint');
 	pServer->ServerDB->ExecuteQuery(
-		"CALL `spInsertCharacter` ('%u','%u','%S','%d','%d','%d','%d','%d','%d','%d','%d','0','%u','%u','%u','0','0','0','%f','%f','%f','%f','%f','%f','%u','%u','0','%d','%d','%d','0','0','0','0','0','0','0','%u','%u','%u','%u');",
+		"CALL `spInsertCharacter` ('%u','%u','%S','%d','%d','%d','%d','%d','%d','%d','%d','0','%u','%u','%u','0','0','0','%f','%f','%f','%f','%f','%f','%u','%u','255','%d','%d','%d','0','0','%d','0','0','0','0');",
 		AccountID, CurrServerID, data.awchName, data.byRace, data.byClass, data.byGender, data.byFace, data.byHair, data.byHairColor, data.bySkinColor, data.byLevel, data.dwMapInfoIndex, data.worldTblidx, data.worldId, data.fPositionX, data.fPositionY,
-		data.fPositionZ, nbdata.vSpawn_Dir.x, nbdata.vSpawn_Dir.y, nbdata.vSpawn_Dir.z, data.dwMoney, data.dwMoneyBank, data.bIsAdult, data.bTutorialFlag, data.bNeedNameChange, pcdata.wBasic_EP, pcdata.wBasic_EP, pcdata.wBasic_LP, pcdata.wBasic_LP);
+		data.fPositionZ, nbdata.vSpawn_Dir.x, nbdata.vSpawn_Dir.y, nbdata.vSpawn_Dir.z, data.dwMoney, data.dwMoneyBank, data.bIsAdult, data.bTutorialFlag, data.bNeedNameChange, bIsGM);
 	if (pServer->ServerDB->ExecuteSelect("SELECT `ID` FROM `character` WHERE `AccID`='%d' AND `Name`='%S';", AccountID, data.awchName))
 	{
 		while (pServer->ServerDB->Fetch())
@@ -114,27 +127,41 @@ int CharClient::DBInsertCharData(sPC_SUMMARY data, sNEWBIE_TBLDAT nbdata)
 			charid = pServer->ServerDB->getInt("ID");
 		}
 	}
+
+
 	// BAGS CONAINERS
-	pServer->ServerDB->ExecuteQuery("INSERT INTO `inventory` (`ItemID`,`CharID`,`Slot`,`Stack`,`Place`) VALUES ('%u', '%u', '%u', '%u', '%u');", 19901, charid, 0, 1, CONTAINER_TYPE_BAGSLOT);
-	pServer->ServerDB->ExecuteQuery("INSERT INTO `inventory` (`ItemID`,`CharID`,`Slot`,`Stack`,`Place`) VALUES ('%u', '%u', '%u', '%u', '%u');", 19905, charid, 1, 1, CONTAINER_TYPE_BAGSLOT);
-	pServer->ServerDB->ExecuteQuery("INSERT INTO `inventory` (`ItemID`,`CharID`,`Slot`,`Stack`,`Place`) VALUES ('%u', '%u', '%u', '%u', '%u');", 19991, charid, 0, 1, CONTAINER_TYPE_BANKSLOT);
+	sItem = *(sITEM_TBLDAT*)pServer->GetTableContainer()->GetItemTable()->FindData(19901);
+	// (nItemID,nCharID,nPlace,nSlot,nStack,nRank,nCurDur,nNeedToIdentify,nGrade,nBattleAttribute,nRestrictType,nMaker,nOpt1,nOpt2,nDurationType);
+	pServer->ServerDB->ExecuteQuery("CALL `spQueryInsertItem`('%u','%u','%d','%d','%d','%d','%d','0','0','%d','0','','%u','0','%d');",
+		sItem.tblidx, charid, CONTAINER_TYPE_BAGSLOT, 0, 1, sItem.byRank, sItem.byDurability, sItem.byBattle_Attribute, sItem.Item_Option_Tblidx, sItem.byDurationType);
+	sItem = *(sITEM_TBLDAT*)pServer->GetTableContainer()->GetItemTable()->FindData(19991);
+	// (nItemID,nCharID,nPlace,nSlot,nStack,nRank,nCurDur,nNeedToIdentify,nGrade,nBattleAttribute,nRestrictType,nMaker,nOpt1,nOpt2,nDurationType);
+	pServer->ServerDB->ExecuteQuery("CALL `spQueryInsertItem`('%u','%u','%d','%d','%d','%d','%d','0','0','%d','0','','%u','0','%d');",
+		sItem.tblidx, charid, CONTAINER_TYPE_BANKSLOT, 0, 1, sItem.byRank, sItem.byDurability, sItem.byBattle_Attribute, sItem.Item_Option_Tblidx, sItem.byDurationType);
+	
+
 	// START ITEMS
 	for (int i = 0; i < NTL_MAX_NEWBIE_ITEM; i++)
 	{
 		int slot = nbdata.abyPos[i];
 		if ((slot >= 0) && (slot <= 12))
-			pServer->ServerDB->ExecuteQuery("INSERT INTO `inventory` (`ItemID`,`CharID`,`Slot`,`Stack`,`Place`) VALUES ('%u', '%u', '%u', '%u', '%u');",
-			nbdata.aitem_Tblidx[i], charid, slot, nbdata.abyStack_Quantity[i], CONTAINER_TYPE_EQUIP);
+		{
+			sItem = *(sITEM_TBLDAT*)pServer->GetTableContainer()->GetItemTable()->FindData(nbdata.aitem_Tblidx[i]);
+			// (nItemID,nCharID,nPlace,nSlot,nStack,nRank,nCurDur,nNeedToIdentify,nGrade,nBattleAttribute,nRestrictType,nMaker,nOpt1,nOpt2,nDurationType);
+			pServer->ServerDB->ExecuteQuery("CALL `spQueryInsertItem`('%u','%u','%d','%d','%d','%d','%d','0','0','%d','0','','%u','0','%d');",
+				sItem.tblidx, charid, CONTAINER_TYPE_EQUIP, slot, nbdata.abyStack_Quantity[i], sItem.byRank, sItem.byDurability, sItem.byBattle_Attribute, sItem.Item_Option_Tblidx, sItem.byDurationType);
+		}
 	}
-	// dragon balls
-	//for (int i = 0; i < 7; i++)
-	//	pServer->ServerDB->ExecuteQuery("INSERT INTO `inventory` (`ItemID`,`CharID`,`Slot`,`Stack`,`Place`) VALUES ('%u', '%u', '%u', '%u', '%u');", 200001 + i, charid, i, 1, CONTAINER_TYPE_BAG1);
+
+
 	// START QUICKSLOTS CONFIG
 	for (int i = 0; i < NTL_MAX_NEWBIE_QUICKSLOT_COUNT; i++)
 	{
 		pServer->ServerDB->ExecuteQuery("INSERT INTO `quickslot` (`CharID`,`TblID`,`Slot`,`Type`) VALUES ('%u','%u','%u','%u');",
 			charid, nbdata.asQuickData[i].tbilidx, nbdata.asQuickData[i].byQuickSlot, nbdata.asQuickData[i].byType);
 	}
+
+
 	// START SKILLS
 	for (int i = 0; i < NTL_MAX_NEWBIE_SKILL; i++)
 	{

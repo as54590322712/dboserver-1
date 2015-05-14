@@ -36,6 +36,7 @@ bool GameClient::PacketControl(Packet* pPacket)
 	case UG_CHAR_MOVE_SYNC: SendCharMoveSync((sUG_CHAR_MOVE_SYNC*)data); break;
 	case UG_CHAR_JUMP: SendCharJump((sUG_CHAR_JUMP*)data); break;
 	case UG_CHAR_JUMP_END: SendCharJumpEnd(); break;
+	case UG_CHAR_TARGET_SELECT: SendTargetSelect((sUG_CHAR_TARGET_SELECT*)data); break;
 	case UG_CHAR_EXIT_REQ: SendCharExitRes(); break;
 	case UG_GAME_EXIT_REQ: SendGameExitRes(); break;
 	case UG_ITEM_MOVE_REQ: SendIemMoveRes((sUG_ITEM_MOVE_REQ*)data); break;
@@ -60,6 +61,40 @@ bool GameClient::PacketControl(Packet* pPacket)
 		break;
 	}
 	return true;
+}
+
+void GameClient::SendCharStateUpdate()
+{
+	sGU_UPDATE_CHAR_STATE sPkt;
+	memset(&sPkt, 0, sizeof(sPkt));
+	sPkt.handle = pProfile->GetSerialID();
+	sPkt.wOpCode = GU_UPDATE_CHAR_STATE;
+	sPkt.sCharState = pProfile->sCharState;
+	pServer->GetClientManager()->SendAll(&sPkt, sizeof(sPkt));
+}
+
+void GameClient::SendCharLevelUp(BYTE byToUp)
+{
+	sEXP_TBLDAT* pExpTbl = (sEXP_TBLDAT*)pServer->GetTableContainer()->GetExpTable()->FindData(pProfile->sPcProfile.byLevel + byToUp);
+
+	if (pExpTbl)
+	{
+		pProfile->sPcProfile.byLevel += byToUp;
+		sGU_UPDATE_CHAR_LEVEL sPkt;
+		memset(&sPkt, 0, sizeof(sPkt));
+		sPkt.wOpCode = GU_UPDATE_CHAR_LEVEL;
+		sPkt.byCurLevel = pProfile->sPcProfile.byLevel;
+		sPkt.byPrevLevel = pProfile->sPcProfile.byLevel - byToUp;
+		sPkt.dwMaxExpInThisLevel = pExpTbl->dwNeed_Exp;
+		sPkt.handle = pProfile->GetSerialID();
+		pServer->GetClientManager()->SendAll(&sPkt, sizeof(sPkt));
+		pProfile->UpdateCharLevel();
+	}
+}
+
+void GameClient::SendTargetSelect(sUG_CHAR_TARGET_SELECT* pData)
+{
+	pProfile->SetTarget(pData->hTarget);
 }
 
 void GameClient::SendTSExecObjectRes(sUG_TS_EXCUTE_TRIGGER_OBJECT* pData)
@@ -189,12 +224,12 @@ void GameClient::SendIemMoveRes(sUG_ITEM_MOVE_REQ* pData)
 	{
 		if (sSrcTbldat)
 		{
-			if (sSrcTbldat->dwNeed_Class_Bit_Flag != pcdata.dwClass_Bit_Flag && sSrcTbldat->dwNeed_Class_Bit_Flag != INVALID_DWORD)
-				wResult = eRESULTCODE::GAME_ITEM_CLASS_FAIL;
-			else if (sSrcTbldat->byClass_Special != pProfile->GetClass() && sSrcTbldat->byClass_Special != INVALID_BYTE)
-				wResult = eRESULTCODE::GAME_ITEM_CLASS_FAIL;
-			else if (sSrcTbldat->byRace_Special != pProfile->GetRace() && sSrcTbldat->byRace_Special != INVALID_BYTE)
-				wResult = eRESULTCODE::GAME_ITEM_CLASS_FAIL;
+			if ((sSrcTbldat->byClass_Special != pProfile->GetClass() && sSrcTbldat->byClass_Special != INVALID_BYTE) ||
+				(sSrcTbldat->byRace_Special != pProfile->GetRace() && sSrcTbldat->byRace_Special != INVALID_BYTE))
+			{
+				if (sSrcTbldat->dwNeed_Class_Bit_Flag != pcdata.dwClass_Bit_Flag && sSrcTbldat->dwNeed_Class_Bit_Flag != INVALID_DWORD)
+					wResult = eRESULTCODE::GAME_ITEM_CLASS_FAIL;
+			}
 			else if (sSrcTbldat->byNeed_Level > pProfile->sPcProfile.byLevel)
 				wResult = eRESULTCODE::GAME_ITEM_NEED_MORE_LEVEL;
 			else if (sSrcTbldat->byNeed_Con > pProfile->sPcProfile.avatarAttribute.byBaseCon && sSrcTbldat->byNeed_Con != INVALID_BYTE)
@@ -366,6 +401,15 @@ void GameClient::CheckCommand(sUG_SERVER_COMMAND* pData)
 				Send(&sPkt, sizeof(sPkt));
 			}
 		}
+		if (strcmp(tok[0].c_str(), "@levelup") == 0)
+		{
+			if (tok.size() > 1)
+			{
+				BYTE byToUp = 1;
+				if (tok.size() == 2) byToUp = atoi(tok[1].c_str());
+				SendCharLevelUp(byToUp);
+			}
+		}
 		if (strcmp(tok[0].c_str(), "@additem") == 0)
 		{
 			if (tok.size() > 1)
@@ -490,6 +534,7 @@ void GameClient::SendCharInfo()
 	memset(&charInfo, 0, sizeof(charInfo));
 	charInfo.wOpCode = GU_AVATAR_CHAR_INFO;
 	pProfile->LoadCharacterData();
+	pProfile->CalculateAtributes();
 	charInfo.handle = pProfile->GetSerialID();
 	memcpy(&charInfo.sPcProfile, &pProfile->sPcProfile, sizeof(pProfile->sPcProfile));
 	memcpy(&charInfo.sCharState, &pProfile->sCharState, sizeof(pProfile->sCharState));
@@ -554,13 +599,13 @@ void GameClient::SendCharJumpEnd()
 
 void GameClient::SendCharMove(sUG_CHAR_MOVE* data)
 {
-	pProfile->UpdatePositions(data->vCurDir, data->vCurLoc);
-	pServer->GetObjectManager()->UpdateCharState(pProfile->GetSerialID(), pProfile->sCharState);
 	sGU_CHAR_MOVE mData;
 	memset(&mData, 0, sizeof(mData));
 	mData.wOpCode = GU_CHAR_MOVE;
 	if (data->byAvatarType == pProfile->GetAvatartype())
 	{
+		pProfile->bIsMoving = true;
+		pProfile->UpdatePositions(data->vCurDir, data->vCurLoc);
 		mData.vCurDir.x = data->vCurDir.x;
 		mData.vCurDir.y = 0.0f;
 		mData.vCurDir.z = data->vCurDir.z;
@@ -581,6 +626,7 @@ void GameClient::SendCharDestMove(sUG_CHAR_DEST_MOVE* pData)
 	dMove.wOpCode = GU_CHAR_DEST_MOVE;
 	if (pData->byAvatarType == pProfile->GetAvatartype())
 	{
+		pProfile->bIsMoving = false;
 		dMove.vCurLoc = pData->vCurLoc;
 		dMove.handle = pProfile->GetSerialID();
 		dMove.byDestLocCount = 1;

@@ -51,6 +51,7 @@ public:
 	eRESULTCODE DBChangeCharName(WCHAR* Name, int charId);
 	int GetDBAllowedRaces();
 	void DBUpdateLastServer();
+	void DBGetGMAccess();
 
 	// PROTOCOL FUNCTIONS
 	void SendLoginResult(sUC_LOGIN_REQ* data);
@@ -79,6 +80,7 @@ private:
 	BYTE CurrChannelID;
 	unsigned int CurrCharID;
 	bool goGameServer;
+	bool bIsGM;
 };
 
 class CharClientFactory : public SessionFactory

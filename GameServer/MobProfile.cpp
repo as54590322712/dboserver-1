@@ -35,8 +35,8 @@ bool MobProfile::Init()
 		sCharState.sCharStateBase.vCurDir.z = pSpawnData->vSpawn_Dir.z;
 	}
 
-	sCharState.sCharStateBase.byStateID = CHARSTATE_SPAWNING;
-	sCharState.sCharStateBase.bFightMode = FALSE;
+	sCharState.sCharStateBase.byStateID = CHARSTATE_STANDING;
+	sCharState.sCharStateBase.bFightMode = false;
 
 	sMOB_TBLDAT* pTblData = (sMOB_TBLDAT*)pServer->GetTableContainer()->GetMobTable()->FindData(mobId);
 

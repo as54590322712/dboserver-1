@@ -24,6 +24,7 @@ public:
 	void Run();
 
 	void SpawnObjects();
+	void UpdateClientData();
 
 	bool AddClient(GameClient* pClient);
 	void RemoveClient(GameClient* pClient);

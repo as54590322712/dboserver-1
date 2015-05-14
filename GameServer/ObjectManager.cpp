@@ -137,7 +137,7 @@ void ObjectManager::UpdateCharState(HOBJECT hObject, sCHARSTATE CharState)
 
 void ObjectManager::SpawnToClient(GameClient* pClient)
 {
-	if (false == pClient->IsClosed() && pClient->IsConnected())
+	if (false == pClient->IsClosed() && pClient->IsConnected() && pClient->GetProfile() && pClient)
 	{
 		for (OBJPCLISTIT it = pcList.begin(); it != pcList.end(); it++)
 		{

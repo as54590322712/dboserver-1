@@ -25,8 +25,17 @@ void CharacterManager::Run()
 {
 	while (IsRunnable())
 	{
-		// TODO CHARACTER IMPLEMENTATIONS
+		UpdateClientData();
 		Sleep(1000);
+	}
+}
+
+void CharacterManager::UpdateClientData()
+{
+	for (cliIt it = cList.begin(); it != cList.end(); ++it)
+	{
+		it->second->GetProfile()->CalculateAtributes();
+		it->second->SendCharStateUpdate();
 	}
 }
 

@@ -22,6 +22,9 @@ public:
 	TBLIDX GetWorldID() { return worldTblIdx; }
 	TBLIDX GetSpawnID() { return spawnTblIdx; }
 	TBLIDX GetMobID() { return mobTblIdx; }
+	HOBJECT GetTarget() { return hTarget; }
+
+	void SetTarget(HOBJECT hTarget) { this->hTarget = hTarget; }
 
 	sMOB_BRIEF sBrief;
 	sCHARSTATE sCharState;
@@ -31,6 +34,7 @@ private:
 	TBLIDX spawnTblIdx;
 	TBLIDX mobTblIdx;
 	HOBJECT hSerialID;
+	HOBJECT hTarget;
 
 	bool bCustomSpawn;
 

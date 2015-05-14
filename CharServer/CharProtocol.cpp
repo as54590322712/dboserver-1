@@ -35,6 +35,7 @@ void CharClient::SendLoginResult(sUC_LOGIN_REQ* data)
 	CurrServerID = data->serverID;
 	AccountID = data->accountId;
 	memcpy(AuthKey, data->abyAuthKey, NTL_MAX_SIZE_AUTH_KEY);
+	DBGetGMAccess();
 
 	Logger::Log("Client[%d] entering char server (%d)\n", this, AccountID);
 

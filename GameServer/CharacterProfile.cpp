@@ -14,11 +14,18 @@ void CharacterProfile::Init()
 	memset(&sPcProfile, 0, sizeof(sPC_PROFILE));
 	memset(&sCharState, 0, sizeof(sCHARSTATE));
 	memset(&sWorldInfo, 0, sizeof(sWORLD_INFO));
+	bIsSit = false;
+	bIsMoving = false;
 }
 
 CharacterProfile::~CharacterProfile()
 {
 	this->pServer = NULL;
+}
+
+void CharacterProfile::UpdateCharLevel()
+{
+	pServer->ServerDB->ExecuteQuery("UPDATE `character` SET `Level` = '%d' WHERE `ID` = '%u';", sPcProfile.byLevel, hCharID);
 }
 
 void CharacterProfile::LoadWarFogFlags()
@@ -186,9 +193,9 @@ bool CharacterProfile::InsertNextBagSlot(sGU_ITEM_CREATE& sPacket, ITEMID item, 
 		return false;
 
 	TBLIDX bags[6];
-	memset(bags, 0, 6);
+	memset(bags, 0, sizeof(bags));
 	int bagscount[6];
-	memset(bagscount, 0, 6);
+	memset(bagscount, 0, sizeof(bagscount));
 
 	for (int i = 0; i < NTL_MAX_COUNT_USER_HAVE_INVEN_ITEM; ++i)
 	{
@@ -215,11 +222,13 @@ bool CharacterProfile::InsertNextBagSlot(sGU_ITEM_CREATE& sPacket, ITEMID item, 
 		if (asItemProfile[i].byPlace == (lastbag + 1) && lastbag < 6)
 		{
 			sITEM_TBLDAT* sBag = (sITEM_TBLDAT*)pServer->GetTableContainer()->GetItemTable()->FindData(bags[lastbag]);
+			
+			if (!sBag) continue;
 
 			if (asItemProfile[i].handle != INVALID_HOBJECT && asItemProfile[i].tblidx != INVALID_TBLIDX)
 			{
 				bagscount[lastbag]++;
-				lastbagslot = asItemProfile[i].byPos;
+				lastbagslot = bagscount[lastbag];
 			}
 
 			if (bagscount[lastbag] == sBag->byBag_Size) lastbag++;
@@ -228,13 +237,15 @@ bool CharacterProfile::InsertNextBagSlot(sGU_ITEM_CREATE& sPacket, ITEMID item, 
 
 	// Bags start from 1 to 6, and array os bags from 0 to 5, add 1 to fix
 	lastbag++;
+	lastbagslot++;
 	
 	for (int i = 0; i < NTL_MAX_COUNT_USER_HAVE_INVEN_ITEM; ++i)
 	{
 		if (asItemProfile[i].handle == INVALID_HOBJECT && asItemProfile[i].tblidx == INVALID_TBLIDX)
 		{
-			if (pServer->ServerDB->ExecuteSp("CALL `spInsertItem`('%u','%u','%d','%d','%d','1','100','0','0','0','0','','0','0','0');",
-				item, hCharID, lastbag, lastbagslot, qtd))
+			// (nItemID,nCharID,nPlace,nSlot,nStack,nRank,nCurDur,nNeedToIdentify,nGrade,nBattleAttribute,nRestrictType,nMaker,nOpt1,nOpt2,nDurationType);
+			if (pServer->ServerDB->ExecuteSp("CALL `spInsertItem`('%u','%u','%d','%d','%d','%d','%d','0','0','%d','0','','%u','0','%d');",
+				item, hCharID, lastbag, lastbagslot, qtd, sItem->byRank, sItem->byDurability, sItem->byBattle_Attribute, sItem->Item_Option_Tblidx, sItem->byDurationType))
 			{
 				do {
 					pServer->ServerDB->GetResultSet();
@@ -250,11 +261,16 @@ bool CharacterProfile::InsertNextBagSlot(sGU_ITEM_CREATE& sPacket, ITEMID item, 
 			sPacket.sItemData.itemId = hItem;
 			sPacket.sItemData.charId = hCharID;
 			sPacket.sItemData.itemNo = item;
-			sPacket.sItemData.byCurrentDurability = 100;
+			sPacket.sItemData.byCurrentDurability = sItem->byDurability;
 			sPacket.sItemData.byPlace = lastbag;
 			sPacket.sItemData.byPosition = lastbagslot;
 			sPacket.sItemData.byStackcount = qtd;
-			sPacket.sItemData.byRank = 1;
+			sPacket.sItemData.byRank = sItem->byRank;
+			sPacket.sItemData.bNeedToIdentify = false;
+			sPacket.sItemData.aOptionTblidx[0] = sItem->Item_Option_Tblidx;
+			sPacket.sItemData.byBattleAttribute = sItem->byBattle_Attribute;
+			sPacket.sItemData.byDurationType = sItem->byDurationType;
+			sPacket.sItemData.byGrade = 0;
 
 			asItemProfile[i].handle = sPacket.sItemData.itemId;
 			asItemProfile[i].tblidx = item;
@@ -263,6 +279,12 @@ bool CharacterProfile::InsertNextBagSlot(sGU_ITEM_CREATE& sPacket, ITEMID item, 
 			asItemProfile[i].byPos = sPacket.sItemData.byPosition;
 			asItemProfile[i].byStackcount = sPacket.sItemData.byStackcount;
 			asItemProfile[i].byRank = sPacket.sItemData.byRank;
+			asItemProfile[i].aOptionTblidx[0] = sPacket.sItemData.aOptionTblidx[0];
+			asItemProfile[i].aOptionTblidx[1] = sPacket.sItemData.aOptionTblidx[1];
+			asItemProfile[i].bNeedToIdentify = sPacket.sItemData.bNeedToIdentify;
+			asItemProfile[i].byBattleAttribute = sPacket.sItemData.byBattleAttribute;
+			asItemProfile[i].byDurationType = sPacket.sItemData.byDurationType;
+			asItemProfile[i].byGrade = sPacket.sItemData.byGrade;
 			break;
 		}
 	}
@@ -337,35 +359,43 @@ void CharacterProfile::LoadWorldInfoData()
 	}
 }
 
-void CharacterProfile::CalculateAtributes(sPC_TBLDAT* pcdata)
+void CharacterProfile::CalculateAtributes()
 {
-	sPcProfile.avatarAttribute.wBaseMaxEP += (pcdata->byLevel_Up_EP * sPcProfile.byLevel);
-	sPcProfile.avatarAttribute.wBaseMaxLP += (pcdata->byLevel_Up_LP * sPcProfile.byLevel);
-	sPcProfile.avatarAttribute.wBaseMaxRP += (pcdata->byLevel_Up_RP * sPcProfile.byLevel);
-	sPcProfile.avatarAttribute.byBaseStr += (BYTE)(pcdata->fLevel_Up_Str * sPcProfile.byLevel);
-	sPcProfile.avatarAttribute.byBaseDex += (BYTE)(pcdata->fLevel_Up_Dex * sPcProfile.byLevel);
-	sPcProfile.avatarAttribute.byBaseFoc += (BYTE)(pcdata->fLevel_Up_Foc * sPcProfile.byLevel);
-	sPcProfile.avatarAttribute.byBaseEng += (BYTE)(pcdata->fLevel_Up_Eng * sPcProfile.byLevel);
-	sPcProfile.avatarAttribute.byBaseCon += (BYTE)(pcdata->fLevel_Up_Con * sPcProfile.byLevel);
-	sPcProfile.avatarAttribute.byBaseSol += (BYTE)(pcdata->fLevel_Up_Sol * sPcProfile.byLevel);
-	sPcProfile.avatarAttribute.wBasePhysicalOffence += (pcdata->byLevel_Up_Physical_Offence * sPcProfile.byLevel);
-	sPcProfile.avatarAttribute.wBasePhysicalDefence += (pcdata->byLevel_Up_Physical_Defence * sPcProfile.byLevel);
-	sPcProfile.avatarAttribute.wBaseEnergyOffence += (pcdata->byLevel_Up_Energy_Offence * sPcProfile.byLevel);
-	sPcProfile.avatarAttribute.wBaseEnergyDefence += (pcdata->byLevel_Up_Energy_Defence * sPcProfile.byLevel);
+	sPC_TBLDAT* pPcTbl = (sPC_TBLDAT*)pServer->GetTableContainer()->GetPcTable()->GetPcTbldat(byRace, byClass, byGender);
 
-	sPcProfile.avatarAttribute.wLastMaxEP = sPcProfile.avatarAttribute.wBaseMaxEP;
-	sPcProfile.avatarAttribute.wLastMaxLP = sPcProfile.avatarAttribute.wBaseMaxLP;
-	sPcProfile.avatarAttribute.wLastMaxRP = sPcProfile.avatarAttribute.wBaseMaxRP;
-	sPcProfile.avatarAttribute.byLastStr = sPcProfile.avatarAttribute.byBaseStr;
-	sPcProfile.avatarAttribute.byLastDex = sPcProfile.avatarAttribute.byBaseDex;
-	sPcProfile.avatarAttribute.byLastFoc = sPcProfile.avatarAttribute.byBaseFoc;
-	sPcProfile.avatarAttribute.byLastEng = sPcProfile.avatarAttribute.byBaseEng;
-	sPcProfile.avatarAttribute.byLastCon = sPcProfile.avatarAttribute.byBaseCon;
-	sPcProfile.avatarAttribute.byLastSol = sPcProfile.avatarAttribute.byBaseSol;
-	sPcProfile.avatarAttribute.wLastPhysicalOffence = sPcProfile.avatarAttribute.wBasePhysicalOffence;
-	sPcProfile.avatarAttribute.wLastPhysicalDefence = sPcProfile.avatarAttribute.wBasePhysicalDefence;
-	sPcProfile.avatarAttribute.wLastEnergyOffence = sPcProfile.avatarAttribute.wBaseEnergyOffence;
-	sPcProfile.avatarAttribute.wLastEnergyDefence = sPcProfile.avatarAttribute.wBaseEnergyDefence;
+	if (pPcTbl)
+	{
+		sPcProfile.avatarAttribute.wBaseMaxEP += (pPcTbl->byLevel_Up_EP * sPcProfile.byLevel);
+		sPcProfile.avatarAttribute.wBaseMaxLP += (pPcTbl->byLevel_Up_LP * sPcProfile.byLevel);
+		sPcProfile.avatarAttribute.wBaseMaxRP += (pPcTbl->byLevel_Up_RP * sPcProfile.byLevel);
+		sPcProfile.avatarAttribute.byBaseStr += (BYTE)(pPcTbl->fLevel_Up_Str * sPcProfile.byLevel);
+		sPcProfile.avatarAttribute.byBaseDex += (BYTE)(pPcTbl->fLevel_Up_Dex * sPcProfile.byLevel);
+		sPcProfile.avatarAttribute.byBaseFoc += (BYTE)(pPcTbl->fLevel_Up_Foc * sPcProfile.byLevel);
+		sPcProfile.avatarAttribute.byBaseEng += (BYTE)(pPcTbl->fLevel_Up_Eng * sPcProfile.byLevel);
+		sPcProfile.avatarAttribute.byBaseCon += (BYTE)(pPcTbl->fLevel_Up_Con * sPcProfile.byLevel);
+		sPcProfile.avatarAttribute.byBaseSol += (BYTE)(pPcTbl->fLevel_Up_Sol * sPcProfile.byLevel);
+		sPcProfile.avatarAttribute.wBasePhysicalOffence += (pPcTbl->byLevel_Up_Physical_Offence * sPcProfile.byLevel);
+		sPcProfile.avatarAttribute.wBasePhysicalDefence += (pPcTbl->byLevel_Up_Physical_Defence * sPcProfile.byLevel);
+		sPcProfile.avatarAttribute.wBaseEnergyOffence += (pPcTbl->byLevel_Up_Energy_Offence * sPcProfile.byLevel);
+		sPcProfile.avatarAttribute.wBaseEnergyDefence += (pPcTbl->byLevel_Up_Energy_Defence * sPcProfile.byLevel);
+
+		sPcProfile.avatarAttribute.wBaseMaxLP += (WORD)((sPcProfile.avatarAttribute.byBaseCon * sPcProfile.byLevel) * 4.7);
+		sPcProfile.avatarAttribute.wBaseMaxEP += (WORD)((sPcProfile.avatarAttribute.byBaseEng * sPcProfile.byLevel) * 4.7);
+
+		sPcProfile.avatarAttribute.wLastMaxEP = sPcProfile.avatarAttribute.wBaseMaxEP;
+		sPcProfile.avatarAttribute.wLastMaxLP = sPcProfile.avatarAttribute.wBaseMaxLP;
+		sPcProfile.avatarAttribute.wLastMaxRP = sPcProfile.avatarAttribute.wBaseMaxRP;
+		sPcProfile.avatarAttribute.byLastStr = sPcProfile.avatarAttribute.byBaseStr;
+		sPcProfile.avatarAttribute.byLastDex = sPcProfile.avatarAttribute.byBaseDex;
+		sPcProfile.avatarAttribute.byLastFoc = sPcProfile.avatarAttribute.byBaseFoc;
+		sPcProfile.avatarAttribute.byLastEng = sPcProfile.avatarAttribute.byBaseEng;
+		sPcProfile.avatarAttribute.byLastCon = sPcProfile.avatarAttribute.byBaseCon;
+		sPcProfile.avatarAttribute.byLastSol = sPcProfile.avatarAttribute.byBaseSol;
+		sPcProfile.avatarAttribute.wLastPhysicalOffence = sPcProfile.avatarAttribute.wBasePhysicalOffence;
+		sPcProfile.avatarAttribute.wLastPhysicalDefence = sPcProfile.avatarAttribute.wBasePhysicalDefence;
+		sPcProfile.avatarAttribute.wLastEnergyOffence = sPcProfile.avatarAttribute.wBaseEnergyOffence;
+		sPcProfile.avatarAttribute.wLastEnergyDefence = sPcProfile.avatarAttribute.wBaseEnergyDefence;
+	}
 }
 
 void CharacterProfile::LoadCharacterData()
@@ -374,53 +404,44 @@ void CharacterProfile::LoadCharacterData()
 	{
 		while (pServer->ServerDB->Fetch())
 		{
+			memset(&sPcProfile, 0, sizeof(sPcProfile));
+			sPcProfile.charId = pServer->ServerDB->getInt("ID");
+			memcpy(sPcProfile.awchName, charToWChar(pServer->ServerDB->getString("Name")), NTL_MAX_SIZE_CHAR_NAME_UNICODE);
+			memcpy(wszCharName, charToWChar(pServer->ServerDB->getString("Name")), NTL_MAX_SIZE_CHAR_NAME_UNICODE);
 			byRace = pServer->ServerDB->getInt("Race");
 			byClass = pServer->ServerDB->getInt("Class");
 			byGender = pServer->ServerDB->getInt("Gender");
-			sPC_TBLDAT pcdata = *(sPC_TBLDAT*)pServer->GetTableContainer()->GetPcTable()->GetPcTbldat(byRace, byClass, byGender);
-			Logger::Log("Loaded PC TblInfo: Idx(%u) Race(%u) Class(%u) Gender(%u)\n", pcdata.tblidx, pcdata.byRace, pcdata.byClass, pcdata.byGender);
-			memset(&sPcProfile, 0, sizeof(sPcProfile));
-			memcpy(sPcProfile.awchName, charToWChar(pServer->ServerDB->getString("Name")), NTL_MAX_SIZE_CHAR_NAME_UNICODE);
-			memcpy(wszCharName, charToWChar(pServer->ServerDB->getString("Name")), NTL_MAX_SIZE_CHAR_NAME_UNICODE);
-			sPcProfile.tblidx = pcdata.tblidx;
-			sPcProfile.charId = pServer->ServerDB->getInt("ID");
-			this->bIsGameMaster = sPcProfile.bIsGameMaster = pServer->ServerDB->getBoolean("IsGameMaster");
 			sPcProfile.byLevel = pServer->ServerDB->getInt("Level");
+			this->bIsGameMaster = sPcProfile.bIsGameMaster = pServer->ServerDB->getBoolean("IsGameMaster");
 			sPcProfile.dwCurExp = pServer->ServerDB->getInt("CurExp");
 			sPcProfile.bIsAdult = pServer->ServerDB->getBoolean("Adult");
-			sPcProfile.dwMaxExpInThisLevel = 100;
 			sPcProfile.dwTutorialHint = pServer->ServerDB->getInt("TutorialHint");
-			sPcProfile.wCurEP = pServer->ServerDB->getInt("CurEP");;
-			sPcProfile.wCurLP = pServer->ServerDB->getInt("CurLP");;
-			sPcProfile.wCurRP = pcdata.wBasic_RP;
 			sPcProfile.dwZenny = pServer->ServerDB->getInt("Money");
-			sPcProfile.sMarking.byCode = INVALID_MARKING_TYPE;
-
-			sPcProfile.avatarAttribute.wBaseMaxEP = pServer->ServerDB->getInt("MaxEP");
-			sPcProfile.avatarAttribute.wBaseMaxLP = pServer->ServerDB->getInt("MaxLP");
-			sPcProfile.avatarAttribute.wBaseMaxRP = pcdata.wBasic_RP;
-			sPcProfile.avatarAttribute.byBaseStr = pcdata.byStr;
-			sPcProfile.avatarAttribute.byBaseFoc = pcdata.byFoc;
-			sPcProfile.avatarAttribute.byBaseSol = pcdata.bySol;
-			sPcProfile.avatarAttribute.byBaseDex = pcdata.byDex;
-			sPcProfile.avatarAttribute.byBaseCon = pcdata.byCon;
-			sPcProfile.avatarAttribute.byBaseEng = pcdata.byEng;
-			sPcProfile.avatarAttribute.fBaseAttackRange = pcdata.fAttack_Range;
-			sPcProfile.avatarAttribute.wBaseAttackRate = pcdata.wAttack_Rate;
-			sPcProfile.avatarAttribute.wBaseAttackSpeedRate = pcdata.wAttack_Speed_Rate;
-			sPcProfile.avatarAttribute.wBaseBlockRate = pcdata.wBlock_Rate;
-			sPcProfile.avatarAttribute.wBaseCurseSuccessRate = pcdata.wCurse_Success_Rate;
-			sPcProfile.avatarAttribute.wBaseCurseToleranceRate = pcdata.wCurse_Tolerance_Rate;
-			sPcProfile.avatarAttribute.wBaseDodgeRate = pcdata.wDodge_Rate;
-			sPcProfile.avatarAttribute.fLastRunSpeed = (sPcProfile.bIsAdult) ? pcdata.fAdult_Run_Speed : pcdata.fChild_Run_Speed;
-			CalculateAtributes(&pcdata);
-
 			sPcProfile.sPcShape.byFace = pServer->ServerDB->getInt("Face");
 			sPcProfile.sPcShape.byHair = pServer->ServerDB->getInt("Hair");
 			sPcProfile.sPcShape.byHairColor = pServer->ServerDB->getInt("HairColor");
 			sPcProfile.sPcShape.bySkinColor = pServer->ServerDB->getInt("SkinColor");
+			sPcProfile.byBindType = pServer->ServerDB->getInt("BindType");
+			sPcProfile.bindObjectTblidx = pServer->ServerDB->getInt("bindObjectTblid");
+			sPcProfile.bindWorldId = pServer->ServerDB->getInt("bindWorldId");
+			sPcProfile.bChangeClass = pServer->ServerDB->getBoolean("ChangeClass");
+			sPcProfile.dwReputation = pServer->ServerDB->getInt("Reputation");
+			sPcProfile.dwMudosaPoint = pServer->ServerDB->getInt("MudosaPoint");
+			sPcProfile.dwSpPoint = pServer->ServerDB->getInt("SpPoint");
+			sPcProfile.sMarking.byCode = pServer->ServerDB->getInt("Marking");
+			sPcProfile.guildId = pServer->ServerDB->getInt("GuildID");
 
 			memset(&sCharState, 0, sizeof(sCharState));
+			sCharState.sCharStateBase.vCurLoc.x = pServer->ServerDB->getFloat("PositionX");
+			sCharState.sCharStateBase.vCurLoc.y = pServer->ServerDB->getFloat("PositionY");
+			sCharState.sCharStateBase.vCurLoc.z = pServer->ServerDB->getFloat("PositionZ");
+			sCharState.sCharStateBase.vCurDir.x = pServer->ServerDB->getFloat("DirectionX");
+			sCharState.sCharStateBase.vCurDir.y = pServer->ServerDB->getFloat("DirectionY");
+			sCharState.sCharStateBase.vCurDir.z = pServer->ServerDB->getFloat("DirectionZ");
+
+			sCharState.sCharStateBase.byStateID = CHARSTATE_SPAWNING;
+			sCharState.sCharStateDetail.sCharStateSpawning.byTeleportType = TELEPORT_TYPE_GAME_IN;
+
 			sCharState.sCharStateBase.dwConditionFlag = 0;
 			sCharState.sCharStateBase.bFightMode = false;
 			sCharState.sCharStateBase.byStateID = 0;
@@ -432,12 +453,34 @@ void CharacterProfile::LoadCharacterData()
 			sCharState.sCharStateBase.aspectState.sAspectStateDetail.sSuperSaiyan.bySourceGrade = 0;
 			sCharState.sCharStateBase.aspectState.sAspectStateDetail.sVehicle.idVehicleTblidx = 0;
 
-			sCharState.sCharStateBase.vCurLoc.x = pServer->ServerDB->getFloat("PositionX");
-			sCharState.sCharStateBase.vCurLoc.y = pServer->ServerDB->getFloat("PositionY");
-			sCharState.sCharStateBase.vCurLoc.z = pServer->ServerDB->getFloat("PositionZ");
-			sCharState.sCharStateBase.vCurDir.x = pServer->ServerDB->getFloat("DirectionX");
-			sCharState.sCharStateBase.vCurDir.y = pServer->ServerDB->getFloat("DirectionY");
-			sCharState.sCharStateBase.vCurDir.z = pServer->ServerDB->getFloat("DirectionZ");
+			sPC_TBLDAT* pPcTbl = (sPC_TBLDAT*)pServer->GetTableContainer()->GetPcTable()->GetPcTbldat(byRace, byClass, byGender);
+			sEXP_TBLDAT* pExpTbl = (sEXP_TBLDAT*)pServer->GetTableContainer()->GetExpTable()->FindData(sPcProfile.byLevel);
+
+			if (pPcTbl && pExpTbl)
+			{
+				sPcProfile.tblidx = pPcTbl->tblidx;
+				sPcProfile.dwMaxExpInThisLevel = pExpTbl->dwNeed_Exp;
+				sPcProfile.wCurEP = pPcTbl->wBasic_EP;
+				sPcProfile.wCurLP = pPcTbl->wBasic_LP;
+				sPcProfile.wCurRP = pPcTbl->wBasic_RP;
+				sPcProfile.avatarAttribute.wBaseMaxEP = pPcTbl->wBasic_EP;
+				sPcProfile.avatarAttribute.wBaseMaxLP = pPcTbl->wBasic_LP;
+				sPcProfile.avatarAttribute.wBaseMaxRP = pPcTbl->wBasic_RP;
+				sPcProfile.avatarAttribute.byBaseStr = pPcTbl->byStr;
+				sPcProfile.avatarAttribute.byBaseFoc = pPcTbl->byFoc;
+				sPcProfile.avatarAttribute.byBaseSol = pPcTbl->bySol;
+				sPcProfile.avatarAttribute.byBaseDex = pPcTbl->byDex;
+				sPcProfile.avatarAttribute.byBaseCon = pPcTbl->byCon;
+				sPcProfile.avatarAttribute.byBaseEng = pPcTbl->byEng;
+				sPcProfile.avatarAttribute.fBaseAttackRange = pPcTbl->fAttack_Range;
+				sPcProfile.avatarAttribute.wBaseAttackRate = pPcTbl->wAttack_Rate;
+				sPcProfile.avatarAttribute.wBaseAttackSpeedRate = pPcTbl->wAttack_Speed_Rate;
+				sPcProfile.avatarAttribute.wBaseBlockRate = pPcTbl->wBlock_Rate;
+				sPcProfile.avatarAttribute.wBaseCurseSuccessRate = pPcTbl->wCurse_Success_Rate;
+				sPcProfile.avatarAttribute.wBaseCurseToleranceRate = pPcTbl->wCurse_Tolerance_Rate;
+				sPcProfile.avatarAttribute.wBaseDodgeRate = pPcTbl->wDodge_Rate;
+				sPcProfile.avatarAttribute.fLastRunSpeed = (sPcProfile.bIsAdult) ? pPcTbl->fAdult_Run_Speed : pPcTbl->fChild_Run_Speed;
+			}
 		}
 	}
 }
@@ -458,13 +501,10 @@ void CharacterProfile::GetObjectCreate(sGU_OBJECT_CREATE& sPacket)
 	sPacket.sObjectInfo.pcBrief.wMaxLP = sPcProfile.avatarAttribute.wLastMaxLP;
 	sPacket.sObjectInfo.pcBrief.fSpeed = sPcProfile.avatarAttribute.fLastRunSpeed;
 	memcpy(sPacket.sObjectInfo.pcBrief.awchName, sPcProfile.awchName, NTL_MAX_SIZE_CHAR_NAME_UNICODE);
-	sPacket.sObjectInfo.pcBrief.sMarking.byCode = INVALID_MARKING_TYPE;
+	sPacket.sObjectInfo.pcBrief.sMarking.byCode = sPcProfile.sMarking.byCode;
 	sPacket.sObjectInfo.pcBrief.bIsAdult = sPcProfile.bIsAdult;
 	memcpy(&sPacket.sObjectInfo.pcBrief.sPcShape, &sPcProfile.sPcShape, sizeof(sPcProfile.sPcShape));
 	memcpy(&sPacket.sObjectInfo.pcState, &sCharState, sizeof(sCharState));
-	sPacket.sObjectInfo.pcState.sCharStateBase.byStateID = CHARSTATE_SPAWNING;
-	sPacket.sObjectInfo.pcState.sCharStateBase.dwStateTime = (DWORD)time(NULL);
-	sPacket.sObjectInfo.pcState.sCharStateDetail.sCharStateSpawning.byTeleportType = TELEPORT_TYPE_GAME_IN;
 
 	for (int i = 0; i < EQUIP_SLOT_TYPE_COUNT; i++)
 	{

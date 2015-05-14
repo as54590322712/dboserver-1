@@ -8,6 +8,7 @@ struct sEXP_TBLDAT : public sTBLDAT
 public:
 	DWORD		dwExp;		// Required exp to become the level from level 1.
 	DWORD		dwNeed_Exp;		// Required exp to become the level from the previous level.
+	BYTE		UNKNOW[40];		// Need to reasearch, but i assume its level atributes from newer client
 
 public:
 

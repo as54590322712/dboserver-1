@@ -35,8 +35,8 @@ bool NpcProfile::Init()
 		sCharState.sCharStateBase.vCurDir.z = pSpawnData->vSpawn_Dir.z;
 	}
 
-	sCharState.sCharStateBase.byStateID = CHARSTATE_SPAWNING;
-	sCharState.sCharStateBase.bFightMode = FALSE;
+	sCharState.sCharStateBase.byStateID = CHARSTATE_STANDING;
+	sCharState.sCharStateBase.bFightMode = false;
 
 	sNPC_TBLDAT* pTblData = (sNPC_TBLDAT*)pServer->GetTableContainer()->GetNpcTable()->FindData(mobId);
 	

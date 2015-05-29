@@ -52,6 +52,7 @@ public:
 
 	// Protocol Resolvers
 	void SendLoginRes(sUA_LOGIN_REQ* data);
+	void SendLoginCjRes(sUA_LOGIN_REQ_KOREA_CJ* data);
 	void SendDisconnectRes(sUA_LOGIN_DISCONNECT_REQ* data);
 
 private:

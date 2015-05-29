@@ -23,8 +23,9 @@ public:
 	void CreateThread();
 	void Run();
 
-	void SpawnObjects();
-	void UpdateClientData();
+	void UpdateClientData(GameClient* pClient, DWORD dwCurrTick);
+
+	bool HasClients() { return (cList.size() > 0); }
 
 	bool AddClient(GameClient* pClient);
 	void RemoveClient(GameClient* pClient);

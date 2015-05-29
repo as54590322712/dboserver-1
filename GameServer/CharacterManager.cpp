@@ -1,6 +1,8 @@
 #include "CharacterManager.h"
 #include "GameNetwork.h"
 
+#include <ppl.h>
+
 CharacterManager::CharacterManager()
 {
 	pServer = (GameServer*)_GetApp();
@@ -25,17 +27,33 @@ void CharacterManager::Run()
 {
 	while (IsRunnable())
 	{
-		UpdateClientData();
-		Sleep(1000);
+		if (HasClients())
+		{
+			// Parallel for each loop
+			concurrency::parallel_for_each(cList.begin(), cList.end(), [&](std::pair<unsigned int, GameClient*> it) {
+				if (it.second) UpdateClientData(it.second, GetTickCount());
+			});
+		}
 	}
 }
 
-void CharacterManager::UpdateClientData()
+void CharacterManager::UpdateClientData(GameClient* pClient, DWORD dwCurrTick)
 {
-	for (cliIt it = cList.begin(); it != cList.end(); ++it)
+	// check if is alive
+	if (false == pClient->IsClosed() && HasClients())
 	{
-		it->second->GetProfile()->CalculateAtributes();
-		it->second->SendCharStateUpdate();
+		// check spawns
+		pServer->GetObjectManager()->SpawnToClient(pClient);
+
+		// update LP and EP
+		pClient->SendLPEPUpdate(pClient->GetProfile()->sPcProfile.wCurLP,
+			pClient->GetProfile()->sPcProfile.avatarAttribute.wBaseMaxLP,
+			pClient->GetProfile()->sPcProfile.wCurEP,
+			pClient->GetProfile()->sPcProfile.avatarAttribute.wBaseMaxEP,
+			pClient->GetProfile()->GetSerialID());
+
+		// check player attack
+		pClient->SendCharAttack();
 	}
 }
 
@@ -43,14 +61,6 @@ void CharacterManager::CreateThread()
 {
 	pThread = ThreadFactory::CreateThread(this, "CharacterManagerThread");
 	pThread->Start();
-}
-
-void CharacterManager::SpawnObjects()
-{
-	for (cliIt it = cList.begin(); it != cList.end(); ++it)
-	{
-		pServer->GetObjectManager()->SpawnToClient(it->second);
-	}
 }
 
 bool CharacterManager::AddClient(GameClient* pClient)

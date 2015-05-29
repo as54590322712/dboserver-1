@@ -4,6 +4,8 @@
 #include "NpcProfile.h"
 #include "MobProfile.h"
 
+#include <ppl.h>
+
 ObjectManager::ObjectManager()
 {
 	pServer = (GameServer*)_GetApp();
@@ -28,8 +30,7 @@ void ObjectManager::Run()
 {
 	while (IsRunnable())
 	{
-		pServer->GetClientManager()->SpawnObjects();
-		Sleep(1000);
+		//Sleep(1000);
 	}
 }
 
@@ -236,7 +237,7 @@ void ObjectManager::SpawnToClient(GameClient* pClient)
 
 			float dist = NtlGetDistance(pcx, pcz, objx, objz);
 
-			if (dist < 100)
+			if (dist < 100.0)
 			{
 				if (false == pClient->FindSpawn(obj->GetSerialID(), eOBJTYPE::OBJTYPE_MOB))
 				{

@@ -34,6 +34,7 @@ void GameClient::OnClose()
 {
 	if (false == bIsClosed)
 	{
+		bIsClosed = true;
 		if (goCharServer) pServer->ServerDB->ExecuteQuery("UPDATE `account` SET `State` = '2' WHERE `ID` = '%d';", pProfile->GetAccountid());
 		else pServer->ServerDB->ExecuteQuery("UPDATE `account` SET `State` = '0' WHERE `ID` = '%d';", pProfile->GetAccountid());
 		if (pServer->GetObjectManager()->FindObject(pProfile->GetSerialID(), OBJTYPE_PC))
@@ -48,7 +49,6 @@ void GameClient::OnClose()
 		pProfile->RemoveOnlineData();
 		if (pServer->GetClientManager()->FindClient(this))
 			pServer->GetClientManager()->RemoveClient(this);
-		bIsClosed = true;
 	}
 }
 

@@ -37,6 +37,8 @@ bool GameClient::PacketControl(Packet* pPacket)
 	case UG_CHAR_JUMP: SendCharJump((sUG_CHAR_JUMP*)data); break;
 	case UG_CHAR_JUMP_END: SendCharJumpEnd(); break;
 	case UG_CHAR_TARGET_SELECT: SendTargetSelect((sUG_CHAR_TARGET_SELECT*)data); break;
+	case UG_CHAR_ATTACK_BEGIN: SendCharAttackBegin((sUG_CHAR_ATTACK_BEGIN*)data); break;
+	case UG_CHAR_ATTACK_END: SendCharAttackEnd((sUG_CHAR_ATTACK_END*)data); break;
 	case UG_CHAR_EXIT_REQ: SendCharExitRes(); break;
 	case UG_GAME_EXIT_REQ: SendGameExitRes(); break;
 	case UG_ITEM_MOVE_REQ: SendIemMoveRes((sUG_ITEM_MOVE_REQ*)data); break;
@@ -61,6 +63,79 @@ bool GameClient::PacketControl(Packet* pPacket)
 		break;
 	}
 	return true;
+}
+
+void GameClient::SendCharAttack()
+{
+	if (pProfile->sCharState.sCharStateBase.bFightMode)
+	{
+		sGU_CHAR_ACTION_ATTACK sPkt;
+		memset(&sPkt, 0, sizeof(sPkt));
+		sPkt.wOpCode = GU_CHAR_ACTION_ATTACK;
+		sPkt.dwLpEpEventId = 255;
+		sPkt.byBlockedAction = 255;
+		sPkt.hSubject = pProfile->GetSerialID();
+		sPkt.hTarget = pProfile->GetTarget();
+		sPkt.wAttackResultValue = pProfile->sPcProfile.avatarAttribute.wLastPhysicalOffence;
+		sPkt.bChainAttack = false;
+		sPkt.byAttackSequence = 1;
+		sPkt.vShift = pProfile->sCharState.sCharStateBase.vCurLoc;
+		pServer->GetClientManager()->SendAll(&sPkt, sizeof(sPkt));
+	}
+}
+
+void GameClient::SendCharAttackEnd(sUG_CHAR_ATTACK_END* pData)
+{
+	if (pData->byAvatarType == pProfile->GetAvatartype())
+	{
+		pProfile->sCharState.sCharStateBase.bFightMode = false;
+	}
+}
+
+void GameClient::SendCharAttackBegin(sUG_CHAR_ATTACK_BEGIN* pData)
+{
+	if (pData->byAvatarType == pProfile->GetAvatartype())
+	{
+		pProfile->sCharState.sCharStateBase.bFightMode = true;
+	}
+}
+
+void GameClient::SendLPEPUpdate(WORD wCurLp, WORD wMaxLp, WORD wCurEp, WORD wMaxEp, HOBJECT hTarget)
+{
+	sGU_UPDATE_CHAR_LP_EP sPkt;
+	memset(&sPkt, 0, sizeof(sPkt));
+	sPkt.wOpCode = GU_UPDATE_CHAR_LP_EP;
+	sPkt.handle = hTarget;
+	sPkt.wCurLP = wCurLp;
+	sPkt.wMaxLP = wMaxLp;
+	sPkt.wCurEP = wCurEp;
+	sPkt.wMaxEP = wMaxEp;
+	sPkt.dwLpEpEventId = 255;
+	pServer->GetClientManager()->SendAll(&sPkt, sizeof(sPkt));
+}
+
+void GameClient::SendEPUpdate(WORD wCurEp, WORD wMaxEp, HOBJECT hTarget)
+{
+	sGU_UPDATE_CHAR_EP sPkt;
+	memset(&sPkt, 0, sizeof(sPkt));
+	sPkt.wOpCode = GU_UPDATE_CHAR_EP;
+	sPkt.handle = hTarget;
+	sPkt.wCurEP = wCurEp;
+	sPkt.wMaxEP = wMaxEp;
+	sPkt.dwLpEpEventId = 255;
+	pServer->GetClientManager()->SendAll(&sPkt, sizeof(sPkt));
+}
+
+void GameClient::SendLPUpdate(WORD wCurLp, WORD wMaxLp, HOBJECT hTarget)
+{
+	sGU_UPDATE_CHAR_LP sPkt;
+	memset(&sPkt, 0, sizeof(sPkt));
+	sPkt.wOpCode = GU_UPDATE_CHAR_LP;
+	sPkt.handle = hTarget;
+	sPkt.wCurLP = wCurLp;
+	sPkt.wMaxLP = wMaxLp;
+	sPkt.dwLpEpEventId = 255;
+	pServer->GetClientManager()->SendAll(&sPkt, sizeof(sPkt));
 }
 
 void GameClient::SendCharStateUpdate()
@@ -371,7 +446,6 @@ void GameClient::SpawnTesteMob(unsigned int id)
 	{
 		pServer->GetObjectManager()->AddObject(mob->GetSerialID(), mob, eOBJTYPE::OBJTYPE_MOB);
 	}
-	pServer->GetClientManager()->SpawnObjects();
 }
 
 void GameClient::CheckCommand(sUG_SERVER_COMMAND* pData)
@@ -403,7 +477,7 @@ void GameClient::CheckCommand(sUG_SERVER_COMMAND* pData)
 		}
 		if (strcmp(tok[0].c_str(), "@levelup") == 0)
 		{
-			if (tok.size() > 1)
+			if (tok.size() >= 1)
 			{
 				BYTE byToUp = 1;
 				if (tok.size() == 2) byToUp = atoi(tok[1].c_str());
@@ -495,7 +569,6 @@ void GameClient::SendCharReadySpawnReq()
 	if (pServer->GetClientManager()->AddClient(this))
 	{
 		pServer->GetObjectManager()->AddObject(pProfile->GetSerialID(), pProfile, eOBJTYPE::OBJTYPE_PC);
-		pServer->GetClientManager()->SpawnObjects();
 	}
 }
 
@@ -533,8 +606,14 @@ void GameClient::SendCharInfo()
 	sGU_AVATAR_CHAR_INFO charInfo;
 	memset(&charInfo, 0, sizeof(charInfo));
 	charInfo.wOpCode = GU_AVATAR_CHAR_INFO;
+
 	pProfile->LoadCharacterData();
 	pProfile->CalculateAtributes();
+
+	// Current LP/EP (TODO: Load from DB)
+	pProfile->sPcProfile.wCurLP = pProfile->sPcProfile.avatarAttribute.wBaseMaxLP;
+	pProfile->sPcProfile.wCurEP = pProfile->sPcProfile.avatarAttribute.wBaseMaxEP;
+
 	charInfo.handle = pProfile->GetSerialID();
 	memcpy(&charInfo.sPcProfile, &pProfile->sPcProfile, sizeof(pProfile->sPcProfile));
 	memcpy(&charInfo.sCharState, &pProfile->sCharState, sizeof(pProfile->sCharState));

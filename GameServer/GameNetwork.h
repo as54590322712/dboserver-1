@@ -94,6 +94,12 @@ public:
 	void SendTargetSelect(sUG_CHAR_TARGET_SELECT* pData);
 	void SendCharLevelUp(BYTE byToUp = 1);
 	void SendCharStateUpdate();
+	void SendLPUpdate(WORD wCurLp, WORD wMaxLp, HOBJECT hTarget);
+	void SendEPUpdate(WORD wCurEp, WORD wMaxEp, HOBJECT hTarget);
+	void SendLPEPUpdate(WORD wCurLp, WORD wMaxLp, WORD wCurEp, WORD wMaxEp, HOBJECT hTarget);
+	void SendCharAttackBegin(sUG_CHAR_ATTACK_BEGIN* pData);
+	void SendCharAttackEnd(sUG_CHAR_ATTACK_END* pData);
+	void SendCharAttack();
 
 	//CASH/EVENT SHOPS
 	void SendEventItemStartRes();

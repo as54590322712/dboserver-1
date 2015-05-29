@@ -365,6 +365,27 @@ void CharacterProfile::CalculateAtributes()
 
 	if (pPcTbl)
 	{
+		sPcProfile.avatarAttribute.wBaseMaxEP = pPcTbl->wBasic_EP;
+		sPcProfile.avatarAttribute.wBaseMaxLP = pPcTbl->wBasic_LP;
+		sPcProfile.avatarAttribute.wBaseMaxRP = pPcTbl->wBasic_RP;
+		sPcProfile.avatarAttribute.byBaseStr = pPcTbl->byStr;
+		sPcProfile.avatarAttribute.byBaseFoc = pPcTbl->byFoc;
+		sPcProfile.avatarAttribute.byBaseSol = pPcTbl->bySol;
+		sPcProfile.avatarAttribute.byBaseDex = pPcTbl->byDex;
+		sPcProfile.avatarAttribute.byBaseCon = pPcTbl->byCon;
+		sPcProfile.avatarAttribute.byBaseEng = pPcTbl->byEng;
+		sPcProfile.avatarAttribute.fBaseAttackRange = pPcTbl->fAttack_Range;
+		sPcProfile.avatarAttribute.wBaseAttackRate = pPcTbl->wAttack_Rate;
+		sPcProfile.avatarAttribute.wBaseAttackSpeedRate = pPcTbl->wAttack_Speed_Rate;
+		sPcProfile.avatarAttribute.wBaseBlockRate = pPcTbl->wBlock_Rate;
+		sPcProfile.avatarAttribute.wBaseCurseSuccessRate = pPcTbl->wCurse_Success_Rate;
+		sPcProfile.avatarAttribute.wBaseCurseToleranceRate = pPcTbl->wCurse_Tolerance_Rate;
+		sPcProfile.avatarAttribute.wBaseDodgeRate = pPcTbl->wDodge_Rate;
+		sPcProfile.avatarAttribute.wBasePhysicalOffence = (pPcTbl->byLevel_Up_Physical_Offence * sPcProfile.byLevel);
+		sPcProfile.avatarAttribute.wBasePhysicalDefence = (pPcTbl->byLevel_Up_Physical_Defence * sPcProfile.byLevel);
+		sPcProfile.avatarAttribute.wBaseEnergyOffence = (pPcTbl->byLevel_Up_Energy_Offence * sPcProfile.byLevel);
+		sPcProfile.avatarAttribute.wBaseEnergyDefence = (pPcTbl->byLevel_Up_Energy_Defence * sPcProfile.byLevel);
+
 		sPcProfile.avatarAttribute.wBaseMaxEP += (pPcTbl->byLevel_Up_EP * sPcProfile.byLevel);
 		sPcProfile.avatarAttribute.wBaseMaxLP += (pPcTbl->byLevel_Up_LP * sPcProfile.byLevel);
 		sPcProfile.avatarAttribute.wBaseMaxRP += (pPcTbl->byLevel_Up_RP * sPcProfile.byLevel);
@@ -374,10 +395,6 @@ void CharacterProfile::CalculateAtributes()
 		sPcProfile.avatarAttribute.byBaseEng += (BYTE)(pPcTbl->fLevel_Up_Eng * sPcProfile.byLevel);
 		sPcProfile.avatarAttribute.byBaseCon += (BYTE)(pPcTbl->fLevel_Up_Con * sPcProfile.byLevel);
 		sPcProfile.avatarAttribute.byBaseSol += (BYTE)(pPcTbl->fLevel_Up_Sol * sPcProfile.byLevel);
-		sPcProfile.avatarAttribute.wBasePhysicalOffence += (pPcTbl->byLevel_Up_Physical_Offence * sPcProfile.byLevel);
-		sPcProfile.avatarAttribute.wBasePhysicalDefence += (pPcTbl->byLevel_Up_Physical_Defence * sPcProfile.byLevel);
-		sPcProfile.avatarAttribute.wBaseEnergyOffence += (pPcTbl->byLevel_Up_Energy_Offence * sPcProfile.byLevel);
-		sPcProfile.avatarAttribute.wBaseEnergyDefence += (pPcTbl->byLevel_Up_Energy_Defence * sPcProfile.byLevel);
 
 		sPcProfile.avatarAttribute.wBaseMaxLP += (WORD)((sPcProfile.avatarAttribute.byBaseCon * sPcProfile.byLevel) * 4.7);
 		sPcProfile.avatarAttribute.wBaseMaxEP += (WORD)((sPcProfile.avatarAttribute.byBaseEng * sPcProfile.byLevel) * 4.7);
@@ -463,22 +480,6 @@ void CharacterProfile::LoadCharacterData()
 				sPcProfile.wCurEP = pPcTbl->wBasic_EP;
 				sPcProfile.wCurLP = pPcTbl->wBasic_LP;
 				sPcProfile.wCurRP = pPcTbl->wBasic_RP;
-				sPcProfile.avatarAttribute.wBaseMaxEP = pPcTbl->wBasic_EP;
-				sPcProfile.avatarAttribute.wBaseMaxLP = pPcTbl->wBasic_LP;
-				sPcProfile.avatarAttribute.wBaseMaxRP = pPcTbl->wBasic_RP;
-				sPcProfile.avatarAttribute.byBaseStr = pPcTbl->byStr;
-				sPcProfile.avatarAttribute.byBaseFoc = pPcTbl->byFoc;
-				sPcProfile.avatarAttribute.byBaseSol = pPcTbl->bySol;
-				sPcProfile.avatarAttribute.byBaseDex = pPcTbl->byDex;
-				sPcProfile.avatarAttribute.byBaseCon = pPcTbl->byCon;
-				sPcProfile.avatarAttribute.byBaseEng = pPcTbl->byEng;
-				sPcProfile.avatarAttribute.fBaseAttackRange = pPcTbl->fAttack_Range;
-				sPcProfile.avatarAttribute.wBaseAttackRate = pPcTbl->wAttack_Rate;
-				sPcProfile.avatarAttribute.wBaseAttackSpeedRate = pPcTbl->wAttack_Speed_Rate;
-				sPcProfile.avatarAttribute.wBaseBlockRate = pPcTbl->wBlock_Rate;
-				sPcProfile.avatarAttribute.wBaseCurseSuccessRate = pPcTbl->wCurse_Success_Rate;
-				sPcProfile.avatarAttribute.wBaseCurseToleranceRate = pPcTbl->wCurse_Tolerance_Rate;
-				sPcProfile.avatarAttribute.wBaseDodgeRate = pPcTbl->wDodge_Rate;
 				sPcProfile.avatarAttribute.fLastRunSpeed = (sPcProfile.bIsAdult) ? pPcTbl->fAdult_Run_Speed : pPcTbl->fChild_Run_Speed;
 			}
 		}

@@ -43,6 +43,7 @@ public:
 private:
 	Thread * pThread;
 	GameServer* pServer;
+	DWORD dwLastTick;
 };
 
 #endif

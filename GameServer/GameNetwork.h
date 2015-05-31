@@ -53,6 +53,7 @@ public:
 	void AddSpawn(unsigned int nHandle, BYTE byType);
 	void RemoveSpawn(unsigned int nHandle);
 	bool FindSpawn(unsigned int nHandle, BYTE byType);
+	void CheckLevelUpdate();
 
 	// Opcode Control
 	bool PacketControl(Packet* pPacket);
@@ -93,13 +94,18 @@ public:
 	void SendTSExecObjectRes(sUG_TS_EXCUTE_TRIGGER_OBJECT* pData);
 	void SendTargetSelect(sUG_CHAR_TARGET_SELECT* pData);
 	void SendCharLevelUp(BYTE byToUp = 1);
-	void SendCharStateUpdate();
+	void SendCharStateUpdate(HOBJECT hObject, sCHARSTATE sCharState) ;
 	void SendLPUpdate(WORD wCurLp, WORD wMaxLp, HOBJECT hTarget);
 	void SendEPUpdate(WORD wCurEp, WORD wMaxEp, HOBJECT hTarget);
 	void SendLPEPUpdate(WORD wCurLp, WORD wMaxLp, WORD wCurEp, WORD wMaxEp, HOBJECT hTarget);
 	void SendCharAttackBegin(sUG_CHAR_ATTACK_BEGIN* pData);
 	void SendCharAttackEnd(sUG_CHAR_ATTACK_END* pData);
-	void SendCharAttack();
+	void SendCharAttack(DWORD dwCurrTick);
+	void SendToggleFightMode(sUG_CHAR_TOGG_FIGHTING* pData);
+	void SendMobGiveExp(TBLIDX mobId);
+	void SendGiveExp(DWORD dwExp);
+	void SendCharSkillRes(sUG_CHAR_SKILL_REQ* pData);
+	void DamagetoTarget(HOBJECT hTarget, WORD wDamage);
 
 	//CASH/EVENT SHOPS
 	void SendEventItemStartRes();
@@ -108,6 +114,8 @@ public:
 	void SendNetpyItemEndRes();
 
 	bool IsClosed() { return bIsClosed; }
+	bool IsSpawnReady() { return bIsSpawnReady; }
+	bool IsReadyToUpdate() { return bIsReadyToUpdate; }
 	CharacterProfile* GetProfile() { return pProfile; }
 
 private:
@@ -117,6 +125,8 @@ private:
 
 	bool bIsClosed;
 	bool goCharServer;
+	bool bIsSpawnReady;
+	bool bIsReadyToUpdate;
 
 	typedef std::map<unsigned int, BYTE> OBJSPAWNLIST;
 	typedef OBJSPAWNLIST::iterator OBJSPAWNLISTIT;
@@ -204,6 +214,7 @@ public:
 	char* chatServerIP;
 	int chatServerPort;
 	char* gameDataPath;
+	int nMobExpMulti;
 };
 
 #endif

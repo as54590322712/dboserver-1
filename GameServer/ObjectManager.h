@@ -36,6 +36,8 @@ public:
 	void UpdateCharState(HOBJECT hObject, sCHARSTATE CharState);
 	void SpawnToClient(GameClient* pClient);
 
+	bool HasPcs() { return pcList.size() > 0; }
+
 	typedef std::map<HOBJECT, NpcProfile*> OBJNPCLIST;
 	typedef OBJNPCLIST::iterator OBJNPCLISTIT;
 	typedef OBJNPCLIST::value_type OBJNPCLISTVAL;

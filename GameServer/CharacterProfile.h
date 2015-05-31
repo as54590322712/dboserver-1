@@ -6,11 +6,12 @@
 #include <TableAll.h>
 
 class GameServer;
+class GameClient;
 
 class CharacterProfile
 {
 public:
-	CharacterProfile();
+	CharacterProfile(GameClient* pClient);
 	~CharacterProfile();
 
 	void Init();
@@ -36,6 +37,7 @@ public:
 	bool CheckWarFogFlags(HOBJECT hObject);
 	bool AddWarFogFlags(HOBJECT hObject);
 	void UpdateCharLevel();
+	void UpdateCharExp();
 
 	// Set
 	void SetAvatartype(BYTE byAvatarType) { this->byAvatarType = byAvatarType; }
@@ -66,6 +68,7 @@ public:
 	BYTE GetAvatartype() { return byAvatarType; }
 	BYTE GetMovedirection() { return byMoveDirection; }
 	HOBJECT GetTarget() { return hTarget; }
+	GameClient* GetClient() { return pClient; }
 
 	// Structs
 	sPC_PROFILE sPcProfile;
@@ -98,6 +101,7 @@ public:
 
 	bool bIsSit;
 	bool bIsMoving;
+	DWORD dwLastAttack;
 
 private:
 	WCHAR wszUserName[NTL_MAX_SIZE_USERID_UNICODE + 1];
@@ -122,6 +126,7 @@ private:
 	HOBJECT hTarget;
 
 	GameServer* pServer;
+	GameClient* pClient;
 };
 
 #endif

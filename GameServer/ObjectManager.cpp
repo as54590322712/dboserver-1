@@ -30,7 +30,19 @@ void ObjectManager::Run()
 {
 	while (IsRunnable())
 	{
-		//Sleep(1000);
+		if (HasPcs())
+		{
+			for (OBJPCLISTIT it = pcList.begin(); it != pcList.end(); it++)
+			{
+				GameClient* pClient = it->second->GetClient();
+
+				if (pClient && pClient->IsSpawnReady())
+				{
+					SpawnToClient(pClient);
+				}
+			}
+		}
+		Sleep(1000);
 	}
 }
 
@@ -138,7 +150,7 @@ void ObjectManager::UpdateCharState(HOBJECT hObject, sCHARSTATE CharState)
 
 void ObjectManager::SpawnToClient(GameClient* pClient)
 {
-	if (false == pClient->IsClosed() && pClient->IsConnected() && pClient->GetProfile() && pClient)
+	if (false == pClient->IsClosed() && pClient->IsConnected() && pClient->GetProfile() && pClient && pClient->IsSpawnReady())
 	{
 		for (OBJPCLISTIT it = pcList.begin(); it != pcList.end(); it++)
 		{

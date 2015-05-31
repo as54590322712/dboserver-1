@@ -16,8 +16,10 @@ GameClient::GameClient(bool IsAliveCheck, bool IsOpcodeCheck)
 
 	SetPacketEncoder(&_packetEncoder);
 	pServer = (GameServer*)_GetApp();
-	pProfile = new CharacterProfile();
+	pProfile = new CharacterProfile(this);
 	bIsClosed = false;
+	bIsSpawnReady = false;
+	bIsReadyToUpdate = false;
 }
 
 GameClient::~GameClient()
@@ -91,5 +93,23 @@ bool GameClient::FindSpawn(unsigned int nHandle, BYTE byType)
 	if (it->first == nHandle && it->second == byType)
 		return true;
 	return false;
+}
+
+void GameClient::CheckLevelUpdate()
+{
+	sEXP_TBLDAT* pTbl = (sEXP_TBLDAT*)pServer->GetTableContainer()->GetExpTable()->FindData(pProfile->sPcProfile.byLevel);
+
+	if (pTbl)
+	{
+		if (pProfile->sPcProfile.dwCurExp >= pTbl->dwNeed_Exp)
+		{
+			// Reset CurExp
+			pProfile->sPcProfile.dwCurExp -= pTbl->dwNeed_Exp;
+			SendGiveExp(0);
+
+			// send Player Level UP!
+			SendCharLevelUp();
+		}
+	}
 }
 

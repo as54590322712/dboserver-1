@@ -50,6 +50,7 @@ int GameServer::OnCreate()
 	chatServerIP = ServerCfg->GetStr("ChatServer", "IP");
 	chatServerPort = ServerCfg->GetInt("ChatServer", "Port");
 	gameDataPath = ServerCfg->GetStr("GameData", "Path");
+	nMobExpMulti = ServerCfg->GetInt("Multipliers", "MobExp");
 
 	m_uiSerialID = INVALID_DWORD;
 
@@ -257,7 +258,7 @@ int GameServer::LoadSpawns(TBLIDX worldTblidx, bool bIsNpc)
 		{
 			sSPAWN_TBLDAT* pSpawnData = (sSPAWN_TBLDAT*)it->second;
 
-			MobProfile* obj = new MobProfile(worldTblidx, pSpawnData->tblidx);
+			MobProfile* obj = new MobProfile(worldTblidx, pSpawnData->tblidx, pSpawnData->mob_Tblidx);
 			obj->Init();
 			GetObjectManager()->AddObject(obj->GetSerialID(), obj, eOBJTYPE::OBJTYPE_MOB);
 		}

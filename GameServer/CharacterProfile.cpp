@@ -1,9 +1,11 @@
 #include "CharacterProfile.h"
 #include "GameNetwork.h"
 
-CharacterProfile::CharacterProfile()
+CharacterProfile::CharacterProfile(GameClient* pClient)
 {
 	this->pServer = (GameServer*)_GetApp();
+	this->pClient = pClient;
+	dwLastAttack = 0;
 }
 
 void CharacterProfile::Init()
@@ -21,6 +23,12 @@ void CharacterProfile::Init()
 CharacterProfile::~CharacterProfile()
 {
 	this->pServer = NULL;
+	this->pClient = NULL;
+}
+
+void CharacterProfile::UpdateCharExp()
+{
+	pServer->ServerDB->ExecuteQuery("UPDATE `character` SET `CurExp` = '%u' WHERE `ID` = '%u';", sPcProfile.dwCurExp, hCharID);
 }
 
 void CharacterProfile::UpdateCharLevel()

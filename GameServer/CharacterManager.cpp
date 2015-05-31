@@ -6,6 +6,7 @@
 CharacterManager::CharacterManager()
 {
 	pServer = (GameServer*)_GetApp();
+	dwLastTick = 0;
 }
 
 CharacterManager::~CharacterManager()
@@ -27,25 +28,25 @@ void CharacterManager::Run()
 {
 	while (IsRunnable())
 	{
+		DWORD dwTick = GetTickCount();
 		if (HasClients())
 		{
-			// Parallel for each loop
-			concurrency::parallel_for_each(cList.begin(), cList.end(), [&](std::pair<unsigned int, GameClient*> it) {
-				if (it.second) UpdateClientData(it.second, GetTickCount());
-			});
+			for(cliIt it = cList.begin(); it != cList.end(); it++)
+			{
+				if (it->second) UpdateClientData(it->second, dwTick);
+			}
 		}
+		dwLastTick = dwTick;
+		Sleep(1000);
 	}
 }
 
 void CharacterManager::UpdateClientData(GameClient* pClient, DWORD dwCurrTick)
 {
 	// check if is alive
-	if (false == pClient->IsClosed() && HasClients())
+	if (false == pClient->IsClosed() && HasClients() && pClient->IsReadyToUpdate())
 	{
-		// check spawns
-		pServer->GetObjectManager()->SpawnToClient(pClient);
-
-		// update LP and EP
+		// Update LP/EP
 		pClient->SendLPEPUpdate(pClient->GetProfile()->sPcProfile.wCurLP,
 			pClient->GetProfile()->sPcProfile.avatarAttribute.wBaseMaxLP,
 			pClient->GetProfile()->sPcProfile.wCurEP,
@@ -53,7 +54,10 @@ void CharacterManager::UpdateClientData(GameClient* pClient, DWORD dwCurrTick)
 			pClient->GetProfile()->GetSerialID());
 
 		// check player attack
-		pClient->SendCharAttack();
+		pClient->SendCharAttack(dwCurrTick);
+
+		// Check Levelup
+		pClient->CheckLevelUpdate();
 	}
 }
 
@@ -86,10 +90,13 @@ void CharacterManager::RemoveClient(GameClient* pClient)
 
 bool CharacterManager::FindClient(GameClient* pClient)
 {
-	for (cliIt it = cList.begin(); it != cList.end(); ++it)
+	cliIt it = cList.find(pClient->GetHandle());
+	if (it != cList.end())
 	{
 		if (pClient->GetHandle() == it->second->GetHandle())
+		{
 			return true;
+		}
 	}
 	return false;
 }

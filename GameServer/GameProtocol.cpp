@@ -36,11 +36,13 @@ bool GameClient::PacketControl(Packet* pPacket)
 	case UG_CHAR_MOVE_SYNC: SendCharMoveSync((sUG_CHAR_MOVE_SYNC*)data); break;
 	case UG_CHAR_JUMP: SendCharJump((sUG_CHAR_JUMP*)data); break;
 	case UG_CHAR_JUMP_END: SendCharJumpEnd(); break;
+	case UG_CHAR_TOGG_FIGHTING: SendToggleFightMode((sUG_CHAR_TOGG_FIGHTING*)data); break;
 	case UG_CHAR_TARGET_SELECT: SendTargetSelect((sUG_CHAR_TARGET_SELECT*)data); break;
 	case UG_CHAR_ATTACK_BEGIN: SendCharAttackBegin((sUG_CHAR_ATTACK_BEGIN*)data); break;
 	case UG_CHAR_ATTACK_END: SendCharAttackEnd((sUG_CHAR_ATTACK_END*)data); break;
 	case UG_CHAR_EXIT_REQ: SendCharExitRes(); break;
 	case UG_GAME_EXIT_REQ: SendGameExitRes(); break;
+	case UG_CHAR_SKILL_REQ: SendCharSkillRes((sUG_CHAR_SKILL_REQ*)data); break;
 	case UG_ITEM_MOVE_REQ: SendIemMoveRes((sUG_ITEM_MOVE_REQ*)data); break;
 	case UG_SOCIAL_ACTION: SendSocialAction((sUG_SOCIAL_ACTION*)data); break;
 	case UG_TS_CONFIRM_STEP_REQ: SendTSConfirmRes((sUG_TS_CONFIRM_STEP_REQ*)data); break;
@@ -56,7 +58,10 @@ bool GameClient::PacketControl(Packet* pPacket)
 
 	// SYS PACKETS
 	case SYS_ALIVE: { ResetAliveTime(); } break;
-	case SYS_PING: break;
+	case SYS_PING:	{
+		// use the ping response to check
+		//pServer->GetObjectManager()->SpawnToClient(this);
+	} break;
 	default:
 		Logger::Log("Received Opcode: %s\n", NtlGetPacketName_UG(data->wOpCode));
 		return false;
@@ -65,22 +70,188 @@ bool GameClient::PacketControl(Packet* pPacket)
 	return true;
 }
 
-void GameClient::SendCharAttack()
+void GameClient::SendCharSkillRes(sUG_CHAR_SKILL_REQ* pData)
 {
+	TBLIDX skillId = INVALID_TBLIDX;
+	WORD Result = GAME_SUCCESS;
+	for (int i = 0; i < NTL_MAX_PC_HAVE_SKILL; i++)
+	{
+		if (pProfile->asSkillInfo[i].bySlotId == pData->bySlotIndex)
+		{
+			skillId = pProfile->asSkillInfo[i].tblidx;
+		}
+	}
+
+	if (skillId != INVALID_TBLIDX)
+	{
+		sSKILL_TBLDAT* pTbl = (sSKILL_TBLDAT*)pServer->GetTableContainer()->GetSkillTable()->FindData(skillId);
+
+		if (pTbl)
+		{
+			sGU_CHAR_ACTION_SKILL sSkill;
+			memset(&sSkill, 0, sizeof(sSkill));
+			sSkill.wOpCode = GU_CHAR_ACTION_SKILL;
+			sSkill.dwLpEpEventId = skillId;
+			sSkill.skillId = skillId;
+			sSkill.handle = pProfile->GetSerialID();
+			sSkill.hAppointedTarget = pData->hTarget;
+			sSkill.wResultCode = Result;
+			sSkill.byRpBonusType = pData->byRpBonusType;
+			sSkill.bySkillResultCount = pData->byApplyTargetCount;
+
+			for (int i = 0; i < sSkill.bySkillResultCount; i++)
+			{
+				sSkill.aSkillResult[i].hTarget = pData->ahApplyTarget[i];
+				sSkill.aSkillResult[i].effectResult1.fResultValue = pTbl->fSkill_Effect_Value[0];
+				sSkill.aSkillResult[i].effectResult2.fResultValue = pTbl->fSkill_Effect_Value[1];
+				sSkill.aSkillResult[i].byAttackResult = BATTLE_ATTACK_RESULT_HIT;
+				sSkill.aSkillResult[i].byBlockedAction = 255;
+
+				WORD wDamage = (WORD)(sSkill.aSkillResult[i].effectResult1.fResultValue + sSkill.aSkillResult[i].effectResult2.fResultValue);
+
+				DamagetoTarget(sSkill.aSkillResult[i].hTarget, wDamage);
+			}
+
+			pServer->GetClientManager()->SendAll(&sSkill, sizeof(sSkill));
+		}
+	}
+	else
+	{
+		Result = eRESULTCODE::GAME_SKILL_ID_NULL;
+	}
+
+	sGU_CHAR_SKILL_RES sPkt;
+	memset(&sPkt, 0, sizeof(sPkt));
+	sPkt.wOpCode = GU_CHAR_SKILL_RES;
+	sPkt.wResultCode = Result;
+	Send(&sPkt, sizeof(sPkt));
+}
+
+void GameClient::SendGiveExp(DWORD dwExp)
+{
+	DWORD mobExp = dwExp * pServer->nMobExpMulti;
+	pProfile->sPcProfile.dwCurExp += mobExp;
+
+	sGU_UPDATE_CHAR_EXP sPkt;
+	memset(&sPkt, 0, sizeof(sPkt));
+	sPkt.wOpCode = GU_UPDATE_CHAR_EXP;
+	sPkt.handle = pProfile->GetSerialID();
+	sPkt.dwIncreasedExp = mobExp;
+	sPkt.dwAcquisitionExp = dwExp;
+	sPkt.dwBonusExp = mobExp - dwExp;
+	sPkt.dwCurExp = pProfile->sPcProfile.dwCurExp;
+	Send(&sPkt, sizeof(sPkt));
+
+	pProfile->UpdateCharExp();
+}
+
+void GameClient::SendMobGiveExp(TBLIDX mobId)
+{
+	sMOB_TBLDAT* pTbl = (sMOB_TBLDAT*)pServer->GetTableContainer()->GetMobTable()->FindData(mobId);
+
+	if (pTbl)
+	{
+		DWORD mobExp = pTbl->wExp * pServer->nMobExpMulti;
+		pProfile->sPcProfile.dwCurExp += mobExp;
+
+		sGU_UPDATE_CHAR_EXP sPkt;
+		memset(&sPkt, 0, sizeof(sPkt));
+		sPkt.wOpCode = GU_UPDATE_CHAR_EXP;
+		sPkt.handle = pProfile->GetSerialID();
+		sPkt.dwIncreasedExp = mobExp;
+		sPkt.dwAcquisitionExp = pTbl->wExp;
+		sPkt.dwBonusExp = mobExp - pTbl->wExp;
+		sPkt.dwCurExp = pProfile->sPcProfile.dwCurExp;
+		Send(&sPkt, sizeof(sPkt));
+
+		pProfile->UpdateCharExp();
+	}
+}
+
+void GameClient::SendToggleFightMode(sUG_CHAR_TOGG_FIGHTING* pData)
+{
+	if (pData->byAvatarType == pProfile->GetAvatartype())
+	{
+		pProfile->sCharState.sCharStateBase.bFightMode = pData->bFightMode;
+
+		sGU_CHAR_FIGHTMODE sPkt;
+		memset(&sPkt, 0, sizeof(sPkt));
+		sPkt.bFightMode = pProfile->sCharState.sCharStateBase.bFightMode;
+		sPkt.handle = pProfile->GetSerialID();
+		sPkt.wOpCode = GU_CHAR_FIGHTMODE;
+		pServer->GetClientManager()->SendAll(&sPkt, sizeof(sPkt));
+	}
+}
+
+void GameClient::DamagetoTarget(HOBJECT hTarget, WORD wDamage)
+{
+	CharacterProfile* pPcProfile = NULL;
+	MobProfile* pMobProfile = NULL;
+	NpcProfile* pNpcProfile = NULL;
+
+	if (pServer->GetObjectManager()->FindObject(hTarget, eOBJTYPE::OBJTYPE_PC))
+	{
+		pPcProfile = pServer->GetObjectManager()->pcList.find(pProfile->GetTarget())->second;
+
+		pPcProfile->sPcProfile.wCurLP -= wDamage;
+		if ((pPcProfile->sPcProfile.wCurLP - wDamage) < 0)
+			pPcProfile->sPcProfile.wCurLP = 0;
+
+		Logger::Log(" PC Attack [%u] LP: %u\n", pPcProfile->GetSerialID(), pPcProfile->sPcProfile.wCurLP);
+	}
+	else if (pServer->GetObjectManager()->FindObject(hTarget, eOBJTYPE::OBJTYPE_MOB))
+	{
+		pMobProfile = pServer->GetObjectManager()->mobList.find(pProfile->GetTarget())->second;
+
+		pMobProfile->sBrief.wCurLP -= wDamage;
+		if ((pMobProfile->sBrief.wCurLP - wDamage) < 0)
+			pMobProfile->sBrief.wCurLP = 0;
+
+		Logger::Log(" MOB Attack [%u] LP: %u\n", pMobProfile->GetSerialID(), pMobProfile->sBrief.wCurLP);
+
+		if (pMobProfile->sBrief.wCurLP == 0)
+		{
+			pMobProfile->sCharState.sCharStateBase.byStateID = CHARSTATE_FAINTING;
+			SendCharStateUpdate(pMobProfile->GetSerialID(), pMobProfile->sCharState);
+			pMobProfile->sCharState.sCharStateBase.byStateID = CHARSTATE_STANDING;
+
+			sGU_CHAR_FIGHTMODE sPkt;
+			memset(&sPkt, 0, sizeof(sPkt));
+			sPkt.bFightMode = pProfile->sCharState.sCharStateBase.bFightMode = false;
+			sPkt.handle = pProfile->GetSerialID();
+			sPkt.wOpCode = GU_CHAR_FIGHTMODE;
+			pServer->GetClientManager()->SendAll(&sPkt, sizeof(sPkt));
+
+			SendMobGiveExp(pMobProfile->GetMobID());
+		}
+	}
+}
+
+void GameClient::SendCharAttack(DWORD dwCurrTick)
+{
+	WORD wDamage = pProfile->sPcProfile.avatarAttribute.wLastPhysicalOffence;
+	wDamage += 2 * wDamage;
+
 	if (pProfile->sCharState.sCharStateBase.bFightMode)
 	{
-		sGU_CHAR_ACTION_ATTACK sPkt;
-		memset(&sPkt, 0, sizeof(sPkt));
-		sPkt.wOpCode = GU_CHAR_ACTION_ATTACK;
-		sPkt.dwLpEpEventId = 255;
-		sPkt.byBlockedAction = 255;
-		sPkt.hSubject = pProfile->GetSerialID();
-		sPkt.hTarget = pProfile->GetTarget();
-		sPkt.wAttackResultValue = pProfile->sPcProfile.avatarAttribute.wLastPhysicalOffence;
-		sPkt.bChainAttack = false;
-		sPkt.byAttackSequence = 1;
-		sPkt.vShift = pProfile->sCharState.sCharStateBase.vCurLoc;
-		pServer->GetClientManager()->SendAll(&sPkt, sizeof(sPkt));
+		if (pProfile->dwLastAttack != 0 && (dwCurrTick - pProfile->dwLastAttack) >= 2100)
+		{
+			sGU_CHAR_ACTION_ATTACK sPkt;
+			memset(&sPkt, 0, sizeof(sPkt));
+			sPkt.wOpCode = GU_CHAR_ACTION_ATTACK;
+			sPkt.dwLpEpEventId = 255;
+			sPkt.byBlockedAction = 255;
+			sPkt.hSubject = pProfile->GetSerialID();
+			sPkt.hTarget = pProfile->GetTarget();
+			sPkt.wAttackResultValue = wDamage;
+			sPkt.bChainAttack = false;
+			sPkt.byAttackSequence = 1;
+			sPkt.vShift = pProfile->sCharState.sCharStateBase.vCurLoc;
+			pServer->GetClientManager()->SendAll(&sPkt, sizeof(sPkt));
+			pProfile->dwLastAttack = dwCurrTick;
+
+			DamagetoTarget(pProfile->GetTarget(), wDamage);
+		}
 	}
 }
 
@@ -88,7 +259,7 @@ void GameClient::SendCharAttackEnd(sUG_CHAR_ATTACK_END* pData)
 {
 	if (pData->byAvatarType == pProfile->GetAvatartype())
 	{
-		pProfile->sCharState.sCharStateBase.bFightMode = false;
+		pProfile->dwLastAttack = 0;
 	}
 }
 
@@ -96,7 +267,7 @@ void GameClient::SendCharAttackBegin(sUG_CHAR_ATTACK_BEGIN* pData)
 {
 	if (pData->byAvatarType == pProfile->GetAvatartype())
 	{
-		pProfile->sCharState.sCharStateBase.bFightMode = true;
+		pProfile->dwLastAttack = GetTickCount();
 	}
 }
 
@@ -138,13 +309,13 @@ void GameClient::SendLPUpdate(WORD wCurLp, WORD wMaxLp, HOBJECT hTarget)
 	pServer->GetClientManager()->SendAll(&sPkt, sizeof(sPkt));
 }
 
-void GameClient::SendCharStateUpdate()
+void GameClient::SendCharStateUpdate(HOBJECT hObject, sCHARSTATE sCharState)
 {
 	sGU_UPDATE_CHAR_STATE sPkt;
 	memset(&sPkt, 0, sizeof(sPkt));
-	sPkt.handle = pProfile->GetSerialID();
+	sPkt.handle = hObject;
 	sPkt.wOpCode = GU_UPDATE_CHAR_STATE;
-	sPkt.sCharState = pProfile->sCharState;
+	sPkt.sCharState = sCharState;
 	pServer->GetClientManager()->SendAll(&sPkt, sizeof(sPkt));
 }
 
@@ -238,6 +409,12 @@ void GameClient::SendTutoHintUpdateRes(sUG_TUTORIAL_HINT_UPDATE_REQ* pData)
 {
 	pProfile->sPcProfile.dwTutorialHint |= pData->dwTutorialHint;
 	pServer->ServerDB->ExecuteQuery("UPDATE `character` SET `TutorialHint` = '%u' WHERE `ID` = '%u';", pProfile->sPcProfile.dwTutorialHint, pProfile->GetCharID());
+	sGU_TUTORIAL_HINT_UPDATE_RES sPkt;
+	memset(&sPkt, 0, sizeof(sPkt));
+	sPkt.wOpCode = GU_TUTORIAL_HINT_UPDATE_RES;
+	sPkt.wResultCode = GAME_SUCCESS;
+	sPkt.dwTutorialHint = pData->dwTutorialHint;
+	Send(&sPkt, sizeof(sPkt));
 }
 
 void GameClient::SendSocialAction(sUG_SOCIAL_ACTION* pData)
@@ -562,6 +739,9 @@ void GameClient::SendCharReadyRes(sUG_CHAR_READY* pData)
 {
 	pProfile->SetAvatartype(pData->byAvatarType);
 	pProfile->InsertOnlineData();
+
+	bIsSpawnReady = true;
+	bIsReadyToUpdate = true;
 }
 
 void GameClient::SendCharReadySpawnReq()

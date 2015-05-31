@@ -10,6 +10,9 @@
   <!-- Chat Server Config -->
   <ChatServer IP="127.0.0.1" Port="50100" />
   
+  <!-- Multipliers -->
+  <Multipliers MobExp="20" />
+  
   <!-- Char Server List Configuration -->
   <CharServerList Count="1">
     <CharServer1 IP="127.0.0.1" Port="50300" />

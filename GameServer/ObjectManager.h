@@ -10,6 +10,8 @@
 #include <map>
 
 #include "GameProtocol.h"
+#include "ObjectTable.h"
+#include "DynamicObjectTable.h"
 
 class GameServer;
 class GameClient;
@@ -52,6 +54,16 @@ public:
 	typedef OBJPCLIST::iterator OBJPCLISTIT;
 	typedef OBJPCLIST::value_type OBJPCLISTVAL;
 	OBJPCLIST pcList;
+
+	typedef std::map<HOBJECT, sOBJECT_TBLDAT*> OBJMAPLIST;
+	typedef OBJMAPLIST::iterator OBJMAPLISTIT;
+	typedef OBJMAPLIST::value_type OBJMAPLISTVAL;
+	OBJMAPLIST objMapList;
+
+	typedef std::map<HOBJECT, sDYNAMIC_OBJECT_TBLDAT*> OBJDYNAMICLIST;
+	typedef OBJDYNAMICLIST::iterator OBJDYNAMICLISTIT;
+	typedef OBJDYNAMICLIST::value_type OBJDYNAMICLISTVAL;
+	OBJDYNAMICLIST objDynamicList;
 
 private:
 	Thread* pThread;

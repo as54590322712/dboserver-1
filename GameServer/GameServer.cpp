@@ -76,6 +76,9 @@ int GameServer::OnAppStart()
 	// Load MOBs/NPCs Spawns
 	LoadSpawns();
 
+	// Load Objects from Server PLEASE NOT SPAWN FOR ANY CHAR! the client does itself through hTriggerOffset - Luiz45
+	LoadGameObjects();
+
 	Logger::Log("Server listening on %s:%d\n", _clientAcceptor.GetListenIP(), _clientAcceptor.GetListenPort());
 	return 0;
 }
@@ -212,6 +215,59 @@ bool GameServer::LoadTableData()
 	m_pTableContainer = new TableContainer();
 	
 	return m_pTableContainer->Create(flagManager, gameDataPath, &fileNameList, eLOADING_METHOD::LOADING_METHOD_SECURED_BINARY, GetACP(), NULL);
+}
+
+//By Luiz45 Load Game Objects
+void GameServer::LoadGameObjects()
+{
+	int count = 0;
+	Logger::Log("Loading Game Objects ...\n");
+	for (TableContainer::OBJTABLEIT it = GetTableContainer()->BeginObjectTable(); GetTableContainer()->EndObjectTable() != it; ++it)
+	{
+		count += LoadGameObjects(it->first);
+	}
+	Logger::Log("Loaded %d GameObjects.\n", count);
+
+	count = 0;
+	Logger::Log("Loading Dynamic Objects ...\n");
+	for (TableContainer::OBJTABLEIT it = GetTableContainer()->BeginObjectTable(); GetTableContainer()->EndObjectTable() != it; ++it)
+	{
+		count += LoadDynamicObjects(it->first);
+	}
+	Logger::Log("Loaded %d Dynamic Objects.\n", count);
+}
+//By Luiz45 - Load All game objects to be able to do somethings like warfog, quest kill and take objects,etc..
+int GameServer::LoadGameObjects(TBLIDX worldTblidx)
+{
+	int count = 0;
+	ObjectTable* pObjectTable = GetTableContainer()->GetObjectTable(worldTblidx);
+	for (Table::TABLEIT it = pObjectTable->Begin(); it != pObjectTable->End(); ++it, ++count)
+	{
+		sOBJECT_TBLDAT* pObjectTblDat = reinterpret_cast<sOBJECT_TBLDAT*>(it->second);
+		if (pObjectTblDat)
+		{
+			//Remember this "100000" must be the same as passed in sWorld for every char
+			HOBJECT handle = (100000 + pObjectTblDat->dwSequence);
+			GetObjectManager()->AddObject(handle, pObjectTblDat, eOBJTYPE::OBJTYPE_TOBJECT);
+		}
+	}
+	return count;
+}
+//By Luiz45 - Load Dynamic Object
+int GameServer::LoadDynamicObjects(TBLIDX dynamicIDX)
+{
+	int count = 0;
+	DynamicObjectTable* pDynamicTable = GetTableContainer()->GetDynamicObjectTable();
+	for (Table::TABLEIT it = pDynamicTable->Begin(); it != pDynamicTable->End(); ++it, ++count)
+	{
+		sDYNAMIC_OBJECT_TBLDAT* pDynamicTblDat = reinterpret_cast<sDYNAMIC_OBJECT_TBLDAT*>(it->second);
+		if (pDynamicTblDat)
+		{
+			HOBJECT handle = (100 + pDynamicTblDat->tblidx);//If i remember this thing have only 4 idx(1,2,3,4)
+			GetObjectManager()->AddObject(handle, pDynamicTblDat, eOBJTYPE::OBJTYPE_DYNAMIC);
+		}
+	}
+	return count;
 }
 
 void GameServer::LoadSpawns()

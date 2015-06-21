@@ -3,10 +3,12 @@
 
 #include "Base.h"
 #include "Def.h"
+#include "AttributeManager.h"
 #include <TableAll.h>
 
 class GameServer;
 class GameClient;
+class AttributeManager;
 
 class CharacterProfile
 {
@@ -25,6 +27,7 @@ public:
 	void UpdatePositions(sVECTOR3 Dir, sVECTOR3 Loc);
 	int LoadItemData();
 	int LoadSkillData();
+	int LoadHTBData();
 	int LoadQuickslotData();
 	void CalculateAtributes();
 	void GetObjectCreate(sGU_OBJECT_CREATE& sPacket);
@@ -69,6 +72,7 @@ public:
 	BYTE GetMovedirection() { return byMoveDirection; }
 	HOBJECT GetTarget() { return hTarget; }
 	GameClient* GetClient() { return pClient; }
+	AttributeManager* GetAttributeManager(){ return pAttributeManager; }
 
 	// Structs
 	sPC_PROFILE sPcProfile;
@@ -127,6 +131,7 @@ private:
 
 	GameServer* pServer;
 	GameClient* pClient;
+	AttributeManager* pAttributeManager;
 };
 
 #endif

@@ -68,6 +68,7 @@
     <ClCompile Include="NormalDropTable.cpp" />
     <ClCompile Include="NpcSpeechTable.cpp" />
     <ClCompile Include="NPCTable.cpp" />
+    <ClCompile Include="NtlAvatar.cpp" />
     <ClCompile Include="NtlBattle.cpp" />
     <ClCompile Include="NtlBBox.cpp" />
     <ClCompile Include="NtlBitFlagManager.cpp" />

@@ -53,6 +53,19 @@ void ChatManager::RemoveClient(ChatClient* pClient)
 	}
 }
 
+//By Luiz45 - Just Return the ChatClient(he will search through CharName)
+ChatClient* ChatManager::GetChatClient(WCHAR* pCharName){
+	for (cliIt it = cList.begin(); it != cList.end(); ++it)
+	{
+		if (FindClient(it->second))
+		{
+			if (wcscmp(it->second->GetCharName(), pCharName) == 0)
+				return it->second;
+		}
+	}
+	return NULL;
+}
+
 bool ChatManager::FindClient(ChatClient* pClient)
 {
 	for (cliIt it = cList.begin(); it != cList.end(); ++it)
@@ -68,6 +81,16 @@ void ChatManager::SendAll(void* pData, int nSize)
 	for (cliIt it = cList.begin(); it != cList.end(); ++it)
 	{
 		it->second->PushPacket(pData, nSize);
+	}
+}
+
+//By Luiz45 - Send A packet directly to a specific client
+void ChatManager::SendTo(void* pData, int nSize, ChatClient* pClient)
+{
+	for (cliIt it = cList.begin(); it != cList.end(); ++it)
+	{
+		if (pClient->GetHandle() == it->second->GetHandle())
+			it->second->PushPacket(pData, nSize);
 	}
 }
 

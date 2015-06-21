@@ -513,6 +513,9 @@
     <ClCompile Include="NtlStringHandler.cpp">
       <Filter>Source Files\GameLib</Filter>
     </ClCompile>
+    <ClCompile Include="NtlAvatar.cpp">
+      <Filter>Source Files\GameLib</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Network.h">

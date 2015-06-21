@@ -5,6 +5,7 @@ CharacterProfile::CharacterProfile(GameClient* pClient)
 {
 	this->pServer = (GameServer*)_GetApp();
 	this->pClient = pClient;
+	this->pAttributeManager = new AttributeManager();
 	dwLastAttack = 0;
 }
 
@@ -38,19 +39,25 @@ void CharacterProfile::UpdateCharLevel()
 
 void CharacterProfile::LoadWarFogFlags()
 {
-	memset(&acWarFogFlag, 0xFF, NTL_MAX_SIZE_WAR_FOG);
+	memset(&acWarFogFlag, 0, NTL_MAX_SIZE_WAR_FOG);
 	// NEED MORE RESEARCH
-	/*if (pServer->ServerDB->ExecuteSelect("SELECT `Object` FROM `warfog` WHERE `CharID` = '%u';", hCharID))
+	if (pServer->ServerDB->ExecuteSelect("SELECT `Object` FROM `warfog` WHERE `CharID` = '%u';", hCharID))
 	{
 		while (pServer->ServerDB->Fetch())
 		{
 			HOBJECT Obj = pServer->ServerDB->getInt("Object");
-			int uiArrayPos = Obj / 8;
-			BYTE byCurBit = (BYTE)(Obj % 8);
+			if (pServer->GetObjectManager()->FindObject(Obj, eOBJTYPE::OBJTYPE_TOBJECT))
+			{
+				TBLIDX contentsTblix = pServer->GetObjectManager()->objMapList.find(Obj)->second->contentsTblidx;
+				if (contentsTblix > NTL_MAX_COUNT_WAR_FOG)
+					return;
+				int uiArrayPos = contentsTblix / 8;
+				BYTE byCurBit = (BYTE)(contentsTblix % 8);
 
-			acWarFogFlag[uiArrayPos] |= 0x01ui8 << byCurBit;
+				acWarFogFlag[uiArrayPos] |= 0x01ui8 << byCurBit;
+			}
 		}
-	}*/
+	}
 }
 
 bool CharacterProfile::CheckWarFogFlags(HOBJECT hObject)
@@ -167,6 +174,29 @@ int CharacterProfile::LoadQuickslotData()
 			asQuickSlotData[count].byType = pServer->ServerDB->getInt("Type");
 			asQuickSlotData[count].hItem = pServer->ServerDB->getInt("Item");
 			count++;
+		}
+	}
+	return count;
+}
+
+int CharacterProfile::LoadHTBData()
+{
+	int count = 0;
+	if (pServer->ServerDB->ExecuteSelect("SELECT * FROM `skills` WHERE `CharID`='%u';", this->hCharID))
+	{
+		while (pServer->ServerDB->Fetch())
+		{
+			sSKILL_TBLDAT* pSkillData = reinterpret_cast<sSKILL_TBLDAT*>(pServer->GetTableContainer()->GetSkillTable()->FindData(pServer->ServerDB->getInt("SkillID")));
+			if (pSkillData)
+			{
+				if (pSkillData->bySkill_Class == NTL_SKILL_CLASS_HTB)
+				{
+					asHTBInfo[count].skillId = pServer->ServerDB->getInt("SkillID");
+					asHTBInfo[count].dwTimeRemaining = pServer->ServerDB->getInt("RemainSec");
+					asHTBInfo[count].bySlotId = pServer->ServerDB->getInt("Slot");
+					count++;
+				}
+			}			
 		}
 	}
 	return count;

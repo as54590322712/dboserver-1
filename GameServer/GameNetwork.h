@@ -64,9 +64,12 @@ public:
 	void SendCharInfoEnd();
 	void SendCharWorldInfo();
 	void SendCharWorldInfoEnd();
-	void SendCharMove(sUG_CHAR_MOVE* data);
+	void SendCharMove(sUG_CHAR_MOVE* pData);
+	void SendCharFollowMove(sUG_CHAR_FOLLOW_MOVE* pData);
+	void SendCharChangeDirectionFloating(sUG_CHAR_CHANGE_DIRECTION_ON_FLOATING* pData);
 	void SendCharItemInfo();
 	void SendCharSkillInfo();
+	void SendCharHTBInfo();
 	void SendCharQuickSlotInfo();
 	void SendCharReadySpawnReq();
 	void SendCharReadyRes(sUG_CHAR_READY* pData);
@@ -81,6 +84,7 @@ public:
 	void SendCharJump(sUG_CHAR_JUMP* pData);
 	void SendCharJumpEnd();
 	void SendCharChangeHeading(sUG_CHAR_CHANGE_HEADING* pData);
+	void SendCharDirectPlay(sUG_CHAR_DIRECT_PLAY_ACK* pData);
 	void SendCharExitRes();
 	void SendGameExitRes();
 	void SendIemMoveRes(sUG_ITEM_MOVE_REQ* pData);
@@ -93,6 +97,7 @@ public:
 	void SendWarFogUpdateRes(sUG_WAR_FOG_UPDATE_REQ* pData);
 	void SendTSExecObjectRes(sUG_TS_EXCUTE_TRIGGER_OBJECT* pData);
 	void SendTargetSelect(sUG_CHAR_TARGET_SELECT* pData);
+	void SendTargetInfo(sUG_CHAR_TARGET_INFO* pData);
 	void SendCharLevelUp(BYTE byToUp = 1);
 	void SendCharStateUpdate(HOBJECT hObject, sCHARSTATE sCharState) ;
 	void SendLPUpdate(WORD wCurLp, WORD wMaxLp, HOBJECT hTarget);
@@ -102,16 +107,24 @@ public:
 	void SendCharAttackEnd(sUG_CHAR_ATTACK_END* pData);
 	void SendCharAttack(DWORD dwCurrTick);
 	void SendToggleFightMode(sUG_CHAR_TOGG_FIGHTING* pData);
+	void SendToggleSitDown();
+	void SendToggleStandUp();
+	void SendToggleRunning(sUG_CHAR_TOGG_RUNNING* pData);
 	void SendMobGiveExp(TBLIDX mobId);
 	void SendGiveExp(DWORD dwExp);
 	void SendCharSkillRes(sUG_CHAR_SKILL_REQ* pData);
 	void DamagetoTarget(HOBJECT hTarget, WORD wDamage);
-
+	//PORTAL PACKETS
+	void SendPortalStart(sUG_PORTAL_START_REQ* pData);
+	void SendPortalAdd(sUG_PORTAL_ADD_REQ* pData);
+	void SendPortalReq(sUG_PORTAL_REQ* pData);
+	void SendCharTeleport(TBLIDX worldID, eTELEPORT_TYPE teleportType, TBLIDX portalIDX = 0);
 	//CASH/EVENT SHOPS
 	void SendEventItemStartRes();
 	void SendEventItemEndRes();
 	void SendNetpyItemStartRes();
 	void SendNetpyItemEndRes();
+	void SendPrivateShopCreate(sUG_PRIVATESHOP_CREATE_REQ* pData);
 
 	bool IsClosed() { return bIsClosed; }
 	bool IsSpawnReady() { return bIsSpawnReady; }
@@ -183,6 +196,9 @@ public:
 
 	bool LoadTableData();
 	void LoadSpawns();
+	void LoadGameObjects();
+	int LoadGameObjects(TBLIDX worldTblidx);
+	int LoadDynamicObjects(TBLIDX tblidx);
 	int LoadSpawns(TBLIDX worldTblidx, bool bIsNpc);
 
 	void Run()

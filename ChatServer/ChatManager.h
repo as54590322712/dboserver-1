@@ -28,8 +28,10 @@ public:
 	void RemoveClient(ChatClient* pClient);
 	bool FindClient(ChatClient* pClient);
 	void SendAll(void* pData, int nSize);
+	void SendTo(void* pData, int nSize, ChatClient* pClient);
 	void SendOthers(void* pData, int nSize, ChatClient* pClient, bool distCheck = false);
 	void RecvOthers(eOPCODE_TU Opcode, ChatClient* pClient, bool distCheck = false);
+	ChatClient* GetChatClient(WCHAR* pCharName);
 
 private:
 	Thread * pThread;

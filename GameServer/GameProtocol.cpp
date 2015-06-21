@@ -470,7 +470,7 @@ void GameClient::SendTSConfirmRes(sUG_TS_CONFIRM_STEP_REQ* pData)
 	sPkt.wResultCode = RESULT_SUCCESS;
 	
 	Send(&sPkt, sizeof(sPkt));
-	DungeonTable* table = pServer->GetTableContainer()->GetDungeonTable();
+	/*DungeonTable* table = pServer->GetTableContainer()->GetDungeonTable();
 	WorldTable* wolrTabl = pServer->GetTableContainer()->GetWorldTable();
 	WorldMapTable* world = pServer->GetTableContainer()->GetWorldMapTable();
 	if (pData->tcNextId == 2)
@@ -484,7 +484,7 @@ void GameClient::SendTSConfirmRes(sUG_TS_CONFIRM_STEP_REQ* pData)
 	{
 		sWORLD_TBLDAT* pTablDat = reinterpret_cast<sWORLD_TBLDAT*>(wolrTabl->FindData(pData->tId));
 		SendCharTeleport(pTablDat->tblidx, TELEPORT_TYPE_NPC_PORTAL);
-	}
+	}*/
 }
 
 void GameClient::UpdateCharObjEquips(HOBJECT hItem, BYTE byPos)
@@ -510,6 +510,10 @@ void GameClient::SendIemMoveRes(sUG_ITEM_MOVE_REQ* pData)
 	HOBJECT hDestItem = pProfile->GetInventoryItemSerialID(pData->byDestPlace, pData->byDestPos);
 	TBLIDX SrcTblidx = pProfile->GetInventoryItemID(pData->bySrcPlace, pData->bySrcPos);
 	TBLIDX DestTblidx = pProfile->GetInventoryItemID(pData->byDestPlace, pData->byDestPos);
+	sITEM_BRIEF pSrcItemData;
+	pProfile->GetItemBrief(pSrcItemData, hSrcItem);
+	sITEM_BRIEF pDestItemData;
+	pProfile->GetItemBrief(pDestItemData, hDestItem);
 
 	if (SrcTblidx != INVALID_TBLIDX)
 		sSrcTbldat = (sITEM_TBLDAT*)pServer->GetTableContainer()->GetItemTable()->FindData(SrcTblidx);
@@ -552,13 +556,67 @@ void GameClient::SendIemMoveRes(sUG_ITEM_MOVE_REQ* pData)
 			((pData->byDestPos >= EQUIP_SLOT_TYPE_FIRST) && (pData->byDestPos <= EQUIP_SLOT_TYPE_LAST)))
 		{
 			UpdateCharObjEquips(hSrcItem, pData->byDestPos);
+			if ((pData->byDestPos == EQUIP_SLOT_TYPE_EARRING_1) ||
+				(pData->byDestPos == EQUIP_SLOT_TYPE_EARRING_2) ||
+				(pData->byDestPos == EQUIP_SLOT_TYPE_SUB_WEAPON) ||
+				(pData->byDestPos == EQUIP_SLOT_TYPE_HAND) ||
+				(pData->byDestPos == EQUIP_SLOT_TYPE_JACKET) ||
+				(pData->byDestPos == EQUIP_SLOT_TYPE_PANTS) ||
+				(pData->byDestPos == EQUIP_SLOT_TYPE_BOOTS) ||
+				(pData->byDestPos == EQUIP_SLOT_TYPE_NECKLACE) ||
+				(pData->byDestPos == EQUIP_SLOT_TYPE_RING_1) ||
+				(pData->byDestPos == EQUIP_SLOT_TYPE_RING_2))
+			{
+				pProfile->GetAttributeManager()->LoadAttribute(&pProfile->sPcProfile.avatarAttribute);
+				if (pDestItemData.tblidx != INVALID_TBLIDX)
+					pProfile->GetAttributeManager()->UpdateWithEquipment(sDestTbldat, false, pDestItemData.byGrade);
+				else
+					pProfile->GetAttributeManager()->UpdateWithEquipment(sSrcTbldat, false, pSrcItemData.byGrade);
+				sGU_AVATAR_ATTRIBUTE_UPDATE pPacket = pProfile->GetAttributeManager()->PrepareUpdatePacket(pProfile->GetSerialID());
+				Send(&pPacket, sizeof(pPacket));
+				pProfile->sPcProfile.avatarAttribute = pProfile->GetAttributeManager()->GetAvatarAttribute();
+			}
 		}
 
 		if ((pData->bySrcPlace == CONTAINER_TYPE_EQUIP) &&
 			((pData->bySrcPos >= EQUIP_SLOT_TYPE_FIRST) && (pData->bySrcPos <= EQUIP_SLOT_TYPE_LAST)))
 		{
 			UpdateCharObjEquips(hDestItem, pData->bySrcPos);
+			if ((pData->bySrcPos == EQUIP_SLOT_TYPE_EARRING_1) ||
+				(pData->bySrcPos == EQUIP_SLOT_TYPE_EARRING_2) ||
+				(pData->bySrcPos == EQUIP_SLOT_TYPE_SUB_WEAPON) ||
+				(pData->bySrcPos == EQUIP_SLOT_TYPE_HAND) ||
+				(pData->bySrcPos == EQUIP_SLOT_TYPE_JACKET) ||
+				(pData->bySrcPos == EQUIP_SLOT_TYPE_PANTS) ||
+				(pData->bySrcPos == EQUIP_SLOT_TYPE_BOOTS) ||
+				(pData->bySrcPos == EQUIP_SLOT_TYPE_NECKLACE) ||
+				(pData->bySrcPos == EQUIP_SLOT_TYPE_RING_1) ||
+				(pData->bySrcPos == EQUIP_SLOT_TYPE_RING_2))
+			{
+				pProfile->GetAttributeManager()->LoadAttribute(&pProfile->sPcProfile.avatarAttribute);
+				if (pDestItemData.tblidx != INVALID_TBLIDX)
+					pProfile->GetAttributeManager()->UpdateWithEquipment(sDestTbldat, true, pDestItemData.byGrade);
+				else
+					pProfile->GetAttributeManager()->UpdateWithEquipment(sSrcTbldat, true, pSrcItemData.byGrade);
+				sGU_AVATAR_ATTRIBUTE_UPDATE pPacket = pProfile->GetAttributeManager()->PrepareUpdatePacket(pProfile->GetSerialID());
+				Send(&pPacket, sizeof(pPacket));
+				pProfile->sPcProfile.avatarAttribute = pProfile->GetAttributeManager()->GetAvatarAttribute();
+			}
 		}
+
+		if ((pData->byDestPlace == CONTAINER_TYPE_SCOUT) &&
+			(pData->byDestPos == EQUIP_SLOT_TYPE_SCOUTER))
+		{
+			UpdateCharObjEquips(hSrcItem, pData->byDestPos);
+			//Do here
+		}
+		if ((pData->bySrcPlace == CONTAINER_TYPE_SCOUT) &&
+			(pData->bySrcPos == EQUIP_SLOT_TYPE_SCOUTER))
+		{
+			UpdateCharObjEquips(hDestItem, pData->bySrcPos);
+			//Do here
+		}
+		
 
 		// Update DB
 		if (hSrcItem != INVALID_HOBJECT)

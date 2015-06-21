@@ -15,8 +15,11 @@ private:
 public:
 	AttributeManager();
 	~AttributeManager();
+	void UpdateWithEquipment(sITEM_TBLDAT* itemTBL, bool bRemove, BYTE byGrade);
 	void LoadAttribute(sAVATAR_ATTRIBUTE* pAttribute);
+	void CalculateAttributes();
 	sGU_AVATAR_ATTRIBUTE_UPDATE PrepareUpdatePacket(HOBJECT playerSerialID);
+	sAVATAR_ATTRIBUTE GetAvatarAttribute();
 private:
 	sAVATAR_ATTRIBUTE_LINK pAvatarAttributeLink;//Compressed
 	sAVATAR_ATTRIBUTE pAvatarMaintAttribute;//Uncompressed

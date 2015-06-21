@@ -92,9 +92,6 @@ void AttributeManager::LoadAttribute(sAVATAR_ATTRIBUTE* pAttribute)
 	pAvatarMaintAttribute.fEleganceDefence = pAttribute->fEleganceDefence;
 	pAvatarMaintAttribute.fFunnyOffence = pAttribute->fFunnyOffence;
 	pAvatarMaintAttribute.fFunnyDefence = pAttribute->fFunnyDefence;
-	//First Calculate next compress
-	//CalculateAttributes();
-	CompressAttributes();
 }
 
 void AttributeManager::CompressAttributes()
@@ -315,12 +312,18 @@ void AttributeManager::CompressAttributes()
 	pAvatarAttributeLink.pfWildDefence = (float*)fWildDefence;
 	pAvatarAttributeLink.pfWildOffence = (float*)fWildOffence;
 }
+//By Luiz45 Calculate Attributes
+void AttributeManager::CalculateAttributes()
+{
+
+}
 //By Luiz45 Send Avatar
 sGU_AVATAR_ATTRIBUTE_UPDATE AttributeManager::PrepareUpdatePacket(HOBJECT playerSerialID)
 {
+	CompressAttributes();
 	sGU_AVATAR_ATTRIBUTE_UPDATE pUpdateAttribute;
 	memset(&pUpdateAttribute, 0, sizeof(pUpdateAttribute));
-
+	
 
 	CNtlBitFlagManager flagMgr;
 
@@ -334,7 +337,7 @@ sGU_AVATAR_ATTRIBUTE_UPDATE AttributeManager::PrepareUpdatePacket(HOBJECT player
 		flagMgr.Set(byIndex);
 	}
 
-	DWORD buffer[1024];
+	DWORD buffer[2048];
 	DWORD datasize;
 
 	if (CNtlAvatar::GetInstance()->SaveAvatarAttribute(&flagMgr, &pAvatarAttributeLink, &buffer, &datasize) == false){
@@ -349,4 +352,45 @@ sGU_AVATAR_ATTRIBUTE_UPDATE AttributeManager::PrepareUpdatePacket(HOBJECT player
 	pUpdateAttribute.hHandle = playerSerialID;
 
 	return pUpdateAttribute;
+}
+//By luiz45 - Update Attribute with Equiped Items
+void AttributeManager::UpdateWithEquipment(sITEM_TBLDAT* itemTBL, bool bRemove, BYTE byGrade)
+{
+	if (itemTBL->wPhysical_Offence < 65535 && itemTBL->wPhysical_Offence > 0)
+	{
+		if (bRemove)
+			pAvatarMaintAttribute.wLastPhysicalOffence -= Dbo_GetFinalOffence(itemTBL->wPhysical_Offence, byGrade);
+		else
+			pAvatarMaintAttribute.wLastPhysicalOffence += Dbo_GetFinalOffence(itemTBL->wPhysical_Offence, byGrade);
+	}
+	if (itemTBL->wPhysical_Defence < 65535 && itemTBL->wPhysical_Defence > 0)
+	{
+		if (bRemove)
+			pAvatarMaintAttribute.wLastPhysicalDefence -= Dbo_GetFinalDefence(itemTBL->wPhysical_Defence, byGrade);
+		else
+			pAvatarMaintAttribute.wLastPhysicalDefence += Dbo_GetFinalDefence(itemTBL->wPhysical_Defence, byGrade);
+	}
+	if (itemTBL->wEnergy_Offence < 65535 && itemTBL->wEnergy_Offence > 0)
+	{
+		if (bRemove)
+			pAvatarMaintAttribute.wLastEnergyOffence -= Dbo_GetFinalOffence(itemTBL->wEnergy_Offence, byGrade);
+		else
+			pAvatarMaintAttribute.wLastEnergyOffence += Dbo_GetFinalOffence(itemTBL->wEnergy_Offence, byGrade);
+	}
+	if (itemTBL->wEnergy_Defence < 65535 && itemTBL->wEnergy_Defence > 0)
+	{
+		if (bRemove)
+			pAvatarMaintAttribute.wLastEnergyDefence -= Dbo_GetFinalDefence(itemTBL->wEnergy_Defence, byGrade);
+		else
+			pAvatarMaintAttribute.wLastEnergyDefence += Dbo_GetFinalDefence(itemTBL->wEnergy_Defence, byGrade);
+	}
+	if (itemTBL->fAttack_Range_Bonus < 65535 && itemTBL->fAttack_Range_Bonus > 0)
+	{
+		pAvatarMaintAttribute.fLastAttackRange += itemTBL->fAttack_Range_Bonus;
+	}
+}
+//By Luiz45 - Just return the Avatar attribute uncrompressed()
+sAVATAR_ATTRIBUTE AttributeManager::GetAvatarAttribute()
+{
+	return this->pAvatarMaintAttribute;
 }

@@ -32,21 +32,22 @@ void ObjectManager::Run()
 	{
 		if (HasPcs())
 		{
-			for (OBJPCLISTIT it = pcList.begin(); it != pcList.end(); it++)
+			try
 			{
-				GameClient* pClient = it->second->GetClient();
-				try
+				for (OBJPCLISTIT it = pcList.begin(); it != pcList.end(); it++)
 				{
+					GameClient* pClient = it->second->GetClient();
+
 					if (pClient && pClient->IsSpawnReady())
 					{
 						SpawnToClient(pClient);
 					}
 				}
-				catch (Exception e){
-					Logger::Log("Error on SpawnToClient: %s Removing from map...",e.GetWhat());
-					pcList.erase(it);
-					continue;
-				}
+
+			}
+			catch (Exception e){
+				Logger::Log("Error on SpawnToClient: %s Removing from map...", e.GetWhat());
+				continue;
 			}
 		}
 		Sleep(1000);

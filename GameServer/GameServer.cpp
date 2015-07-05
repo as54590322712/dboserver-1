@@ -35,6 +35,7 @@ int GameServer::OnCreate()
 	_charManager->Init();
 	_objManager = new ObjectManager();
 	_objManager->Init();
+	_logic = new Logic();
 
 	ServerDB = new Database();
 	if (!ServerDB->Connect(
@@ -117,6 +118,7 @@ bool GameServer::LoadTableData()
 	flagManager.Set(TableContainer::TABLE_SET_ITEM);
 	flagManager.Set(TableContainer::TABLE_CHARM);
 	flagManager.Set(TableContainer::TABLE_ACTION);
+	//flagManager.Set(TableContainer::TABLE_PASS_POINT);
 	flagManager.Set(TableContainer::TABLE_CHAT_COMMAND);
 	flagManager.Set(TableContainer::TABLE_QUEST_ITEM);
 	flagManager.Set(TableContainer::TABLE_QUEST_TEXT_DATA);
@@ -211,6 +213,7 @@ bool GameServer::LoadTableData()
 	fileNameList.SetFileName(TableContainer::TABLE_BASIC_DROP, "table_basic_drop_data");
 	fileNameList.SetFileName(TableContainer::TABLE_LEGENDARY_DROP, "table_legendary_drop_data");
 	fileNameList.SetFileName(TableContainer::TABLE_SYSTEM_EFFECT, "table_system_effect_data");
+	//fileNameList.SetFileName(TableContainer::TABLE_PASS_POINT, "Table_World_Data");
 
 	m_pTableContainer = new TableContainer();
 	
@@ -220,6 +223,10 @@ bool GameServer::LoadTableData()
 //By Luiz45 Load Game Objects
 void GameServer::LoadGameObjects()
 {
+	int dbcount = 0;
+	Logger::Log("Loading Dragon Ball Objects ...\n");
+	dbcount = LoadDragonBall();
+	Logger::Log("Loaded %d Dragon Ball Objects.\n", dbcount);
 	int count = 0;
 	Logger::Log("Loading Game Objects ...\n");
 	for (TableContainer::OBJTABLEIT it = GetTableContainer()->BeginObjectTable(); GetTableContainer()->EndObjectTable() != it; ++it)
@@ -236,18 +243,63 @@ void GameServer::LoadGameObjects()
 	}
 	Logger::Log("Loaded %d Dynamic Objects.\n", count);
 }
+//By Luiz45 - Load All dragon balls in game in a list to make easy to use after
+int GameServer::LoadDragonBall()
+{
+	int count = 0;
+	HOBJECT handle;
+	for (Table::TABLEIT it = GetTableContainer()->GetDragonBallTable()->Begin(); GetTableContainer()->GetDragonBallTable()->End() != it; ++it)
+	{
+		sDRAGONBALL_TBLDAT* pDbTblData = (sDRAGONBALL_TBLDAT*)it->second;
+		if (pDbTblData)
+		{
+			if (eDRAGON_BALL_TYPE::DRAGON_BALL_TYPE_BASIC == pDbTblData->byBallType)
+			{
+				for (int i = 0; i < 7; i++){
+					if (false == GetObjectManager()->FindDragonBall(pDbTblData->aBallTblidx[i])){
+						GetObjectManager()->AddDragonBall(pDbTblData->aBallTblidx[i], pDbTblData);
+						count++;
+					}
+				}
+				continue;
+			}
+			else if (eDRAGON_BALL_TYPE::DRAGON_BALL_TYPE_NORMAL == pDbTblData->byBallType)
+			{
+				for (int i = 0; i < 7; i++){
+					if (false == GetObjectManager()->FindDragonBall(pDbTblData->aBallTblidx[i])){
+						GetObjectManager()->AddDragonBall(pDbTblData->aBallTblidx[i], pDbTblData);
+						count++;
+					}
+				}
+				continue;
+			}
+			else if (eDRAGON_BALL_TYPE::DRAGON_BALL_TYPE_EVENT == pDbTblData->byBallType)
+			{
+				for (int i = 0; i < 7; i++){
+					if (false == GetObjectManager()->FindDragonBall(pDbTblData->aBallTblidx[i])){
+						GetObjectManager()->AddDragonBall(pDbTblData->aBallTblidx[i], pDbTblData);
+						count++;
+					}
+				}
+				continue;
+			}
+		}
+	}
+	return count;
+}
 //By Luiz45 - Load All game objects to be able to do somethings like warfog, quest kill and take objects,etc..
 int GameServer::LoadGameObjects(TBLIDX worldTblidx)
 {
 	int count = 0;
 	ObjectTable* pObjectTable = GetTableContainer()->GetObjectTable(worldTblidx);
+	HOBJECT handle;
 	for (Table::TABLEIT it = pObjectTable->Begin(); it != pObjectTable->End(); ++it, ++count)
 	{
 		sOBJECT_TBLDAT* pObjectTblDat = reinterpret_cast<sOBJECT_TBLDAT*>(it->second);
 		if (pObjectTblDat)
 		{
 			//Remember this "100000" must be the same as passed in sWorld for every char
-			HOBJECT handle = (100000 + pObjectTblDat->dwSequence);
+			handle = (100000 + pObjectTblDat->dwSequence);
 			GetObjectManager()->AddObject(handle, pObjectTblDat, eOBJTYPE::OBJTYPE_TOBJECT);
 		}
 	}

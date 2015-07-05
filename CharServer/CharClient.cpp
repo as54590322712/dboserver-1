@@ -132,12 +132,12 @@ int CharClient::DBInsertCharData(sPC_SUMMARY data, sNEWBIE_TBLDAT nbdata)
 	// BAGS CONAINERS
 	sItem = *(sITEM_TBLDAT*)pServer->GetTableContainer()->GetItemTable()->FindData(19901);
 	// (nItemID,nCharID,nPlace,nSlot,nStack,nRank,nCurDur,nNeedToIdentify,nGrade,nBattleAttribute,nRestrictType,nMaker,nOpt1,nOpt2,nDurationType);
-	pServer->ServerDB->ExecuteQuery("CALL `spQueryInsertItem`('%u','%u','%d','%d','%d','%d','%d','0','0','%d','0','','%u','0','%d');",
-		sItem.tblidx, charid, CONTAINER_TYPE_BAGSLOT, 0, 1, sItem.byRank, sItem.byDurability, sItem.byBattle_Attribute, sItem.Item_Option_Tblidx, sItem.byDurationType);
+	pServer->ServerDB->ExecuteQuery("CALL `spQueryInsertItem`('%u','%u','%d','%d','%d','%d','%d','0','0','%d','0','','%u','0','%d','%d');",
+		sItem.tblidx, charid, CONTAINER_TYPE_BAGSLOT, 0, 1, sItem.byRank, sItem.byDurability, sItem.byBattle_Attribute, sItem.Item_Option_Tblidx, sItem.byDurationType,pServer->AcquireSerialID());
 	sItem = *(sITEM_TBLDAT*)pServer->GetTableContainer()->GetItemTable()->FindData(19991);
 	// (nItemID,nCharID,nPlace,nSlot,nStack,nRank,nCurDur,nNeedToIdentify,nGrade,nBattleAttribute,nRestrictType,nMaker,nOpt1,nOpt2,nDurationType);
-	pServer->ServerDB->ExecuteQuery("CALL `spQueryInsertItem`('%u','%u','%d','%d','%d','%d','%d','0','0','%d','0','','%u','0','%d');",
-		sItem.tblidx, charid, CONTAINER_TYPE_BANKSLOT, 0, 1, sItem.byRank, sItem.byDurability, sItem.byBattle_Attribute, sItem.Item_Option_Tblidx, sItem.byDurationType);
+	pServer->ServerDB->ExecuteQuery("CALL `spQueryInsertItem`('%u','%u','%d','%d','%d','%d','%d','0','0','%d','0','','%u','0','%d','%d');",
+		sItem.tblidx, charid, CONTAINER_TYPE_BANKSLOT, 0, 1, sItem.byRank, sItem.byDurability, sItem.byBattle_Attribute, sItem.Item_Option_Tblidx, sItem.byDurationType, pServer->AcquireSerialID());
 	
 
 	// START ITEMS
@@ -148,8 +148,9 @@ int CharClient::DBInsertCharData(sPC_SUMMARY data, sNEWBIE_TBLDAT nbdata)
 		{
 			sItem = *(sITEM_TBLDAT*)pServer->GetTableContainer()->GetItemTable()->FindData(nbdata.aitem_Tblidx[i]);
 			// (nItemID,nCharID,nPlace,nSlot,nStack,nRank,nCurDur,nNeedToIdentify,nGrade,nBattleAttribute,nRestrictType,nMaker,nOpt1,nOpt2,nDurationType);
-			pServer->ServerDB->ExecuteQuery("CALL `spQueryInsertItem`('%u','%u','%d','%d','%d','%d','%d','0','0','%d','0','','%u','0','%d');",
-				sItem.tblidx, charid, CONTAINER_TYPE_EQUIP, slot, nbdata.abyStack_Quantity[i], sItem.byRank, sItem.byDurability, sItem.byBattle_Attribute, sItem.Item_Option_Tblidx, sItem.byDurationType);
+			HOBJECT handleItem = pServer->AcquireSerialID();
+			pServer->ServerDB->ExecuteQuery("CALL `spQueryInsertItem`('%u','%u','%d','%d','%d','%d','%d','0','0','%d','0','','%u','0','%d','%d');",
+				sItem.tblidx, charid, CONTAINER_TYPE_EQUIP, slot, nbdata.abyStack_Quantity[i], sItem.byRank, sItem.byDurability, sItem.byBattle_Attribute, sItem.Item_Option_Tblidx, sItem.byDurationType, handleItem);
 		}
 	}
 

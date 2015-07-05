@@ -467,7 +467,8 @@ int Connections::CompleteRecv(DWORD TransferedBytes)
 
 		_recvBuffer.IncreaseWorkPos(packet.GetUsedSize());
 
-		if (_PacketEncoder)
+		//if (_PacketEncoder)
+		if (false)
 		{
 			rc = _PacketEncoder->RxDecrypt(packet);
 			if (0 != rc)
@@ -527,7 +528,8 @@ int Connections::CompleteSend(DWORD TransferedBytes)
 			BYTE Sequence = (BYTE)(_PacketSendCount & PACKET_MAX_SEQUENCE);
 			SetSequence(SendPacket->GetPacketHeader(), Sequence);
 
-			if (_PacketEncoder)
+			//if (_PacketEncoder)
+			if (false)
 			{
 				rc = _PacketEncoder->TxEncrypt(*SendPacket);
 				if (0 != rc)
@@ -772,7 +774,8 @@ int Connections::PushPacket(Packet* pPacket)
 
 	int rc = 0;
 
-	if (_PacketEncoder)
+	//if (_PacketEncoder) //For Packet Encrypt
+	if (false)
 	{
 		rc = _PacketEncoder->TxEncrypt(sendPacket);
 		if (0 != rc)

@@ -57,7 +57,7 @@ void ChatClient::SendChatSay(sUT_CHAT_MESSAGE_SAY* pData)
 	memcpy(pSay.awchMessage, pData->awchMessage, NTL_MAX_LENGTH_OF_CHAT_MESSAGE_UNICODE);
 	pSay.wMessageLengthInUnicode = pData->wMessageLengthInUnicode;
 	Logger::Log("%s says: %s\n", GameString(pSay.awchSenderCharName).c_str(), GameString(pSay.awchMessage).c_str());
-	pServer->GetChatManager()->SendAll(&pSay, sizeof(pSay));
+	pServer->GetChatManager()->SendAll2(&pSay, sizeof(pSay),this);
 }
 //By Luiz45 Shouting the msg to everybody who is connected at channel
 void ChatClient::SendChatShout(sUT_CHAT_MESSAGE_SHOUT* pData)

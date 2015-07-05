@@ -10,7 +10,7 @@ Target Server Type    : MYSQL
 Target Server Version : 50534
 File Encoding         : 65001
 
-Date: 2015-06-20 21:53:12
+Date: 2015-07-05 09:56:49
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -30,13 +30,7 @@ CREATE TABLE `account` (
   `isGameMaster` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`ID`),
   UNIQUE KEY `ID_UNIQUE` (`ID`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
-
--- ----------------------------
--- Records of account
--- ----------------------------
-INSERT INTO `account` VALUES ('1', 'luizoe', 'luizoe', '0', '255', '0', '3', '1');
-INSERT INTO `account` VALUES ('2', '1', '1', '0', '255', '0', '3', '0');
+) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Table structure for `blacklist`
@@ -48,10 +42,6 @@ CREATE TABLE `blacklist` (
   `target_id` int(10) NOT NULL,
   PRIMARY KEY (`pkID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
--- ----------------------------
--- Records of blacklist
--- ----------------------------
 
 -- ----------------------------
 -- Table structure for `character`
@@ -101,15 +91,7 @@ CREATE TABLE `character` (
   UNIQUE KEY `ID_UNIQUE` (`ID`),
   KEY `fk_character_account_idx` (`AccID`),
   CONSTRAINT `fk_character_account_id` FOREIGN KEY (`AccID`) REFERENCES `account` (`ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;
-
--- ----------------------------
--- Records of character
--- ----------------------------
-INSERT INTO `character` VALUES ('1', '1', '0', '0', 'teste', '0', '0', '0', '1', '1', '1', '1', '77', '31930', '200101000', '1', '1', '0', '0', '0', '2048.000000', '57.480820', '2048.000000', '-0.636172', '0.000000', '-0.771501', '10000', '100000', '255', '0', '1', '0', '0', '0', '1', '290459648', '0', '0', '0');
-INSERT INTO `character` VALUES ('2', '1', '0', '0', 'tadf', '0', '0', '0', '1', '1', '1', '1', '9', '90', '200101000', '1', '1', '0', '0', '0', '4633.508301', '-68.229599', '4326.203125', '-0.995366', '0.000000', '0.095816', '10000', '100000', '255', '0', '1', '0', '0', '0', '1', '22020096', '0', '0', '0');
-INSERT INTO `character` VALUES ('3', '2', '0', '0', 'fff', '0', '0', '0', '1', '1', '1', '1', '1', '0', '200101000', '1', '1', '0', '0', '0', '4693.416016', '-53.131866', '4477.039062', '-0.920355', '0.000000', '0.391284', '10000', '100000', '255', '0', '1', '0', '0', '0', '0', '4194304', '0', '0', '0');
-INSERT INTO `character` VALUES ('4', '2', '0', '0', 'test', '1', '3', '2', '1', '1', '1', '1', '3', '270', '200105000', '1', '1', '0', '0', '0', '2927.796387', '21.408035', '-2507.627441', '0.453687', '0.000000', '0.891203', '10000', '100000', '255', '0', '1', '0', '0', '0', '0', '22020096', '0', '0', '0');
+) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Table structure for `friendlist`
@@ -149,44 +131,13 @@ CREATE TABLE `inventory` (
   `Opt2` bigint(20) NOT NULL DEFAULT '0',
   `DurationType` int(11) NOT NULL DEFAULT '0',
   `UseStartTime` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-  `UseEndTime` timestamp NULL DEFAULT NULL,
-  PRIMARY KEY (`ID`,`CharID`),
+  `UseEndTime` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `ItemSerialID` int(255) DEFAULT NULL COMMENT 'Unique ID in Client(this field cannot be duplicated)',
+  PRIMARY KEY (`ID`,`CharID`,`UseEndTime`),
   UNIQUE KEY `ID_UNIQUE` (`ID`),
   KEY `fk_inventory_character_idx` (`CharID`),
   CONSTRAINT `fk_inventory_character_id` FOREIGN KEY (`CharID`) REFERENCES `character` (`ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=29 DEFAULT CHARSET=utf8;
-
--- ----------------------------
--- Records of inventory
--- ----------------------------
-INSERT INTO `inventory` VALUES ('1', '1', '19901', '0', '0', '1', '0', '255', '0', '0', '0', '0', '', '4294967295', '0', '0', '2015-06-18 00:03:40', null);
-INSERT INTO `inventory` VALUES ('2', '1', '19991', '9', '0', '1', '0', '255', '0', '0', '0', '0', '', '4294967295', '0', '0', '2015-06-18 00:03:40', null);
-INSERT INTO `inventory` VALUES ('3', '1', '10045', '7', '0', '1', '1', '100', '0', '0', '0', '0', '', '4294967295', '0', '0', '2015-06-18 00:03:40', null);
-INSERT INTO `inventory` VALUES ('4', '1', '14001', '7', '2', '1', '1', '100', '0', '0', '0', '0', '', '4294967295', '0', '0', '2015-06-18 00:03:40', null);
-INSERT INTO `inventory` VALUES ('5', '1', '14002', '7', '3', '1', '1', '100', '0', '0', '0', '0', '', '4294967295', '0', '0', '2015-06-18 00:03:40', null);
-INSERT INTO `inventory` VALUES ('6', '1', '14003', '7', '4', '1', '1', '100', '0', '0', '0', '0', '', '4294967295', '0', '0', '2015-06-18 00:03:41', null);
-INSERT INTO `inventory` VALUES ('7', '1', '17001', '7', '5', '1', '1', '50', '0', '0', '0', '0', '', '4294967295', '0', '0', '2015-06-18 00:03:41', null);
-INSERT INTO `inventory` VALUES ('8', '2', '19901', '0', '0', '1', '0', '255', '0', '0', '0', '0', '', '4294967295', '0', '0', '2015-06-18 00:05:55', null);
-INSERT INTO `inventory` VALUES ('9', '2', '19991', '9', '0', '1', '0', '255', '0', '0', '0', '0', '', '4294967295', '0', '0', '2015-06-18 00:05:55', null);
-INSERT INTO `inventory` VALUES ('10', '2', '10045', '7', '0', '1', '1', '100', '0', '0', '0', '0', '', '4294967295', '0', '0', '2015-06-18 00:05:55', null);
-INSERT INTO `inventory` VALUES ('11', '2', '14001', '7', '2', '1', '1', '100', '0', '0', '0', '0', '', '4294967295', '0', '0', '2015-06-18 00:05:55', null);
-INSERT INTO `inventory` VALUES ('12', '2', '14002', '7', '3', '1', '1', '100', '0', '0', '0', '0', '', '4294967295', '0', '0', '2015-06-18 00:05:55', null);
-INSERT INTO `inventory` VALUES ('13', '2', '14003', '7', '4', '1', '1', '100', '0', '0', '0', '0', '', '4294967295', '0', '0', '2015-06-18 00:05:55', null);
-INSERT INTO `inventory` VALUES ('14', '2', '17001', '7', '5', '1', '1', '50', '0', '0', '0', '0', '', '4294967295', '0', '0', '2015-06-18 00:05:55', null);
-INSERT INTO `inventory` VALUES ('15', '3', '19901', '0', '0', '1', '0', '255', '0', '0', '0', '0', '', '4294967295', '0', '0', '2015-06-18 00:27:38', null);
-INSERT INTO `inventory` VALUES ('16', '3', '19991', '9', '0', '1', '0', '255', '0', '0', '0', '0', '', '4294967295', '0', '0', '2015-06-18 00:27:38', null);
-INSERT INTO `inventory` VALUES ('17', '3', '10045', '7', '0', '1', '1', '100', '0', '0', '0', '0', '', '4294967295', '0', '0', '2015-06-18 00:27:38', null);
-INSERT INTO `inventory` VALUES ('18', '3', '14001', '7', '2', '1', '1', '100', '0', '0', '0', '0', '', '4294967295', '0', '0', '2015-06-18 00:27:38', null);
-INSERT INTO `inventory` VALUES ('19', '3', '14002', '7', '3', '1', '1', '100', '0', '0', '0', '0', '', '4294967295', '0', '0', '2015-06-18 00:27:38', null);
-INSERT INTO `inventory` VALUES ('20', '3', '14003', '7', '4', '1', '1', '100', '0', '0', '0', '0', '', '4294967295', '0', '0', '2015-06-18 00:27:38', null);
-INSERT INTO `inventory` VALUES ('21', '3', '17001', '7', '5', '1', '1', '50', '0', '0', '0', '0', '', '4294967295', '0', '0', '2015-06-18 00:27:38', null);
-INSERT INTO `inventory` VALUES ('22', '4', '19901', '0', '0', '1', '0', '255', '0', '0', '0', '0', '', '4294967295', '0', '0', '2015-06-19 22:30:08', null);
-INSERT INTO `inventory` VALUES ('23', '4', '19991', '9', '0', '1', '0', '255', '0', '0', '0', '0', '', '4294967295', '0', '0', '2015-06-19 22:30:08', null);
-INSERT INTO `inventory` VALUES ('24', '4', '500045', '7', '0', '1', '1', '100', '0', '0', '0', '0', '', '4294967295', '0', '0', '2015-06-19 22:30:08', null);
-INSERT INTO `inventory` VALUES ('25', '4', '13001', '7', '2', '1', '1', '100', '0', '0', '0', '0', '', '4294967295', '0', '0', '2015-06-19 22:30:08', null);
-INSERT INTO `inventory` VALUES ('26', '4', '13002', '7', '3', '1', '1', '100', '0', '0', '0', '0', '', '4294967295', '0', '0', '2015-06-19 22:30:08', null);
-INSERT INTO `inventory` VALUES ('27', '4', '13003', '7', '4', '1', '1', '100', '0', '0', '0', '0', '', '4294967295', '0', '0', '2015-06-19 22:30:08', null);
-INSERT INTO `inventory` VALUES ('28', '4', '17001', '7', '5', '1', '1', '50', '0', '0', '0', '0', '', '4294967295', '0', '0', '2015-06-19 22:30:08', null);
+) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Table structure for `online`
@@ -206,11 +157,6 @@ CREATE TABLE `online` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- ----------------------------
--- Records of online
--- ----------------------------
-INSERT INTO `online` VALUES ('1', '2', '0', '0', '29674');
-
--- ----------------------------
 -- Table structure for `quickslot`
 -- ----------------------------
 DROP TABLE IF EXISTS `quickslot`;
@@ -225,31 +171,7 @@ CREATE TABLE `quickslot` (
   UNIQUE KEY `ID_UNIQUE` (`ID`),
   KEY `fk_quickslot_character_id_idx` (`CharID`),
   CONSTRAINT `fk_quickslot_character_id` FOREIGN KEY (`CharID`) REFERENCES `character` (`ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=21 DEFAULT CHARSET=utf8;
-
--- ----------------------------
--- Records of quickslot
--- ----------------------------
-INSERT INTO `quickslot` VALUES ('1', '1', '103', '1', '3', '0');
-INSERT INTO `quickslot` VALUES ('2', '1', '104', '2', '3', '0');
-INSERT INTO `quickslot` VALUES ('3', '1', '10111', '0', '1', '0');
-INSERT INTO `quickslot` VALUES ('4', '1', '105', '3', '3', '0');
-INSERT INTO `quickslot` VALUES ('5', '1', '106', '11', '3', '0');
-INSERT INTO `quickslot` VALUES ('6', '2', '103', '1', '3', '0');
-INSERT INTO `quickslot` VALUES ('7', '2', '104', '2', '3', '0');
-INSERT INTO `quickslot` VALUES ('8', '2', '10111', '0', '1', '0');
-INSERT INTO `quickslot` VALUES ('9', '2', '105', '3', '3', '0');
-INSERT INTO `quickslot` VALUES ('10', '2', '106', '11', '3', '0');
-INSERT INTO `quickslot` VALUES ('11', '3', '103', '1', '3', '0');
-INSERT INTO `quickslot` VALUES ('12', '3', '104', '2', '3', '0');
-INSERT INTO `quickslot` VALUES ('13', '3', '10111', '0', '1', '0');
-INSERT INTO `quickslot` VALUES ('14', '3', '105', '3', '3', '0');
-INSERT INTO `quickslot` VALUES ('15', '3', '106', '11', '3', '0');
-INSERT INTO `quickslot` VALUES ('16', '4', '103', '1', '3', '0');
-INSERT INTO `quickslot` VALUES ('17', '4', '104', '2', '3', '0');
-INSERT INTO `quickslot` VALUES ('18', '4', '310111', '0', '1', '0');
-INSERT INTO `quickslot` VALUES ('19', '4', '105', '3', '3', '0');
-INSERT INTO `quickslot` VALUES ('20', '4', '106', '11', '3', '0');
+) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Table structure for `skills`
@@ -268,15 +190,7 @@ CREATE TABLE `skills` (
   UNIQUE KEY `ID_UNIQUE` (`ID`),
   KEY `fk_character_id_idx` (`CharID`),
   CONSTRAINT `fk_character_id` FOREIGN KEY (`CharID`) REFERENCES `character` (`ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;
-
--- ----------------------------
--- Records of skills
--- ----------------------------
-INSERT INTO `skills` VALUES ('1', '1', '10111', '1', '0', '0', '0', '0');
-INSERT INTO `skills` VALUES ('2', '2', '10111', '1', '0', '0', '0', '0');
-INSERT INTO `skills` VALUES ('3', '3', '10111', '1', '0', '0', '0', '0');
-INSERT INTO `skills` VALUES ('4', '4', '310111', '1', '0', '0', '0', '0');
+) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Table structure for `warfog`
@@ -290,12 +204,7 @@ CREATE TABLE `warfog` (
   UNIQUE KEY `ID_UNIQUE` (`ID`),
   KEY `pkey_warfog_charid` (`CharID`),
   CONSTRAINT `fk_warfog_charid` FOREIGN KEY (`CharID`) REFERENCES `character` (`ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=latin1;
-
--- ----------------------------
--- Records of warfog
--- ----------------------------
-INSERT INTO `warfog` VALUES ('1', '1', '100007');
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- ----------------------------
 -- Procedure structure for `spClearOnline`
@@ -452,8 +361,7 @@ DELIMITER ;
 -- ----------------------------
 DROP PROCEDURE IF EXISTS `spInsertItem`;
 DELIMITER ;;
-CREATE DEFINER=`root`@`localhost` PROCEDURE `spInsertItem`(
-	IN nItemID BIGINT,
+CREATE DEFINER=`root`@`localhost` PROCEDURE `spInsertItem`(IN nItemID BIGINT,
 	IN nCharID BIGINT,
 	IN nPlace INT,
 	IN nSlot INT,
@@ -467,7 +375,7 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `spInsertItem`(
 	IN nMaker VARCHAR(20),
 	IN nOpt1 BIGINT,
 	IN nOpt2 BIGINT,
-	IN nDurationType INT)
+	IN nDurationType INT, IN nSerialID BIGINT)
 BEGIN
 	INSERT INTO `inventory` 
 	(`ItemID`, 
@@ -484,7 +392,8 @@ BEGIN
 	`Maker`, 
 	`Opt1`, 
 	`Opt2`, 
-	`DurationType`)
+	`DurationType`,
+   `ItemSerialID`)
 	VALUES
 	(nItemID,
 	nCharID,
@@ -500,7 +409,8 @@ BEGIN
 	nMaker,
 	nOpt1,
 	nOpt2,
-	nDurationType);
+	nDurationType,
+  nSerialID);
 	SELECT LAST_INSERT_ID() AS `LastID` LIMIT 1;
     END
 ;;
@@ -541,8 +451,7 @@ DELIMITER ;
 -- ----------------------------
 DROP PROCEDURE IF EXISTS `spQueryInsertItem`;
 DELIMITER ;;
-CREATE DEFINER=`root`@`localhost` PROCEDURE `spQueryInsertItem`(
-	IN nItemID BIGINT,
+CREATE DEFINER=`root`@`localhost` PROCEDURE `spQueryInsertItem`(IN nItemID BIGINT,
 	IN nCharID BIGINT,
 	IN nPlace INT,
 	IN nSlot INT,
@@ -556,7 +465,7 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `spQueryInsertItem`(
 	IN nMaker VARCHAR(20),
 	IN nOpt1 BIGINT,
 	IN nOpt2 BIGINT,
-	IN nDurationType INT)
+	IN nDurationType INT, IN nItemSerialID BIGINT)
 BEGIN
 	INSERT INTO `inventory` 
 	(`ItemID`, 
@@ -573,7 +482,8 @@ BEGIN
 	`Maker`, 
 	`Opt1`, 
 	`Opt2`, 
-	`DurationType`)
+	`DurationType`,
+  `ItemSerialID`)
 	VALUES
 	(nItemID,
 	nCharID,
@@ -589,7 +499,8 @@ BEGIN
 	nMaker,
 	nOpt1,
 	nOpt2,
-	nDurationType);
+	nDurationType,
+  nItemSerialID);
     END
 ;;
 DELIMITER ;

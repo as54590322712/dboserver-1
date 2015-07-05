@@ -37,10 +37,20 @@ public:
 	void UpdateItemInventoryPosition(HOBJECT hItem, BYTE byPlace, BYTE byPos);
 	void GetItemBrief(sITEM_BRIEF& sBrief, HOBJECT hItem);
 	void LoadWarFogFlags();
+	bool ExistItemInGame(HOBJECT hItemObject);
 	bool CheckWarFogFlags(HOBJECT hObject);
 	bool AddWarFogFlags(HOBJECT hObject);
+	int ScanForFreeBag();
+	int ScanForFreePosition(DWORD dwBag);
+	void insertItemIntoInventory(sITEM_DATA& sItemData, HOBJECT itemHandle);
+	void RemoveItemFromInventory(HOBJECT hItem);
 	void UpdateCharLevel();
 	void UpdateCharExp();
+	void UpdateStackCount(HOBJECT hItem, BYTE byStackCount);
+	TBLIDX GetSkillBySlot(int iIdx);
+	void UpdateSkill(TBLIDX tblBefore, TBLIDX tblNext);
+	BYTE GetStackCount(HOBJECT itemSerialID);
+	void UpdateMoneyDataBase();
 
 	// Set
 	void SetAvatartype(BYTE byAvatarType) { this->byAvatarType = byAvatarType; }
@@ -49,6 +59,8 @@ public:
 	void SetTutorialmode(bool bTutorialMode) { this->bTutorialMode = bTutorialMode; }
 	void SetMovedirection(BYTE byMoveDirection) { this->byMoveDirection = byMoveDirection; }
 	void SetTarget(HOBJECT hTarget) { this->hTarget = hTarget; }
+	void SetBagStatus(DWORD dwStatus){ this->dwBagStatus = dwStatus; }
+	void SetSpawnedShenron(HOBJECT hObj){ this->spawnedShenron = hObj; }
 
 	// Get
 	WCHAR* GetUsername() { return wszUserName; }
@@ -70,9 +82,11 @@ public:
 	BYTE GetGender() { return byGender; }
 	BYTE GetAvatartype() { return byAvatarType; }
 	BYTE GetMovedirection() { return byMoveDirection; }
+	DWORD GetBagStatus();
 	HOBJECT GetTarget() { return hTarget; }
 	GameClient* GetClient() { return pClient; }
 	AttributeManager* GetAttributeManager(){ return pAttributeManager; }
+	HOBJECT GetSpawnedShenron(){ return spawnedShenron; }
 
 	// Structs
 	sPC_PROFILE sPcProfile;
@@ -105,6 +119,7 @@ public:
 
 	bool bIsSit;
 	bool bIsMoving;
+	DWORD dwBagStatus;
 	DWORD dwLastAttack;
 
 private:
@@ -128,6 +143,7 @@ private:
 	BYTE byClass;
 	BYTE byGender;
 	HOBJECT hTarget;
+	HOBJECT spawnedShenron;
 
 	GameServer* pServer;
 	GameClient* pClient;

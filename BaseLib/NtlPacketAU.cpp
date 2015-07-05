@@ -11,6 +11,9 @@ const char * s_packetName_AU[] =
 	DECLARE_PACKET_NAME( AU_LOGIN_RES ),
 	DECLARE_PACKET_NAME( AU_LOGIN_CREATEUSER_RES ),
 	DECLARE_PACKET_NAME( AU_LOGIN_DISCONNECT_RES ),
+	#ifdef USE_DBO_TW
+	DECLARE_PACKET_NAME(AU_COMMERCIAL_SETTING_NFY),
+	#endif
 };
 //------------------------------------------------------------------
 

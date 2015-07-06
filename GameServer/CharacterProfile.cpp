@@ -59,6 +59,137 @@ void CharacterProfile::LoadWarFogFlags()
 		}
 	}
 }
+/*
+This method need return only the bag available to use
+if the user have the bag then return only
+Luiz45
+*/
+int CharacterProfile::ScanForFreeBag()
+{
+	int iAvaibleBag = 0;
+	for (int i = 0; i < NTL_MAX_COUNT_USER_HAVE_INVEN_ITEM; i++)
+	{
+		if (this->asItemProfile[i].byPlace == CONTAINER_TYPE_BAGSLOT)
+		{
+			sITEM_TBLDAT* pItemTbl = reinterpret_cast<sITEM_TBLDAT*>(pServer->GetTableContainer()->GetItemTable()->FindData(this->asItemProfile[i].tblidx));
+			//Main Bag
+			if (this->asItemProfile[i].byPos == (CONTAINER_TYPE_BAG1 - 1))
+			{
+				if (this->ScanForFreePosition(CONTAINER_TYPE_BAG1) >= pItemTbl->byBag_Size)
+					continue;
+				else{
+					iAvaibleBag = CONTAINER_TYPE_BAG1;
+					break;
+				}
+			}
+			//Secondary Bag
+			else if (this->asItemProfile[i].byPos == (CONTAINER_TYPE_BAG2 - 1))
+			{
+				if (this->ScanForFreePosition(CONTAINER_TYPE_BAG2) >= pItemTbl->byBag_Size)
+					continue;
+				else{
+					iAvaibleBag = CONTAINER_TYPE_BAG2;
+					break;
+				}
+			}
+			//Third Bag
+			else if (this->asItemProfile[i].byPos == (CONTAINER_TYPE_BAG3 - 1))
+			{
+				if (this->ScanForFreePosition(CONTAINER_TYPE_BAG3) >= pItemTbl->byBag_Size)
+					continue;
+				else{
+					iAvaibleBag = CONTAINER_TYPE_BAG3;
+					break;
+				}
+			}
+			//Fourth Bag
+			else if (this->asItemProfile[i].byPos == (CONTAINER_TYPE_BAG4 - 1))
+			{
+				if (this->ScanForFreePosition(CONTAINER_TYPE_BAG4) >= pItemTbl->byBag_Size)
+					continue;
+				else{
+					iAvaibleBag = CONTAINER_TYPE_BAG4;
+					break;
+				}
+			}
+			//Five Bag
+			else if (this->asItemProfile[i].byPos == (CONTAINER_TYPE_BAG5 - 1))
+			{
+				if (this->ScanForFreePosition(CONTAINER_TYPE_BAG5) >= pItemTbl->byBag_Size)
+					continue;
+				else{
+					iAvaibleBag = CONTAINER_TYPE_BAG5;
+					break;
+				}
+			}
+		}
+	}
+
+	return (iAvaibleBag == 0 ? 99 : iAvaibleBag);
+}
+void CharacterProfile::insertItemIntoInventory(sITEM_DATA& sItemData, HOBJECT itemHandle)
+{
+	for (int i = 0; i < NTL_MAX_COUNT_USER_HAVE_INVEN_ITEM; i++)
+	{
+		if (asItemProfile[i].handle == INVALID_TBLIDX)
+		{
+			asItemProfile[i].handle = itemHandle;
+			asItemProfile[i].aOptionTblidx[0] = sItemData.aOptionTblidx[0];
+			asItemProfile[i].aOptionTblidx[1] = sItemData.aOptionTblidx[1];
+			asItemProfile[i].bNeedToIdentify = sItemData.bNeedToIdentify;
+			asItemProfile[i].byGrade = sItemData.byGrade;
+			asItemProfile[i].byPos = sItemData.byPosition;
+			asItemProfile[i].byPlace = sItemData.byPlace;
+			asItemProfile[i].byCurDur = sItemData.byCurrentDurability;
+			asItemProfile[i].byBattleAttribute = sItemData.byBattleAttribute;
+			asItemProfile[i].byDurationType = sItemData.byDurationType;
+			asItemProfile[i].byStackcount = sItemData.byStackcount;
+			asItemProfile[i].byRestrictType = sItemData.byRestrictType;
+			asItemProfile[i].tblidx = sItemData.itemId;
+			return;
+		}
+	}
+}
+/*
+This method receive the Bag container to check if have any slot available
+he will check the slots stored in our struct sItemBrief...
+by Luiz45
+*/
+int CharacterProfile::ScanForFreePosition(DWORD dwBag)
+{
+	int iAvaibleSlot = 0;
+	int iOccupedSlot = 0;
+	int iMaxBagSz = 0;	
+	int arInventSlot[NTL_MAX_BAG_ITEM_SLOT] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+	for (int i = 0; i < NTL_MAX_COUNT_USER_HAVE_INVEN_ITEM; i++)
+	{
+		if (asItemProfile[i].byPlace == CONTAINER_TYPE_BAGSLOT)
+		{
+			//Its because we have 5 bags and in the game he identify by CONTAINER TYPE BAGSLOT
+			if (asItemProfile[i].byPos == (dwBag - 1))
+			{
+				sITEM_TBLDAT* pItemTbl = reinterpret_cast<sITEM_TBLDAT*>(pServer->GetTableContainer()->GetItemTable()->FindData(asItemProfile[i].tblidx));
+				iMaxBagSz = pItemTbl->byBag_Size;
+			}
+		}
+		else if (asItemProfile[i].byPlace == dwBag)
+		{
+
+			if (asItemProfile[i].handle != 0)
+			{
+				iOccupedSlot = asItemProfile[i].byPos;
+				arInventSlot[iOccupedSlot] = 1;
+			}
+		}
+	}
+	for (int p = 0; p < NTL_MAX_BAG_ITEM_SLOT; p++)
+	{
+		if (arInventSlot[p] == 0)
+			return p;
+		else if ((NTL_MAX_BAG_ITEM_SLOT - 1) == (p))
+			return iMaxBagSz;
+	}
+}
 
 bool CharacterProfile::CheckWarFogFlags(HOBJECT hObject)
 {
@@ -110,7 +241,7 @@ void CharacterProfile::GetItemBrief(sITEM_BRIEF& sBrief, HOBJECT hItem)
 
 void CharacterProfile::UpdateItemInventoryPosition(HOBJECT hItem, BYTE byPlace, BYTE byPos)
 {
-	pServer->ServerDB->ExecuteQuery("UPDATE `inventory` SET `Place` = '%d', `Slot` = '%d' WHERE `ID` = '%u' AND `CharID` = '%u';",
+	pServer->ServerDB->ExecuteQuery("UPDATE `inventory` SET `Place` = '%d', `Slot` = '%d' WHERE `ItemSerialID` = '%u' AND `CharID` = '%u';",
 		byPlace, byPos, hItem, hCharID);
 	for (int i = 0; i < NTL_MAX_COUNT_USER_HAVE_INVEN_ITEM; ++i)
 	{
@@ -125,17 +256,37 @@ void CharacterProfile::UpdateItemInventoryPosition(HOBJECT hItem, BYTE byPlace, 
 HOBJECT CharacterProfile::GetInventoryItemSerialID(BYTE byPlace, BYTE byPos)
 {
 	HOBJECT ret = INVALID_HOBJECT;
-	if (pServer->ServerDB->ExecuteSelect("SELECT `ID` FROM `inventory` WHERE `Place` = '%d' AND `Slot` = '%d' AND `CharID` = '%u';",
+	if (pServer->ServerDB->ExecuteSelect("SELECT `ItemSerialID` FROM `inventory` WHERE `Place` = '%d' AND `Slot` = '%d' AND `CharID` = '%u';",
 		byPlace, byPos, hCharID))
 	{
 		while (pServer->ServerDB->Fetch())
 		{
-			ret = pServer->ServerDB->getInt("ID");
+			ret = pServer->ServerDB->getInt("ItemSerialID");
 		}
 	}
 	return ret;
 }
+//By Luiz45 Get Item Stack count by handle
+BYTE CharacterProfile::GetStackCount(HOBJECT itemSerialID)
+{
+	for (int i = 0; i < sizeof(asItemProfile); i++)
+	{
+		if (asItemProfile[i].handle == itemSerialID)
+			return asItemProfile[i].byStackcount;
+	}
+	return 0;
+}
 
+bool CharacterProfile::ExistItemInGame(HOBJECT hItemObject)
+{
+	bool bExist = false;
+	if (pServer->ServerDB->ExecuteSelect("SELECT * FROM `inventory` WHERE `ItemSerialID` = '%d';", hItemObject))
+	{
+		if (pServer->ServerDB->rowsCount() > 0)
+			bExist = true;
+	}
+	return bExist;
+}
 TBLIDX CharacterProfile::GetInventoryItemID(BYTE byPlace, BYTE byPos)
 {
 	TBLIDX ret = INVALID_TBLIDX;
@@ -282,8 +433,9 @@ bool CharacterProfile::InsertNextBagSlot(sGU_ITEM_CREATE& sPacket, ITEMID item, 
 		if (asItemProfile[i].handle == INVALID_HOBJECT && asItemProfile[i].tblidx == INVALID_TBLIDX)
 		{
 			// (nItemID,nCharID,nPlace,nSlot,nStack,nRank,nCurDur,nNeedToIdentify,nGrade,nBattleAttribute,nRestrictType,nMaker,nOpt1,nOpt2,nDurationType);
-			if (pServer->ServerDB->ExecuteSp("CALL `spInsertItem`('%u','%u','%d','%d','%d','%d','%d','0','0','%d','0','','%u','0','%d');",
-				item, hCharID, lastbag, lastbagslot, qtd, sItem->byRank, sItem->byDurability, sItem->byBattle_Attribute, sItem->Item_Option_Tblidx, sItem->byDurationType))
+			HOBJECT handleItem = pServer->AcquireSerialID();
+			if (pServer->ServerDB->ExecuteSp("CALL `spInsertItem`('%u','%u','%d','%d','%d','%d','%d','0','0','%d','0','','%u','0','%d','%d');",
+				item, hCharID, lastbag, lastbagslot, qtd, sItem->byRank, sItem->byDurability, sItem->byBattle_Attribute, sItem->Item_Option_Tblidx, sItem->byDurationType, handleItem))
 			{
 				do {
 					pServer->ServerDB->GetResultSet();
@@ -295,7 +447,7 @@ bool CharacterProfile::InsertNextBagSlot(sGU_ITEM_CREATE& sPacket, ITEMID item, 
 
 			sPacket.bIsNew = true;
 			sPacket.wOpCode = GU_ITEM_CREATE;
-			sPacket.handle = hItem;
+			sPacket.handle = handleItem;
 			sPacket.sItemData.itemId = hItem;
 			sPacket.sItemData.charId = hCharID;
 			sPacket.sItemData.itemNo = item;
@@ -310,7 +462,7 @@ bool CharacterProfile::InsertNextBagSlot(sGU_ITEM_CREATE& sPacket, ITEMID item, 
 			sPacket.sItemData.byDurationType = sItem->byDurationType;
 			sPacket.sItemData.byGrade = 0;
 
-			asItemProfile[i].handle = sPacket.sItemData.itemId;
+			asItemProfile[i].handle = handleItem;
 			asItemProfile[i].tblidx = item;
 			asItemProfile[i].byCurDur = sPacket.sItemData.byCurrentDurability;
 			asItemProfile[i].byPlace = sPacket.sItemData.byPlace;
@@ -342,7 +494,8 @@ int CharacterProfile::LoadItemData()
 	{
 		while (pServer->ServerDB->Fetch())
 		{
-			asItemProfile[count].handle = pServer->ServerDB->getInt("ID");
+			HOBJECT serialItem = pServer->ServerDB->getInt("ItemSerialID");
+			asItemProfile[count].handle = serialItem;
 			asItemProfile[count].tblidx = pServer->ServerDB->getInt("ItemID");
 			asItemProfile[count].byPlace = pServer->ServerDB->getInt("Place");
 			asItemProfile[count].byPos = pServer->ServerDB->getInt("Slot");
@@ -359,6 +512,10 @@ int CharacterProfile::LoadItemData()
 			asItemProfile[count].byDurationType = pServer->ServerDB->getInt("DurationType");
 			asItemProfile[count].nUseStartTime = pServer->ServerDB->getInt("UseStartTime");
 			asItemProfile[count].nUseEndTime = pServer->ServerDB->getInt("UseEndTime");
+			if (serialItem > pServer->m_uiSerialID)
+			{
+				pServer->m_uiSerialID = pServer->ServerDB->getInt("ItemSerialID");
+			}
 			count++;
 		}
 	}
@@ -563,4 +720,64 @@ void CharacterProfile::GetObjectCreate(sGU_OBJECT_CREATE& sPacket)
 			sPacket.sObjectInfo.pcBrief.sItemBrief[slot].byRank = asItemProfile[i].byRank;
 		}
 	}
+}
+//By Luiz45 he will return the TBLIDX for skill else an invalid tblidx
+TBLIDX CharacterProfile::GetSkillBySlot(int iIdx)
+{
+	for (int i = 0; i < NTL_MAX_PC_HAVE_SKILL; i++)
+	{
+		if (asSkillInfo[i].bySlotId == iIdx)
+			return asSkillInfo[i].tblidx;
+	}
+	return INVALID_TBLIDX;
+}
+//By Luiz45 he will update Skill in the DBase and in our asSkillInfo list
+void CharacterProfile::UpdateSkill(TBLIDX tblBefore, TBLIDX tblNext)
+{
+	pServer->ServerDB->ExecuteQuery("UPDATE `skills` Set `SkillID`='%u' WHERE `SkillID`='%u' AND `CharID`='%u';", tblNext,tblBefore, GetCharID());
+	pServer->ServerDB->ExecuteQuery("UPDATE `character` Set `SpPoint`='%u' WHERE `CharID`='%u';", sPcProfile.dwSpPoint, GetCharID());
+	for (int i = 0; i < NTL_MAX_PC_HAVE_SKILL; i++)
+	{
+		if (asSkillInfo[i].tblidx == tblBefore)
+		{
+			asSkillInfo[i].tblidx = tblNext;
+			return;
+		}
+	}
+}
+//By Luiz45 update Stack Count in DB and in Inventory
+void CharacterProfile::UpdateStackCount(HOBJECT hItem, BYTE byStackCount)
+{
+	for (int i = 0; i < NTL_MAX_COUNT_USER_HAVE_INVEN_ITEM; i++)
+	{
+		if (asItemProfile[i].handle == hItem)
+		{
+			asItemProfile[i].byStackcount = byStackCount;
+			pServer->ServerDB->ExecuteQuery("UPDATE `inventory` Set `Stack` = '%u' WHERE `CharID`='%u' AND `ItemSerialID`='%u'", byStackCount, GetCharID(), hItem);
+			break;
+		}
+	}
+}
+//By Luiz45 Remove Item From Inventory and Delete from DB
+void CharacterProfile::RemoveItemFromInventory(HOBJECT hItem)
+{
+	for (int i = 0; i < NTL_MAX_COUNT_USER_HAVE_INVEN_ITEM; i++)
+	{
+		if (asItemProfile[i].handle == hItem)
+		{
+			asItemProfile[i].handle = INVALID_HOBJECT;
+			asItemProfile[i].byStackcount = 255;
+			asItemProfile[i].bNeedToIdentify = false;
+			asItemProfile[i].tblidx = INVALID_TBLIDX;
+			asItemProfile[i].byPlace = 255;
+			asItemProfile[i].byPos = 255;
+			pServer->ServerDB->ExecuteQuery("DELETE FROM `inventory` WHERE `CharID`='%u' AND `ItemSerialID`='%u'", GetCharID(), hItem);
+			break;
+		}
+	}
+}
+//By Luiz45 Update Money in Database
+void CharacterProfile::UpdateMoneyDataBase()
+{
+	pServer->ServerDB->ExecuteQuery("UPDATE `character` SET `Money`='%u' WHERE `ID`='%u' AND `AccID`='%u'",sPcProfile.dwZenny,GetCharID(),GetAccountid());
 }

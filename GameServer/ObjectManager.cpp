@@ -34,13 +34,16 @@ void ObjectManager::Run()
 		{
 			try
 			{
-				for (OBJPCLISTIT it = pcList.begin(); it != pcList.end(); it++)
+				if (pcList.size()>0)
 				{
-					GameClient* pClient = it->second->GetClient();
-
-					if (pClient && pClient->IsSpawnReady())
+					for (OBJPCLISTIT it = pcList.begin(); it != pcList.end(); it++)
 					{
-						SpawnToClient(pClient);
+						GameClient* pClient = it->second->GetClient();
+
+						if (pClient && pClient->IsSpawnReady())
+						{
+							SpawnToClient(pClient);
+						}
 					}
 				}
 
@@ -60,6 +63,21 @@ void ObjectManager::CreateThread()
 	pThread->Start();
 }
 
+//By Luiz45 Insert the DB on our list
+bool ObjectManager::AddDragonBall(TBLIDX tblDragonBallItem, sDRAGONBALL_TBLDAT* pDb)
+{
+	if (false == dbList.insert(OBJDRAGONBALLLISTVAL(tblDragonBallItem, pDb)).second)
+		return false;
+	return true;
+}
+//By Luiz45 Find DB
+bool ObjectManager::FindDragonBall(TBLIDX idxDB)
+{
+	OBJDRAGONBALLIT it = dbList.find(idxDB);
+	if (it == dbList.end())
+		return false;
+	return true;
+}
 bool ObjectManager::AddObject(HOBJECT hObject, void* pObj, eOBJTYPE eType)
 {
 	if (eType == eOBJTYPE::OBJTYPE_PC)

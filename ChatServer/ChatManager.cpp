@@ -76,11 +76,22 @@ bool ChatManager::FindClient(ChatClient* pClient)
 	return false;
 }
 
+void ChatManager::SendAll2(void* pData, int nSize, ChatClient* pClient)
+{
+	for (cliIt it = cList.begin(); it != cList.end(); ++it)
+	{
+		if (pClient->GetHandle() == it->second->GetHandle())
+			it->second->PushPacket(pData, nSize);
+		else if (pServer->GetChatManager()->FindClient(it->second))
+			it->second->PushPacket(pData, nSize);
+	}
+}
+
 void ChatManager::SendAll(void* pData, int nSize)
 {
 	for (cliIt it = cList.begin(); it != cList.end(); ++it)
 	{
-		it->second->PushPacket(pData, nSize);
+			it->second->PushPacket(pData, nSize);
 	}
 }
 

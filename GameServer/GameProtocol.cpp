@@ -11,11 +11,11 @@ bool GameClient::PacketControl(Packet* pPacket)
 	case UG_PING: break;
 	case UG_GAME_ENTER_REQ: {
 		SendGameEnterRes((sUG_GAME_ENTER_REQ*)data);
-		SendCharInfo();
 		SendCharItemInfo();
 		SendCharSkillInfo();
 		SendCharBuffsInfo();
 		SendCharHTBInfo();
+		SendCharInfo();
 		// Quest List
 		SendCharQuickSlotInfo();
 		SendAvatarWarFogInfo();
@@ -35,12 +35,15 @@ bool GameClient::PacketControl(Packet* pPacket)
 	case UG_CHAR_MOVE: SendCharMove((sUG_CHAR_MOVE*)data); break;
 	case UG_CHAR_DEST_MOVE: SendCharDestMove((sUG_CHAR_DEST_MOVE*)data); break;
 	case UG_CHAR_CHANGE_HEADING: SendCharChangeHeading((sUG_CHAR_CHANGE_HEADING*)data); break;
+	case UG_ITEM_UPGRADE_REQ: SendItemUpgrade((sUG_ITEM_UPGRADE_REQ*)data); break;
 	case UG_CHAR_CHANGE_DIRECTION_ON_FLOATING: SendCharChangeDirectionFloating((sUG_CHAR_CHANGE_DIRECTION_ON_FLOATING*)data); break;
+
 	case UG_CHAR_MOVE_SYNC: SendCharMoveSync((sUG_CHAR_MOVE_SYNC*)data); break;
 	case UG_CHAR_JUMP: SendCharJump((sUG_CHAR_JUMP*)data); break;
 	case UG_CHAR_JUMP_END: SendCharJumpEnd(); break;
 	case UG_CHAR_DIRECT_PLAY_ACK: SendCharDirectPlay((sUG_CHAR_DIRECT_PLAY_ACK*)data); break;
 	case UG_CHAR_TOGG_FIGHTING: SendToggleFightMode((sUG_CHAR_TOGG_FIGHTING*)data); break;
+	case UG_SKILL_UPGRADE_REQ: SendCharSkillUpgrade((sUG_SKILL_UPGRADE_REQ*)data); break;
 	case UG_CHAR_TOGG_SITDOWN:{
 		sUG_CHAR_TOGG_SITDOWN* test = (sUG_CHAR_TOGG_SITDOWN*)data;
 		if (test->bSitDown)
@@ -52,6 +55,8 @@ bool GameClient::PacketControl(Packet* pPacket)
 			SendToggleStandUp();
 		}
 	}break;
+	case UG_CHAR_DASH_KEYBOARD: SendCharDashKeyboard((sUG_CHAR_DASH_KEYBOARD*)data); break;
+	case UG_CHAR_DASH_MOUSE: SendCharDashMouse((sUG_CHAR_DASH_MOUSE*)data); break;
 	case UG_CHAR_TARGET_SELECT: SendTargetSelect((sUG_CHAR_TARGET_SELECT*)data); break;
 	case UG_CHAR_TARGET_INFO: SendTargetInfo((sUG_CHAR_TARGET_INFO*)data); break;
 	case UG_CHAR_ATTACK_BEGIN: SendCharAttackBegin((sUG_CHAR_ATTACK_BEGIN*)data); break;
@@ -59,19 +64,37 @@ bool GameClient::PacketControl(Packet* pPacket)
 	case UG_CHAR_EXIT_REQ: SendCharExitRes(); break;
 	case UG_GAME_EXIT_REQ: SendGameExitRes(); break;
 	case UG_CHAR_SKILL_REQ: SendCharSkillRes((sUG_CHAR_SKILL_REQ*)data); break;
+	case UG_HTB_LEARN_REQ: SendSkillHTBLearn((sUG_HTB_LEARN_REQ*)data); break;
 	case UG_ITEM_MOVE_REQ: SendIemMoveRes((sUG_ITEM_MOVE_REQ*)data); break;
 	case UG_SOCIAL_ACTION: SendSocialAction((sUG_SOCIAL_ACTION*)data); break;
+	case UG_TRANSFORM_CANCEL_REQ: SendCharSkillTransformCancel((sUG_TRANSFORM_CANCEL_REQ*)data); break;
 	case UG_TS_CONFIRM_STEP_REQ: SendTSConfirmRes((sUG_TS_CONFIRM_STEP_REQ*)data); break;
 	case UG_TS_EXCUTE_TRIGGER_OBJECT: SendTSExecObjectRes((sUG_TS_EXCUTE_TRIGGER_OBJECT*)data); break;
 	case UG_TUTORIAL_HINT_UPDATE_REQ: SendTutoHintUpdateRes((sUG_TUTORIAL_HINT_UPDATE_REQ*)data); break;
 	case UG_WAR_FOG_UPDATE_REQ: SendWarFogUpdateRes((sUG_WAR_FOG_UPDATE_REQ*)data); break;
 
+		//DRAGON BALL
+	case UG_DRAGONBALL_CHECK_REQ: SendDragonBallCheckRes((sUG_DRAGONBALL_CHECK_REQ*)data); break;
+	case UG_DRAGONBALL_REWARD_REQ: SendDragonBallReward((sUG_DRAGONBALL_REWARD_REQ*)data); break;
+		//QUESTS
+	case UG_QUEST_OBJECT_VISIT_REQ: SendObjectVisitQuest((sUG_QUEST_OBJECT_VISIT_REQ*)data); break;
+	case UG_QUEST_GIVEUP_REQ: SendGiveUpQuest((sUG_QUEST_GIVEUP_REQ*)data); break;
+	case UG_QUEST_ITEM_DELETE_REQ: SendQuestDeleteItem((sUG_QUEST_ITEM_DELETE_REQ*)data); break;
+	case UG_QUEST_ITEM_MOVE_REQ: SendQuestMoveItem((sUG_QUEST_ITEM_MOVE_REQ*)data); break;
+	case UG_QUEST_SHARE: SendQuestShare((sUG_QUEST_SHARE*)data); break;
+
+		//SCOUTER STUFF
+	case UG_SCOUTER_INDICATOR_REQ: SendScouterIndicatorRes((sUG_SCOUTER_INDICATOR_REQ*)data); break;
 		//CASH/EVENT SHOPS (not working)
 	case UG_SHOP_EVENTITEM_START_REQ: SendEventItemStartRes(); break;
 	case UG_SHOP_EVENTITEM_END_REQ: SendEventItemEndRes(); break;
 	case UG_SHOP_NETPYITEM_START_REQ: SendNetpyItemStartRes(); break;
 	case UG_SHOP_NETPYITEM_END_REQ: SendNetpyItemEndRes(); break;
 	case UG_PRIVATESHOP_CREATE_REQ: SendPrivateShopCreate((sUG_PRIVATESHOP_CREATE_REQ*)data); break;
+	case UG_SHOP_START_REQ: SendShopStartRes((sUG_SHOP_START_REQ*)data); break;
+	case UG_SHOP_BUY_REQ: SendShopBuyRes((sUG_SHOP_BUY_REQ*)data); break;
+	case UG_SHOP_SELL_REQ: SendShopSell((sUG_SHOP_SELL_REQ*)data); break;
+	case UG_SHOP_END_REQ: SendShopEnd((sUG_SHOP_END_REQ*)data); break;
 
 		//PORTAL PACKETS
 	case UG_PORTAL_START_REQ: SendPortalStart((sUG_PORTAL_START_REQ*)data); break;
@@ -200,7 +223,7 @@ void GameClient::SendToggleFightMode(sUG_CHAR_TOGG_FIGHTING* pData)
 		sPkt.bFightMode = pProfile->sCharState.sCharStateBase.bFightMode;
 		sPkt.handle = pProfile->GetSerialID();
 		sPkt.wOpCode = GU_CHAR_FIGHTMODE;
-		pServer->GetClientManager()->SendAll2(&sPkt, sizeof(sPkt),this);
+		pServer->GetClientManager()->SendAll2(&sPkt, sizeof(sPkt), this);
 	}
 }
 
@@ -225,14 +248,14 @@ void GameClient::DamagetoTarget(HOBJECT hTarget, WORD wDamage)
 		pMobProfile = pServer->GetObjectManager()->mobList.find(pProfile->GetTarget())->second;
 
 		int result = pMobProfile->sBrief.wCurLP;
-		result-= wDamage;
+		result -= wDamage;
 		if (result <= 0)
 			pMobProfile->sBrief.wCurLP = 0;
 		else
 			pMobProfile->sBrief.wCurLP = result;
 
 		Logger::Log(" MOB Attack [%u] LP: %u\n", pMobProfile->GetSerialID(), pMobProfile->sBrief.wCurLP);//just to use in console
-		
+
 		if (pMobProfile->sBrief.wCurLP == 0)
 		{
 			pMobProfile->sCharState.sCharStateBase.byStateID = CHARSTATE_FAINTING;
@@ -244,7 +267,7 @@ void GameClient::DamagetoTarget(HOBJECT hTarget, WORD wDamage)
 			sPkt.bFightMode = pProfile->sCharState.sCharStateBase.bFightMode = false;
 			sPkt.handle = pProfile->GetSerialID();
 			sPkt.wOpCode = GU_CHAR_FIGHTMODE;
-			pServer->GetClientManager()->SendAll2(&sPkt, sizeof(sPkt),this);
+			pServer->GetClientManager()->SendAll2(&sPkt, sizeof(sPkt), this);
 
 			SendMobGiveExp(pMobProfile->GetMobID());
 		}
@@ -271,7 +294,7 @@ void GameClient::SendCharAttack(DWORD dwCurrTick)
 			sPkt.bChainAttack = false;
 			sPkt.byAttackSequence = 1;
 			sPkt.vShift = pProfile->sCharState.sCharStateBase.vCurLoc;
-			pServer->GetClientManager()->SendAll2(&sPkt, sizeof(sPkt),this);
+			pServer->GetClientManager()->SendAll2(&sPkt, sizeof(sPkt), this);
 			pProfile->dwLastAttack = dwCurrTick;
 
 			DamagetoTarget(pProfile->GetTarget(), wDamage);
@@ -306,7 +329,7 @@ void GameClient::SendLPEPUpdate(WORD wCurLp, WORD wMaxLp, WORD wCurEp, WORD wMax
 	sPkt.wCurEP = wCurEp;
 	sPkt.wMaxEP = wMaxEp;
 	sPkt.dwLpEpEventId = 255;
-	pServer->GetClientManager()->SendAll2(&sPkt, sizeof(sPkt),this);
+	pServer->GetClientManager()->SendAll2(&sPkt, sizeof(sPkt), this);
 }
 
 void GameClient::SendEPUpdate(WORD wCurEp, WORD wMaxEp, HOBJECT hTarget)
@@ -318,7 +341,7 @@ void GameClient::SendEPUpdate(WORD wCurEp, WORD wMaxEp, HOBJECT hTarget)
 	sPkt.wCurEP = wCurEp;
 	sPkt.wMaxEP = wMaxEp;
 	sPkt.dwLpEpEventId = 255;
-	pServer->GetClientManager()->SendAll2(&sPkt, sizeof(sPkt),this);
+	pServer->GetClientManager()->SendAll2(&sPkt, sizeof(sPkt), this);
 }
 
 void GameClient::SendLPUpdate(WORD wCurLp, WORD wMaxLp, HOBJECT hTarget)
@@ -330,7 +353,7 @@ void GameClient::SendLPUpdate(WORD wCurLp, WORD wMaxLp, HOBJECT hTarget)
 	sPkt.wCurLP = wCurLp;
 	sPkt.wMaxLP = wMaxLp;
 	sPkt.dwLpEpEventId = 255;
-	pServer->GetClientManager()->SendAll2(&sPkt, sizeof(sPkt),this);
+	pServer->GetClientManager()->SendAll2(&sPkt, sizeof(sPkt), this);
 }
 
 void GameClient::SendCharStateUpdate(HOBJECT hObject, sCHARSTATE sCharState)
@@ -468,22 +491,22 @@ void GameClient::SendTSConfirmRes(sUG_TS_CONFIRM_STEP_REQ* pData)
 	sPkt.tcCurId = pData->tcCurId;
 	sPkt.tcNextId = pData->tcNextId;
 	sPkt.wResultCode = RESULT_SUCCESS;
-	
+
 	Send(&sPkt, sizeof(sPkt));
 	/*DungeonTable* table = pServer->GetTableContainer()->GetDungeonTable();
 	WorldTable* wolrTabl = pServer->GetTableContainer()->GetWorldTable();
 	WorldMapTable* world = pServer->GetTableContainer()->GetWorldMapTable();
 	if (pData->tcNextId == 2)
 	{
-		sCHARSTATE pState = pProfile->sCharState;
-		pState.sCharStateBase.byStateID = CHARSTATE_TELEPORTING;
-		pState.sCharStateDetail.sCharStateTeleporting.byTeleportType = TELEPORT_TYPE_NPC_PORTAL;//dont know if is dungeont or npc however we progress
-		SendCharStateUpdate(pProfile->GetSerialID(), pState);//just relax
+	sCHARSTATE pState = pProfile->sCharState;
+	pState.sCharStateBase.byStateID = CHARSTATE_TELEPORTING;
+	pState.sCharStateDetail.sCharStateTeleporting.byTeleportType = TELEPORT_TYPE_NPC_PORTAL;//dont know if is dungeont or npc however we progress
+	SendCharStateUpdate(pProfile->GetSerialID(), pState);//just relax
 	}
 	if (pData->tcNextId == 254)
 	{
-		sWORLD_TBLDAT* pTablDat = reinterpret_cast<sWORLD_TBLDAT*>(wolrTabl->FindData(pData->tId));
-		SendCharTeleport(pTablDat->tblidx, TELEPORT_TYPE_NPC_PORTAL);
+	sWORLD_TBLDAT* pTablDat = reinterpret_cast<sWORLD_TBLDAT*>(wolrTabl->FindData(pData->tId));
+	SendCharTeleport(pTablDat->tblidx, TELEPORT_TYPE_NPC_PORTAL);
 	}*/
 }
 
@@ -508,6 +531,11 @@ void GameClient::SendIemMoveRes(sUG_ITEM_MOVE_REQ* pData)
 
 	HOBJECT hSrcItem = pProfile->GetInventoryItemSerialID(pData->bySrcPlace, pData->bySrcPos);
 	HOBJECT hDestItem = pProfile->GetInventoryItemSerialID(pData->byDestPlace, pData->byDestPos);
+	//If hSrcItem is invalid is because he come to a empty slot
+	if (hSrcItem == INVALID_TBLIDX){
+		hSrcItem = hDestItem;
+		hDestItem = INVALID_TBLIDX;
+	}
 	TBLIDX SrcTblidx = pProfile->GetInventoryItemID(pData->bySrcPlace, pData->bySrcPos);
 	TBLIDX DestTblidx = pProfile->GetInventoryItemID(pData->byDestPlace, pData->byDestPos);
 	sITEM_BRIEF pSrcItemData;
@@ -616,7 +644,6 @@ void GameClient::SendIemMoveRes(sUG_ITEM_MOVE_REQ* pData)
 			UpdateCharObjEquips(hDestItem, pData->bySrcPos);
 			//Do here
 		}
-		
 
 		// Update DB
 		if (hSrcItem != INVALID_HOBJECT)
@@ -743,6 +770,56 @@ void GameClient::CheckCommand(sUG_SERVER_COMMAND* pData)
 		if (strcmp(tok[0].c_str(), "@teste") == 0)
 		{
 			// TEST COMMANDS
+		}
+		if (strcmp(tok[0].c_str(), "@getdragonballt1") == 0)
+		{
+			DragonBallTable* pDragonBall = pServer->GetTableContainer()->GetDragonBallTable();
+			int i = 0;
+			for (Table::TABLEIT itDragonball = pDragonBall->Begin(); itDragonball != pDragonBall->End(); ++itDragonball)
+			{
+				sDRAGONBALL_TBLDAT* pDbTblData = (sDRAGONBALL_TBLDAT*)itDragonball->second;
+				if (eDRAGON_BALL_TYPE::DRAGON_BALL_TYPE_BASIC == pDbTblData->byBallType)
+				{
+					for (int i = 0; i < 7; i++)
+					{
+						sGU_ITEM_CREATE sPkt;
+						if (pProfile->InsertNextBagSlot(sPkt, pDbTblData->aBallTblidx[i], 1))
+						{
+							Send(&sPkt, sizeof(sPkt));
+						}
+						else
+						{
+							SendSystemText("Invalid Item Index");
+						}
+					}
+					break;
+				}
+			}
+		}
+		if (strcmp(tok[0].c_str(), "@getdragonballt2") == 0)
+		{
+			DragonBallTable* pDragonBall = pServer->GetTableContainer()->GetDragonBallTable();
+			int i = 0;
+			for (Table::TABLEIT itDragonball = pDragonBall->Begin(); itDragonball != pDragonBall->End(); ++itDragonball)
+			{
+				sDRAGONBALL_TBLDAT* pDbTblData = (sDRAGONBALL_TBLDAT*)itDragonball->second;
+				if (eDRAGON_BALL_TYPE::DRAGON_BALL_TYPE_NORMAL == pDbTblData->byBallType)
+				{
+					for (int i = 0; i < 7; i++)
+					{
+						sGU_ITEM_CREATE sPkt;
+						if (pProfile->InsertNextBagSlot(sPkt, pDbTblData->aBallTblidx[i], 1))
+						{
+							Send(&sPkt, sizeof(sPkt));
+						}
+						else
+						{
+							SendSystemText("Invalid Item Index");
+						}
+					}
+					break;
+				}
+			}
 		}
 		if (strcmp(tok[0].c_str(), "@addcon") == 0)
 		{
@@ -1312,7 +1389,7 @@ void GameClient::SendCharTeleport(TBLIDX worldID, eTELEPORT_TYPE teleportType, T
 			pRes.vNewLoc.x = pPortalTblData->vLoc.x;
 			pRes.vNewLoc.y = pPortalTblData->vLoc.y;
 			pRes.vNewLoc.z = pPortalTblData->vLoc.z;
-		}		
+		}
 	}
 	pRes.wOpCode = GU_CHAR_TELEPORT_RES;
 	Send(&pRes, sizeof(pRes));
@@ -1323,4 +1400,575 @@ void GameClient::SendCharTeleport(TBLIDX worldID, eTELEPORT_TYPE teleportType, T
 	pCharState.sCharStateBase.byStateID = CHARSTATE_SPAWNING;
 	pCharState.sCharStateDetail.sCharStateTeleporting.byTeleportType = teleportType;
 	SendCharStateUpdate(pProfile->GetSerialID(), pCharState);
+}
+//By Luiz45 Learn HTB Skill
+void GameClient::SendSkillHTBLearn(sUG_HTB_LEARN_REQ* pData)
+{
+	HTBSetTable * pHTBTable = pServer->GetTableContainer()->GetHTBSetTable();
+	sHTB_SET_TBLDAT *pHTBSetTblData = reinterpret_cast<sHTB_SET_TBLDAT*>(pHTBTable->FindData(pData->skillId));
+	sGU_HTB_LEARN_RES pPacket;
+	memset(&pPacket, 0, sizeof(pPacket));
+	pPacket.skillId = pHTBSetTblData->tblidx;
+	pPacket.bySkillSlot = pHTBSetTblData->bySlot_Index;
+	pPacket.wResultCode = GAME_SUCCESS;
+	pPacket.wOpCode = GU_HTB_LEARN_RES;
+	Send(&pPacket, sizeof(pPacket));
+}
+//By Luiz45 Dash Skill using Keyboard
+void GameClient::SendCharDashKeyboard(sUG_CHAR_DASH_KEYBOARD* pData)
+{
+	sGU_UPDATE_CHAR_EP pRes;
+	memset(&pRes, 0, sizeof(pRes));
+	pRes.handle = pProfile->GetSerialID();
+	pRes.wCurEP = (pProfile->sPcProfile.wCurEP -= 50);
+	pRes.wMaxEP = pProfile->sPcProfile.avatarAttribute.wBaseMaxEP;
+	pRes.wOpCode = GU_UPDATE_CHAR_EP;
+	pServer->GetClientManager()->SendOthers(&pRes, sizeof(pRes), this);
+	sCHARSTATE plr = pProfile->sCharState;
+	//Response
+	plr.sCharStateBase.byStateID = CHARSTATE_DASH_PASSIVE;
+	plr.sCharStateBase.vCurDir.x = pData->vCurDir.x;
+	plr.sCharStateBase.vCurDir.z = pData->vCurDir.z;
+	plr.sCharStateBase.vCurDir.y = pData->vCurLoc.y;
+	plr.sCharStateBase.vCurLoc.x = pData->vCurLoc.x;
+	plr.sCharStateBase.vCurLoc.z = pData->vCurLoc.z;
+	plr.sCharStateBase.vCurLoc.y = pData->vCurLoc.y;
+	SendCharStateUpdate(pProfile->GetSerialID(), plr);
+}
+//By Luiz45 Dash Skill using Mouse
+void GameClient::SendCharDashMouse(sUG_CHAR_DASH_MOUSE* pData)
+{
+	sGU_UPDATE_CHAR_EP pRes;
+	memset(&pRes, 0, sizeof(pRes));
+	pRes.handle = pProfile->GetSerialID();
+	pRes.wCurEP = (pProfile->sPcProfile.wCurEP -= 50);
+	pRes.wMaxEP = pProfile->sPcProfile.avatarAttribute.wBaseMaxEP;
+	pRes.wOpCode = GU_UPDATE_CHAR_EP;
+	pServer->GetClientManager()->SendOthers(&pRes, sizeof(pRes), this);
+	sCHARSTATE plr = pProfile->sCharState;
+	//Response
+	plr.sCharStateBase.byStateID = CHARSTATE_DASH_PASSIVE;
+	plr.sCharStateBase.vCurLoc.x = pData->vDestLoc.x;
+	plr.sCharStateBase.vCurLoc.z = pData->vDestLoc.z;
+	plr.sCharStateBase.vCurLoc.y = pData->vDestLoc.y;
+	SendCharStateUpdate(pProfile->GetSerialID(), plr);
+}
+//By Luiz45 Shop Buy
+void GameClient::SendShopStartRes(sUG_SHOP_START_REQ* pData)
+{
+	sGU_SHOP_START_RES pPacket;
+	memset(&pPacket, 0, sizeof(pPacket));
+	pPacket.wOpCode = GU_SHOP_START_RES;
+	pPacket.wResultCode = GAME_SUCCESS;
+	pPacket.handle = pData->handle;
+	pPacket.byType = 1;
+	Send(&pPacket, sizeof(pPacket));
+}
+//By Luiz45 Shop End
+void GameClient::SendShopEnd(sUG_SHOP_END_REQ* pData)
+{
+	sGU_SHOP_END_RES pRes;
+	memset(&pRes, 0, sizeof(pRes));
+	pRes.wOpCode = GU_SHOP_END_RES;
+	pRes.wResultCode = GAME_SUCCESS;
+	Send(&pRes, sizeof(pRes));
+}
+//By Luiz45 Shop Buy
+void GameClient::SendShopBuyRes(sUG_SHOP_BUY_REQ* pData)
+{
+	NpcProfile* pNpcServer = pServer->GetObjectManager()->npcList.find(pData->handle)->second;
+	sNPC_TBLDAT* pNpc = reinterpret_cast<sNPC_TBLDAT*>(pServer->GetTableContainer()->GetNpcTable()->FindData(pNpcServer->sBrief.tblidx));
+	sMERCHANT_TBLDAT* pNpcMerchant = reinterpret_cast<sMERCHANT_TBLDAT*>(pServer->GetTableContainer()->GetMerchantTable()->FindData(pNpc->amerchant_Tblidx[pData->sBuyData[0].byMerchantTab]));
+	sGU_SHOP_BUY_RES pRes;
+	WORD	buy_item_result = 0;
+	bool bBuyed = false;
+	sSHOP_BUY_CART pShopBuyCart[NTL_MAX_BUY_SHOPPING_CART];
+	memset(&pShopBuyCart, 0, sizeof(sSHOP_BUY_CART));
+	BYTE iEmptySlot = 0;
+	for (int i = 0; i < NTL_MAX_BUY_SHOPPING_CART; ++i)
+	{
+		if (&pData->sBuyData[i])
+		{
+			if (pData->sBuyData[i].byStack > 0)
+			{
+				memcpy((void*)&pShopBuyCart[iEmptySlot], (void*)&pData->sBuyData[i], sizeof(sSHOP_BUY_CART));
+				++iEmptySlot;
+			}
+		}
+	}
+	if (pNpcMerchant->bySell_Type == MERCHANT_SELL_TYPE_ITEM)
+	{
+		for (int l = NTL_MAX_BUY_SHOPPING_CART; l >= 0; l--)
+		{
+			if ((pShopBuyCart[l].byItemPos < 16) && (pShopBuyCart[l].byStack != 0))
+			{
+				bBuyed = false;
+				sITEM_TBLDAT* pItemData = reinterpret_cast<sITEM_TBLDAT*>(pServer->GetTableContainer()->GetItemTable()->FindData(pNpcMerchant->aitem_Tblidx[pShopBuyCart[l].byItemPos]));
+				if (pItemData && !bBuyed){
+					//Basic check to see if the item already exist in server to not crash
+					HOBJECT handleItem = pServer->AcquireSerialID();
+					bool bExistObjectInGame = true;
+					while (bExistObjectInGame){
+						bExistObjectInGame = pProfile->ExistItemInGame(handleItem);
+						if (bExistObjectInGame)
+							handleItem = pServer->AcquireSerialID();
+					}
+					int iPlace = pProfile->ScanForFreeBag();
+					int iPos = pProfile->ScanForFreePosition(iPlace);
+					if (iPlace == 99){
+						buy_item_result = GAME_ITEM_INVEN_FULL;
+						break;
+					}
+					pProfile->sPcProfile.dwZenny -= pItemData->dwCost;
+					int testValue = pProfile->sPcProfile.dwZenny;
+					if (testValue <= 0){
+						buy_item_result = GAME_ZENNY_NOT_ENOUGH;
+						pProfile->sPcProfile.dwZenny = 0;
+					}
+					else{
+						pServer->ServerDB->ExecuteQuery("CALL `spQueryInsertItem`('%u','%u','%d','%d','%d','%d','%d','0','0','%d','0','','%u','0','%d','%d');",
+							pItemData->tblidx, pProfile->GetCharID(), iPlace, iPos, pShopBuyCart[l].byStack, pItemData->byRank, pItemData->byDurability, pItemData->byBattle_Attribute, pItemData->Item_Option_Tblidx, pItemData->byDurationType, handleItem);
+
+						//FOR NOW SHOP IS FREE \õ/
+						sGU_ITEM_CREATE pMake;
+						memset(&pMake, 0, sizeof(pMake));
+						pMake.bIsNew = true;
+						pMake.wOpCode = GU_ITEM_CREATE;
+						pMake.handle = handleItem;
+						pMake.sItemData.charId = pProfile->GetCharID();
+						pMake.sItemData.itemNo = pItemData->tblidx;
+						pMake.sItemData.byStackcount = pShopBuyCart[l].byStack;
+						pMake.sItemData.itemId = pItemData->tblidx;
+						pMake.sItemData.byPlace = iPlace;
+						pMake.sItemData.byPosition = iPos;
+						pMake.sItemData.byCurrentDurability = pItemData->byDurability;
+						pMake.sItemData.byRank = pItemData->byRank;
+						Send(&pMake, sizeof(pMake));
+						bBuyed = true;
+						buy_item_result = GAME_SUCCESS;
+						pProfile->insertItemIntoInventory(pMake.sItemData, handleItem);
+					}
+
+				}
+			}
+		}
+	}
+	else if (buy_item_result == GAME_SUCCESS){
+		pProfile->UpdateMoneyDataBase();
+		SendCharZennyUpdate(eZENNY_CHANGE_TYPE::ZENNY_CHANGE_TYPE_ITEM_BUY);
+	}
+	pRes.wOpCode = GU_SHOP_BUY_RES;
+	pRes.wResultCode = buy_item_result;
+	pRes.handle = pData->handle;
+	Send(&pRes, sizeof(pRes));
+}
+//By Luiz45 Char Skill Upgrade
+void GameClient::SendCharSkillUpgrade(sUG_SKILL_UPGRADE_REQ* pData)
+{
+	sSKILL_TBLDAT* pSkillData = reinterpret_cast<sSKILL_TBLDAT*>(pServer->GetTableContainer()->GetSkillTable()->FindData(pProfile->GetSkillBySlot(pData->bySlotIndex)));
+	if (pSkillData->dwNextSkillTblidx)
+	{
+		sGU_SKILL_UPGRADE_RES res;
+		memset(&res, 0, sizeof(res));
+		res.wOpCode = GU_SKILL_UPGRADE_RES;
+
+		if (pProfile->sPcProfile.dwSpPoint > 0)
+			res.wResultCode = GAME_SUCCESS;
+		else
+			res.wResultCode = GAME_SKILL_NOT_ENOUGH_SP_POINT;
+
+		res.skillId = pSkillData->dwNextSkillTblidx;
+		res.bySlot = pData->bySlotIndex;
+		Send(&res, sizeof(res));
+		if (res.wResultCode == GAME_SUCCESS)
+		{
+			sGU_UPDATE_CHAR_SP res2;
+			memset(&res2, 0, sizeof(res2));
+			//Update player's SP
+			pProfile->sPcProfile.dwSpPoint -= 1;
+			pProfile->UpdateSkill(pSkillData->tblidx, pSkillData->dwNextSkillTblidx);
+
+			//Send a response to client to get Update SP OK
+			res2.wOpCode = GU_UPDATE_CHAR_SP;
+			res2.dwSpPoint = pProfile->sPcProfile.dwSpPoint;
+
+			Send(&res2, sizeof(res2));
+		}
+	}
+}
+//By Luiz45 Cancel transformation
+void GameClient::SendCharSkillTransformCancel(sUG_TRANSFORM_CANCEL_REQ* pData)
+{
+	sGU_TRANSFORM_CANCEL_RES res;
+	memset(&res, 0, sizeof(res));
+	res.wOpCode = GU_TRANSFORM_CANCEL_RES;
+	res.wResultCode = GAME_SUCCESS;
+
+	//Update Char State
+	sGU_UPDATE_CHAR_ASPECT_STATE myPlayerState;
+	memset(&myPlayerState, 0, sizeof(myPlayerState));
+	myPlayerState.handle = pProfile->GetSerialID();
+	myPlayerState.wOpCode = GU_UPDATE_CHAR_ASPECT_STATE;
+	myPlayerState.aspectState.sAspectStateBase.byAspectStateId = ASPECTSTATE_INVALID;
+
+	Send(&res, sizeof(res));
+	Send(&myPlayerState, sizeof(myPlayerState));
+	pServer->GetClientManager()->SendOthers(&res, sizeof(res), this);
+	pServer->GetClientManager()->SendOthers(&myPlayerState, sizeof(myPlayerState), this);
+}
+//By Luiz45 Object Visit quest
+void GameClient::SendObjectVisitQuest(sUG_QUEST_OBJECT_VISIT_REQ* pData)
+{
+	sGU_QUEST_OBJECT_VISIT_RES res;
+	memset(&res, 0, sizeof(res));
+	res.byObjType = pData->byObjType;
+	res.objectTblidx = pData->objectTblidx;
+	res.qId = pData->qId;
+	res.worldId = pData->worldId;
+	res.wOpCode = GU_QUEST_OBJECT_VISIT_RES;
+	res.wResultCode = GAME_SUCCESS;
+	Send(&res, sizeof(res));
+}
+//By Luiz45 Giveup Quest
+void GameClient::SendGiveUpQuest(sUG_QUEST_GIVEUP_REQ* pData)
+{
+	sGU_QUEST_GIVEUP_RES res;
+	memset(&res, 0, sizeof(res));
+	res.tId = pData->tId;
+	res.wOpCode = GU_QUEST_GIVEUP_RES;
+	res.wResultCode = GAME_SUCCESS;
+	Send(&res, sizeof(res));
+}
+//By Luiz45 Delete item Quest
+void GameClient::SendQuestDeleteItem(sUG_QUEST_ITEM_DELETE_REQ* pData)
+{
+	sGU_QUEST_ITEM_DELETE_RES res;
+	memset(&res, 0, sizeof(res));
+	res.byDeletePos = pData->byDeletePos;
+	res.wOpCode = GU_QUEST_ITEM_DELETE_RES;
+	res.wResultCode = GAME_SUCCESS;
+	Send(&res, sizeof(res));
+	//TODO: Add validation to see if item exist
+	sGU_QUEST_ITEM_DELETE_NFY nfy;
+	memset(&nfy, 0, sizeof(nfy));
+	nfy.byDeletePos = pData->byDeletePos;
+	nfy.wOpCode = GU_QUEST_ITEM_DELETE_NFY;
+	pServer->GetClientManager()->SendOthers(&nfy, sizeof(nfy), this);
+}
+//By Luiz45 QuestMove item
+void GameClient::SendQuestMoveItem(sUG_QUEST_ITEM_MOVE_REQ* pData)
+{
+	sGU_QUEST_ITEM_MOVE_RES res;
+	memset(&res, 0, sizeof(res));
+	//TODO: Same logic for item move....but remove the attribute calc
+}
+//By Luiz45 Quest Share
+void GameClient::SendQuestShare(sUG_QUEST_SHARE* pData)
+{
+	CharacterProfile* pCharToShare = pServer->GetObjectManager()->pcList.find(pProfile->GetTarget())->second;
+	sGU_QUEST_SHARE_NFY res;
+	memset(&res, 0, sizeof(res));
+	res.tId = pData->tId;
+	res.wOpCode = GU_QUEST_SHARE_NFY;
+	if (pCharToShare)
+	{
+		res.hActor = pCharToShare->GetSerialID();
+		res.wResultCode = GAME_SUCCESS;
+	}
+	else{
+		res.hActor = INVALID_HOBJECT;
+		res.wResultCode = GAME_FAIL;
+	}
+	Send(&res, sizeof(res));
+	pServer->GetClientManager()->SendOthers(&res, sizeof(res), this);
+}
+//By Luiz45 Item Upgrade
+void GameClient::SendItemUpgrade(sUG_ITEM_UPGRADE_REQ* pData)
+{
+	sGU_ITEM_UPGRADE_RES res;
+	memset(&res, 0, sizeof(res));
+	res.byGrade = 1;//TODO: Add itemGrade+1
+	res.byBattleAttribute = pData->byStonPlace;
+	res.byItemPlace = pData->byItemPlace;
+	res.byItemPos = pData->byItemPos;
+	res.byStack = 1;
+	res.byStonPlace = pData->byStonPlace;
+	res.byStonPos = pData->byStonPos;
+
+	res.wResultCode = GAME_SUCCESS;//By now every item is a success
+	res.wOpCode = GU_ITEM_UPGRADE_RES;
+	Send(&res, sizeof(res));
+}
+//Shop Selling by Luiz45/Kalisto/Atidot3(its because i dont remember who done the function)
+void GameClient::SendShopSell(sUG_SHOP_SELL_REQ* pData)
+{
+	sGU_SHOP_SELL_RES res;
+	memset(&res, 0, sizeof(res));
+
+	sSHOP_SELL_CART pShopSellCart[NTL_MAX_BUY_SHOPPING_CART];
+	memset(&pShopSellCart, 0, sizeof(sSHOP_SELL_CART));
+	BYTE iEmptySlot = 0;
+	for (int i = 0; i < NTL_MAX_BUY_SHOPPING_CART; ++i)
+	{
+		if (&pData->sSellData[i])
+		{
+			if (pData->sSellData[i].byStack > 0)
+			{
+				memcpy((void*)&pShopSellCart[iEmptySlot], (void*)&pData->sSellData[i], sizeof(sSHOP_SELL_CART));
+				++iEmptySlot;
+			}
+		}
+	}
+
+	int zenit_amount = 0;
+	for (int i = 0; (pShopSellCart[i].byStack < 204); i++)
+	{
+		HOBJECT itemSerialID = pProfile->GetInventoryItemSerialID(pShopSellCart[i].byPlace, pShopSellCart[i].byPos);
+		TBLIDX item_id = pProfile->GetInventoryItemID(pShopSellCart[i].byPlace, pShopSellCart[i].byPos);
+		BYTE itemAmount = pProfile->GetStackCount(itemSerialID);
+		sITEM_TBLDAT* pItemData = reinterpret_cast<sITEM_TBLDAT*>(pServer->GetTableContainer()->GetItemTable()->FindData(item_id));
+		sITEM_OPTION_TBLDAT* pOption = reinterpret_cast<sITEM_OPTION_TBLDAT*>(pServer->GetTableContainer()->GetItemOptionTable()->FindData(pItemData->Item_Option_Tblidx));
+		zenit_amount += pServer->GetLogic()->Logic_CalcPrice_for_Sell(pItemData, pOption, pShopSellCart[i].byStack);
+		int count_less = pShopSellCart[i].byStack - itemAmount;
+		if (count_less <= 0)
+		{
+			sGU_ITEM_DELETE res1;
+			memset(&res1, 0, sizeof(res1));
+			res1.bySrcPlace = pShopSellCart[i].byPlace;
+			res1.bySrcPos = pShopSellCart[i].byPos;
+			res1.hSrcItem = itemSerialID;
+			res1.wOpCode = GU_ITEM_DELETE;
+			Send(&res1, sizeof(res1));
+			pProfile->RemoveItemFromInventory(itemSerialID);
+		}
+		else if (count_less >= 1)
+		{
+			SendItemStackUpdate(item_id, count_less);
+		}
+	}
+	pProfile->sPcProfile.dwZenny += zenit_amount;
+	pProfile->UpdateMoneyDataBase();
+	res.handle = pData->handle;
+	res.wOpCode = GU_SHOP_SELL_RES;
+	res.wResultCode = GAME_SUCCESS;
+	//Send Packets
+	Send(&res, sizeof(res));
+	SendCharZennyUpdate(eZENNY_CHANGE_TYPE::ZENNY_CHANGE_TYPE_ITEM_SELL);
+}
+//By Luiz45 Update Char Zenny
+void GameClient::SendCharZennyUpdate(eZENNY_CHANGE_TYPE eZennyType)
+{
+	sGU_UPDATE_CHAR_ZENNY res2;
+	memset(&res2, 0, sizeof(res2));
+	res2.bIsNew = true;
+	res2.byChangeType = eZennyType;
+	res2.dwZenny = pProfile->sPcProfile.dwZenny;
+	res2.handle = pProfile->GetSerialID();
+	res2.wOpCode = GU_UPDATE_CHAR_ZENNY;
+	Send(&res2, sizeof(res2));
+}
+// By Ebbo - Scouter scanning
+void GameClient::SendScouterIndicatorRes(sUG_SCOUTER_INDICATOR_REQ* pData)
+{
+	sGU_SCOUTER_INDICATOR_RES res;
+	memset(&res, 0, sizeof(res));
+	res.hTarget = pData->hTarget;
+	res.dwRetValue = 0;
+	res.wOpCode = GU_SCOUTER_INDICATOR_RES;
+
+	CharacterProfile* pPcProfile = NULL;
+	MobProfile* pMobProfile = NULL;
+	NpcProfile* pNpcProfile = NULL;
+	//Check if player exist
+	if (pServer->GetObjectManager()->FindObject(res.hTarget, eOBJTYPE::OBJTYPE_PC))
+	{
+		pPcProfile = pServer->GetObjectManager()->pcList.find(res.hTarget)->second;
+
+		//Scouter calcuation for player
+		res.dwRetValue = Dbo_CalculatePowerLevel(pPcProfile->sPcProfile.avatarAttribute.byLastStr, pPcProfile->sPcProfile.avatarAttribute.byLastCon, pPcProfile->sPcProfile.avatarAttribute.byLastFoc, pPcProfile->sPcProfile.avatarAttribute.byLastDex,
+			pPcProfile->sPcProfile.avatarAttribute.byLastSol, pPcProfile->sPcProfile.avatarAttribute.byLastEng, pPcProfile->sPcProfile.avatarAttribute.wLastPhysicalOffence, pPcProfile->sPcProfile.avatarAttribute.wLastPhysicalDefence,
+			pPcProfile->sPcProfile.avatarAttribute.wLastEnergyOffence, pPcProfile->sPcProfile.avatarAttribute.wLastEnergyDefence, pPcProfile->sPcProfile.avatarAttribute.wLastAttackRate, pPcProfile->sPcProfile.avatarAttribute.wLastDodgeRate, pPcProfile->sPcProfile.avatarAttribute.wLastCurseSuccessRate,
+			pPcProfile->sPcProfile.avatarAttribute.wLastCurseToleranceRate, pPcProfile->sPcProfile.avatarAttribute.wLastPhysicalCriticalRate, pPcProfile->sPcProfile.avatarAttribute.wLastEnergyCriticalRate, pPcProfile->sPcProfile.avatarAttribute.wLastAttackSpeedRate, pPcProfile->sPcProfile.avatarAttribute.wBaseMaxLP,
+			pPcProfile->sPcProfile.avatarAttribute.wBaseMaxEP, pPcProfile->sPcProfile.wCurLP, pPcProfile->sPcProfile.wCurEP, 0, pPcProfile->sPcProfile.byLevel, 0);
+		res.wResultCode = GAME_SUCCESS;
+	}
+	//Check if mob exist
+	else if (pServer->GetObjectManager()->FindObject(res.hTarget, eOBJTYPE::OBJTYPE_MOB))
+	{
+		pMobProfile = pServer->GetObjectManager()->mobList.find(res.hTarget)->second;
+		MobTable* mobTable = pServer->GetTableContainer()->GetMobTable();
+		sMOB_TBLDAT* mobData = reinterpret_cast<sMOB_TBLDAT*>(mobTable->FindData(pMobProfile->GetMobID()));
+
+		//Scouter calculation for mobs
+		res.dwRetValue = Dbo_CalculatePowerLevel(mobData->byStr, mobData->byCon, mobData->byFoc, mobData->byDex, mobData->bySol,
+			mobData->byEng, mobData->wBasic_Offence, mobData->wBasic_Physical_Defence, mobData->wBasic_Energy_Defence, mobData->wBasic_Energy_Defence,
+			mobData->wAttack_Rate, mobData->wDodge_Rate, mobData->wCurse_Success_Rate, mobData->wCurse_Tolerance_Rate, 5,
+			5, mobData->wAttack_Speed_Rate, mobData->wBasic_LP, mobData->wBasic_EP, mobData->wBasic_LP, mobData->wBasic_EP, 1, mobData->byLevel, mobData->byGrade);
+		res.wResultCode = GAME_SUCCESS;
+	}
+	else if (pServer->GetObjectManager()->FindObject(res.hTarget, eOBJTYPE::OBJTYPE_NPC))
+	{
+		pNpcProfile = pServer->GetObjectManager()->npcList.find(res.hTarget)->second;
+		NPCTable* npcTable = pServer->GetTableContainer()->GetNpcTable();
+		sNPC_TBLDAT* npcData = reinterpret_cast<sNPC_TBLDAT*>(npcTable->FindData(pNpcProfile->sBrief.tblidx));
+
+		//Scouter calcutation for npcs	
+		res.dwRetValue = Dbo_CalculatePowerLevel(npcData->byStr, npcData->byCon, npcData->byFoc, npcData->byDex, npcData->bySol,
+			npcData->byEng, npcData->wBasic_Offence, npcData->wBasic_Physical_Defence, npcData->wBasic_Energy_Defence, npcData->wBasic_Energy_Defence,
+			npcData->wAttack_Rate, npcData->wDodge_Rate, npcData->wCurse_Success_Rate, npcData->wCurse_Tolerance_Rate, 5,
+			5, npcData->wAttack_Speed_Rate, npcData->wBasic_LP, npcData->wBasic_EP, npcData->wBasic_LP, npcData->wBasic_EP, 1, npcData->byLevel, 0);
+		res.wResultCode = GAME_SUCCESS;
+
+	}
+	else
+	{
+		res.wResultCode = GAME_SCOUTER_TARGET_FAIL;
+	}
+	Send(&res, sizeof(res));
+}
+//By Luiz45 item Stack Update
+void GameClient::SendItemStackUpdate(HOBJECT hItem, BYTE byStackCount)
+{
+	sGU_ITEM_STACK_UPDATE res;
+	memset(&res, 0, sizeof(res));
+	res.bIsNew = false;
+	res.byStack = byStackCount;
+	res.hItemHandle = hItem;
+	res.wOpCode = GU_ITEM_STACK_UPDATE;
+	Send(&res, sizeof(res));
+	pProfile->UpdateStackCount(hItem, byStackCount);
+}
+//By Luiz45 Dragon Ball Check
+void GameClient::SendDragonBallCheckRes(sUG_DRAGONBALL_CHECK_REQ* pData)
+{
+	int itemExist = 0;
+	DWORD gameResult = 0;
+	HOBJECT shenronIdx = INVALID_TBLIDX;
+	TBLIDX testValue = INVALID_TBLIDX;
+	int i = 0;
+	for (i = 0; i < 7; i++)
+	{
+		testValue = pProfile->GetInventoryItemID(pData->sData[i].byPlace, pData->sData[i].byPos);
+		if (pProfile->GetInventoryItemSerialID(pData->sData[i].byPlace, pData->sData[i].byPos) == pData->sData[i].hItem){
+			i++;
+			gameResult = GAME_SUCCESS;
+
+		}
+		else{
+			gameResult = GAME_DRAGONBALL_NOT_SAME_EXIST;
+			break;
+		}
+
+	}
+	sGU_DRAGONBALL_CHECK_RES res;
+	memset(&res, 0, sizeof(res));
+	res.hObject = pData->hObject;
+	res.wResultCode = gameResult;
+	res.wOpCode = GU_DRAGONBALL_CHECK_RES;
+	Send(&res, sizeof(res));
+	if (gameResult == GAME_SUCCESS)
+	{
+		shenronIdx = (pServer->GetObjectManager()->dbList.find(testValue))->second->dragonNPCTblidx;
+		SendChangeZoneInfo(true);
+		SpawnShenron(shenronIdx, pServer->GetObjectManager()->objMapList.find(pData->hObject)->second);
+	}
+}
+//By Luiz45 Dragon Ball Wish
+void GameClient::SendDragonBallReward(sUG_DRAGONBALL_REWARD_REQ* pData)
+{
+	DWORD gameResult = GAME_SUCCESS;
+
+	sDRAGONBALL_REWARD_TBLDAT* pDBtData = (sDRAGONBALL_REWARD_TBLDAT*)pServer->GetTableContainer()->GetDragonBallRewardTable()->FindData(pData->rewardTblidx);
+	sSKILL_TBLDAT* pSkillData = (sSKILL_TBLDAT*)pServer->GetTableContainer()->GetSkillTable()->FindData(pDBtData->rewardLinkTblidx);
+	sITEM_TBLDAT * pItemData = (sITEM_TBLDAT*)pServer->GetTableContainer()->GetItemTable()->FindData(pDBtData->rewardLinkTblidx);
+	switch (pDBtData->byRewardType)
+	{
+		case DRAGONBALL_REWARD_TYPE_SKILL:{
+			sGU_SKILL_LEARNED_NFY re;
+			//Fixed Slot Index for Shenron's Buff Skill
+			re.wOpCode = GU_SKILL_LEARNED_NFY;
+			re.skillId = pSkillData->tblidx;
+			re.bySlot = pSkillData->bySlot_Index;
+			Send(&re, sizeof(re));			
+		}
+			break;
+		case DRAGONBALL_REWARD_TYPE_ITEM:{
+			sGU_ITEM_PICK_RES re;
+			memset(&re, 0, sizeof(re));
+			re.itemTblidx = pItemData->tblidx;
+			re.wOpCode = GU_ITEM_PICK_RES;
+			re.wResultCode = GAME_SUCCESS;
+			Send(&re, sizeof(re));
+		}
+			break;
+		case DRAGONBALL_REWARD_TYPE_ZENNY:{
+			pProfile->sPcProfile.dwZenny += pData->rewardTblidx;
+			SendCharZennyUpdate(eZENNY_CHANGE_TYPE::ZENNY_CHANGE_TYPE_DB_REWARD);
+		}
+		break;
+	}
+	sGU_DRAGONBALL_REWARD_RES res;
+	memset(&res, 0, sizeof(res));
+	res.hObject = pData->hObject;
+	res.wOpCode = GU_DRAGONBALL_REWARD_RES;
+	res.wResultCode = gameResult;
+	Send(&res, sizeof(res));
+	if (gameResult == GAME_SUCCESS){
+		sOBJECT_TBLDAT* test = pServer->GetObjectManager()->objMapList.find(pData->hObject)->second;
+		sCHARSTATE shenron;
+		shenron.sCharStateBase.byStateID = CHARSTATE_DESPAWNING;
+		shenron.sCharStateBase.vCurLoc.x = test->vLoc.x;
+		shenron.sCharStateBase.vCurLoc.y = test->vLoc.y;
+		shenron.sCharStateBase.vCurLoc.z = test->vLoc.z;
+
+		Sleep(6000);
+		SendChangeZoneInfo(false);
+		SendCharStateUpdate(pProfile->GetSpawnedShenron(), shenron);
+		Sleep(5500);
+		SendObjectDestroy(pProfile->GetSpawnedShenron());
+		//SendDeleteDragonBalls();
+	}
+}
+//By Luiz45 Change Zone info
+void GameClient::SendChangeZoneInfo(bool bNight)
+{
+	sGU_AVATAR_ZONE_INFO res;
+	memset(&res, 0, sizeof(res));
+	res.zoneInfo.zoneId = pProfile->sPcProfile.bindWorldId;
+	res.zoneInfo.bIsDark = bNight;
+	res.wOpCode = GU_AVATAR_ZONE_INFO;
+	//Send(&res, sizeof(res));
+	pServer->GetClientManager()->SendAll2(&res, sizeof(res), this);
+}
+//By luiz45 Create a Object
+void GameClient::SpawnShenron(TBLIDX shenronIDX, sOBJECT_TBLDAT* object)
+{
+	sGU_OBJECT_CREATE res;
+	memset(&res, 0, sizeof(res));
+	res.handle = pServer->AcquireSerialID();
+	res.sObjectInfo.objType = OBJTYPE_NPC; // this is wrong
+	res.sObjectInfo.npcBrief.tblidx = shenronIDX; // this is wrong
+	res.sObjectInfo.npcState.sCharStateBase.vCurLoc.x = object->vLoc.x;
+	res.sObjectInfo.npcState.sCharStateBase.vCurLoc.y = object->vLoc.y;
+	res.sObjectInfo.npcState.sCharStateBase.vCurLoc.z = object->vLoc.z;
+	res.sObjectInfo.npcState.sCharStateBase.vCurDir.x = (0.96313f);
+	res.sObjectInfo.npcState.sCharStateBase.vCurDir.z = (0.28984f);
+	res.sObjectInfo.npcState.sCharStateBase.byStateID = CHARSTATE_SPAWNING;
+	res.sObjectInfo.npcBrief.wCurEP = 100;
+	res.sObjectInfo.npcBrief.wCurLP = 100;
+	res.sObjectInfo.npcBrief.wMaxEP = 100;
+	res.sObjectInfo.npcBrief.wMaxLP = 100;
+	res.wOpCode = GU_OBJECT_CREATE;
+	pServer->GetClientManager()->SendAll2(&res, sizeof(res), this);
+	pProfile->SetSpawnedShenron(res.handle);
+	
+}
+//By Luiz45 Destroy objecs
+void GameClient::SendObjectDestroy(HOBJECT hObject)
+{
+	sGU_OBJECT_DESTROY res;
+	memset(&res, 0, sizeof(res));
+	res.handle = hObject;
+	res.wOpCode = GU_OBJECT_DESTROY;
+	pServer->GetClientManager()->SendAll2(&res, sizeof(res), this);
 }

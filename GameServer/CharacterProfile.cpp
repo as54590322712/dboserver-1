@@ -361,7 +361,7 @@ void CharacterProfile::LoadWorldInfoData()
 		{
 			sWorldInfo.tblidx = pServer->ServerDB->getInt("worldTblidx");
 			sWorldInfo.worldID = pServer->ServerDB->getInt("worldId");
-			sWorldInfo.hTriggerObjectOffset = 100000; // WHAT IS THIS??
+			sWorldInfo.hTriggerObjectOffset = 133000; // WHAT IS THIS??
 			sWorldInfo.sRuleInfo.byRuleType = GAMERULE_NORMAL;
 		}
 	}
@@ -374,14 +374,14 @@ void CharacterProfile::CalculateAtributes()
 	if (pPcTbl)
 	{
 		sPcProfile.avatarAttribute.wBaseMaxEP = pPcTbl->wBasic_EP;
-		sPcProfile.avatarAttribute.wBaseMaxLP = pPcTbl->wBasic_LP;
+		sPcProfile.avatarAttribute.dwBaseMaxLP = pPcTbl->wBasic_LP;
 		sPcProfile.avatarAttribute.wBaseMaxRP = pPcTbl->wBasic_RP;
-		sPcProfile.avatarAttribute.byBaseStr = pPcTbl->byStr;
-		sPcProfile.avatarAttribute.byBaseFoc = pPcTbl->byFoc;
-		sPcProfile.avatarAttribute.byBaseSol = pPcTbl->bySol;
-		sPcProfile.avatarAttribute.byBaseDex = pPcTbl->byDex;
-		sPcProfile.avatarAttribute.byBaseCon = pPcTbl->byCon;
-		sPcProfile.avatarAttribute.byBaseEng = pPcTbl->byEng;
+		sPcProfile.avatarAttribute.wBaseStr = pPcTbl->byStr;
+		sPcProfile.avatarAttribute.wBaseFoc = pPcTbl->byFoc;
+		sPcProfile.avatarAttribute.wBaseSol = pPcTbl->bySol;
+		sPcProfile.avatarAttribute.wBaseDex = pPcTbl->byDex;
+		sPcProfile.avatarAttribute.wBaseCon = pPcTbl->byCon;
+		sPcProfile.avatarAttribute.wBaseEng = pPcTbl->byEng;
 		sPcProfile.avatarAttribute.fBaseAttackRange = pPcTbl->fAttack_Range;
 		sPcProfile.avatarAttribute.wBaseAttackRate = pPcTbl->wAttack_Rate;
 		sPcProfile.avatarAttribute.wBaseAttackSpeedRate = pPcTbl->wAttack_Speed_Rate;
@@ -395,27 +395,27 @@ void CharacterProfile::CalculateAtributes()
 		sPcProfile.avatarAttribute.wBaseEnergyDefence = (pPcTbl->byLevel_Up_Energy_Defence * sPcProfile.byLevel);
 
 		sPcProfile.avatarAttribute.wBaseMaxEP += (pPcTbl->byLevel_Up_EP * sPcProfile.byLevel);
-		sPcProfile.avatarAttribute.wBaseMaxLP += (pPcTbl->byLevel_Up_LP * sPcProfile.byLevel);
+		sPcProfile.avatarAttribute.dwBaseMaxLP += (pPcTbl->byLevel_Up_LP * sPcProfile.byLevel);
 		sPcProfile.avatarAttribute.wBaseMaxRP += (pPcTbl->byLevel_Up_RP * sPcProfile.byLevel);
-		sPcProfile.avatarAttribute.byBaseStr += (BYTE)(pPcTbl->fLevel_Up_Str * sPcProfile.byLevel);
-		sPcProfile.avatarAttribute.byBaseDex += (BYTE)(pPcTbl->fLevel_Up_Dex * sPcProfile.byLevel);
-		sPcProfile.avatarAttribute.byBaseFoc += (BYTE)(pPcTbl->fLevel_Up_Foc * sPcProfile.byLevel);
-		sPcProfile.avatarAttribute.byBaseEng += (BYTE)(pPcTbl->fLevel_Up_Eng * sPcProfile.byLevel);
-		sPcProfile.avatarAttribute.byBaseCon += (BYTE)(pPcTbl->fLevel_Up_Con * sPcProfile.byLevel);
-		sPcProfile.avatarAttribute.byBaseSol += (BYTE)(pPcTbl->fLevel_Up_Sol * sPcProfile.byLevel);
+		sPcProfile.avatarAttribute.wBaseStr += (BYTE)(pPcTbl->fLevel_Up_Str * sPcProfile.byLevel);
+		sPcProfile.avatarAttribute.wBaseDex += (BYTE)(pPcTbl->fLevel_Up_Dex * sPcProfile.byLevel);
+		sPcProfile.avatarAttribute.wBaseFoc += (BYTE)(pPcTbl->fLevel_Up_Foc * sPcProfile.byLevel);
+		sPcProfile.avatarAttribute.wBaseEng += (BYTE)(pPcTbl->fLevel_Up_Eng * sPcProfile.byLevel);
+		sPcProfile.avatarAttribute.wBaseCon += (BYTE)(pPcTbl->fLevel_Up_Con * sPcProfile.byLevel);
+		sPcProfile.avatarAttribute.wBaseSol += (BYTE)(pPcTbl->fLevel_Up_Sol * sPcProfile.byLevel);
 
-		sPcProfile.avatarAttribute.wBaseMaxLP += (WORD)((sPcProfile.avatarAttribute.byBaseCon * sPcProfile.byLevel) * 4.7);
-		sPcProfile.avatarAttribute.wBaseMaxEP += (WORD)((sPcProfile.avatarAttribute.byBaseEng * sPcProfile.byLevel) * 4.7);
+		sPcProfile.avatarAttribute.dwBaseMaxLP += (WORD)((sPcProfile.avatarAttribute.wBaseCon * sPcProfile.byLevel) * 4.7);
+		sPcProfile.avatarAttribute.wBaseMaxEP += (WORD)((sPcProfile.avatarAttribute.wBaseEng * sPcProfile.byLevel) * 4.7);
 
 		sPcProfile.avatarAttribute.wLastMaxEP = sPcProfile.avatarAttribute.wBaseMaxEP;
-		sPcProfile.avatarAttribute.wLastMaxLP = sPcProfile.avatarAttribute.wBaseMaxLP;
+		sPcProfile.avatarAttribute.dwLastMaxLP = sPcProfile.avatarAttribute.dwBaseMaxLP;
 		sPcProfile.avatarAttribute.wLastMaxRP = sPcProfile.avatarAttribute.wBaseMaxRP;
-		sPcProfile.avatarAttribute.byLastStr = sPcProfile.avatarAttribute.byBaseStr;
-		sPcProfile.avatarAttribute.byLastDex = sPcProfile.avatarAttribute.byBaseDex;
-		sPcProfile.avatarAttribute.byLastFoc = sPcProfile.avatarAttribute.byBaseFoc;
-		sPcProfile.avatarAttribute.byLastEng = sPcProfile.avatarAttribute.byBaseEng;
-		sPcProfile.avatarAttribute.byLastCon = sPcProfile.avatarAttribute.byBaseCon;
-		sPcProfile.avatarAttribute.byLastSol = sPcProfile.avatarAttribute.byBaseSol;
+		sPcProfile.avatarAttribute.wLastStr = sPcProfile.avatarAttribute.wBaseStr;
+		sPcProfile.avatarAttribute.wLastDex = sPcProfile.avatarAttribute.wBaseDex;
+		sPcProfile.avatarAttribute.wLastFoc = sPcProfile.avatarAttribute.wBaseFoc;
+		sPcProfile.avatarAttribute.wLastEng = sPcProfile.avatarAttribute.wBaseEng;
+		sPcProfile.avatarAttribute.wLastCon = sPcProfile.avatarAttribute.wBaseCon;
+		sPcProfile.avatarAttribute.wLastSol = sPcProfile.avatarAttribute.wBaseSol;
 		sPcProfile.avatarAttribute.wLastPhysicalOffence = sPcProfile.avatarAttribute.wBasePhysicalOffence;
 		sPcProfile.avatarAttribute.wLastPhysicalDefence = sPcProfile.avatarAttribute.wBasePhysicalDefence;
 		sPcProfile.avatarAttribute.wLastEnergyOffence = sPcProfile.avatarAttribute.wBaseEnergyOffence;
@@ -453,7 +453,7 @@ void CharacterProfile::LoadCharacterData()
 			sPcProfile.dwReputation = pServer->ServerDB->getInt("Reputation");
 			sPcProfile.dwMudosaPoint = pServer->ServerDB->getInt("MudosaPoint");
 			sPcProfile.dwSpPoint = pServer->ServerDB->getInt("SpPoint");
-			sPcProfile.sMarking.byCode = pServer->ServerDB->getInt("Marking");
+			sPcProfile.sMarking.dwCode = pServer->ServerDB->getInt("Marking");
 			sPcProfile.guildId = pServer->ServerDB->getInt("GuildID");
 
 			memset(&sCharState, 0, sizeof(sCharState));
@@ -486,7 +486,7 @@ void CharacterProfile::LoadCharacterData()
 				sPcProfile.tblidx = pPcTbl->tblidx;
 				sPcProfile.dwMaxExpInThisLevel = pExpTbl->dwNeed_Exp;
 				sPcProfile.wCurEP = pPcTbl->wBasic_EP;
-				sPcProfile.wCurLP = pPcTbl->wBasic_LP;
+				sPcProfile.dwCurLP = pPcTbl->wBasic_LP;
 				sPcProfile.wCurRP = pPcTbl->wBasic_RP;
 				sPcProfile.avatarAttribute.fLastRunSpeed = (sPcProfile.bIsAdult) ? pPcTbl->fAdult_Run_Speed : pPcTbl->fChild_Run_Speed;
 			}
@@ -505,12 +505,12 @@ void CharacterProfile::GetObjectCreate(sGU_OBJECT_CREATE& sPacket)
 	sPacket.sObjectInfo.pcBrief.byLevel = sPcProfile.byLevel;
 	sPacket.sObjectInfo.pcBrief.wAttackSpeedRate = sPcProfile.avatarAttribute.wLastAttackSpeedRate;
 	sPacket.sObjectInfo.pcBrief.wCurEP = sPcProfile.wCurEP;
-	sPacket.sObjectInfo.pcBrief.wCurLP = sPcProfile.wCurLP;
+	sPacket.sObjectInfo.pcBrief.wCurLP = sPcProfile.dwCurLP;
 	sPacket.sObjectInfo.pcBrief.wMaxEP = sPcProfile.avatarAttribute.wLastMaxEP;
-	sPacket.sObjectInfo.pcBrief.wMaxLP = sPcProfile.avatarAttribute.wLastMaxLP;
+	sPacket.sObjectInfo.pcBrief.wMaxLP = sPcProfile.avatarAttribute.dwLastMaxLP;
 	sPacket.sObjectInfo.pcBrief.fSpeed = sPcProfile.avatarAttribute.fLastRunSpeed;
 	memcpy(sPacket.sObjectInfo.pcBrief.awchName, sPcProfile.awchName, NTL_MAX_SIZE_CHAR_NAME_UNICODE);
-	sPacket.sObjectInfo.pcBrief.sMarking.byCode = sPcProfile.sMarking.byCode;
+	sPacket.sObjectInfo.pcBrief.sMarking.dwCode = sPcProfile.sMarking.dwCode;
 	sPacket.sObjectInfo.pcBrief.bIsAdult = sPcProfile.bIsAdult;
 	memcpy(&sPacket.sObjectInfo.pcBrief.sPcShape, &sPcProfile.sPcShape, sizeof(sPcProfile.sPcShape));
 	memcpy(&sPacket.sObjectInfo.pcState, &sCharState, sizeof(sCharState));

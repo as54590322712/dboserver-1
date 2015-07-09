@@ -29,10 +29,10 @@
 #define NTL_MAX_SIZE_DB_PASSWORD						(32)
 
 // User AccountID and Password
-#define NTL_MAX_SIZE_USERID								(12)
-#define NTL_MAX_SIZE_USERPW								(12)
-#define NTL_MAX_SIZE_USERID_UNICODE						(12)
-#define NTL_MAX_SIZE_USERPW_UNICODE						(12)
+#define NTL_MAX_SIZE_USERID								(16)
+#define NTL_MAX_SIZE_USERPW								(16)
+#define NTL_MAX_SIZE_USERID_UNICODE						(16)
+#define NTL_MAX_SIZE_USERPW_UNICODE						(16)
 #define NTL_MAX_SIZE_USERID_MULTIBYTE_BUFFER			(128)
 #define NTL_MAX_SIZE_USERPW_MULTIBYTE_BUFFER			(128)
 #define NTL_MAX_SIZE_USERCN								(12)

@@ -616,7 +616,7 @@ enum eMARKING_TYPE
 	MARKING_TYPE_BUDOKAI_JUNIOR_WINNER02 = MARKING_TYPE_BUDOKAI_WINNER02,
 	MARKING_TYPE_BUDOKAI_JUNIOR_WINNER03 = MARKING_TYPE_BUDOKAI_WINNER03,
 
-	INVALID_MARKING_TYPE = INVALID_BYTE,
+	INVALID_MARKING_TYPE = INVALID_WORD,
 };
 
 enum eMARKING_CONTENTS_TYPE
@@ -715,11 +715,11 @@ struct sDELETE_WAIT_CHARACTER_INFO
 
 struct sMARKING
 {
-	BYTE byCode;			// eMARKING_TYPE
+	DWORD dwCode;			// eMARKING_TYPE
 
 public:
 	sMARKING()
-		: byCode( INVALID_MARKING_TYPE )
+		: dwCode( INVALID_MARKING_TYPE )
 	{
 	}
 };//end of sMARKING
@@ -746,6 +746,7 @@ union sASPECTSTATE_DETAIL
 	sASPECTSTATE_KAIOKEN			sKaioken;
 	sASPECTSTATE_SPINNING_ATTACK	sSpinningAttack;
 	sASPECTSTATE_VEHICLE			sVehicle;
+	BYTE							unknown[10];
 };
 
 struct sASPECTSTATE
@@ -760,6 +761,7 @@ struct sCHARSTATE_BASE
 	BYTE			byStateID;
 	DWORD			dwStateTime;
 	DWORD			dwConditionFlag;
+	DWORD			unknow1;
 	sASPECTSTATE	aspectState;
 	bool			bFightMode:1;
 
@@ -933,6 +935,8 @@ struct sPC_SUMMARY
 	sMARKING		sMarking;
 	bool			bNeedNameChange;
 	sDBO_DOGI_DATA	sDogi;
+	WORD			wUnknow1; // 0x0000
+	BYTE			abyUnknow2[6];
 };
 
 struct sPC_BRIEF
@@ -977,18 +981,20 @@ struct sPC_PROFILE_LOCALIZE_CJIKOR
 struct sPC_PROFILE_LOCALIZE
 {
 	LOCALIZETYPE type;
+	BYTE unknown[27];
 
-	union
+	/*union
 	{
 		sPC_PROFILE_LOCALIZE_DEV pcProfileDev;
 
 		sPC_PROFILE_LOCALIZE_CJIKOR pcProfileCJKor;
-	};
+	};*/
 };
 
 // PC 캐릭터 전체 정보 ( 아바타 로딩이나 캐릭터 조회등에 사용 )
 struct sPC_PROFILE
 {
+	BYTE			byMaxLevel;
 	TBLIDX			tblidx; // pc 테이블 인덱스
 	bool			bIsAdult;
 	bool			bChangeClass;		// 전직 권한을 가지고 있는지의 여부
@@ -999,11 +1005,11 @@ struct sPC_PROFILE
 
 	sAVATAR_ATTRIBUTE		avatarAttribute;
 
-	WORD			wCurLP;
+	DWORD			dwCurLP;
 	WORD			wCurEP;
 	WORD			wCurRP;
-
-//	float			fSpeed;
+	BYTE			byUnknow;
+	DWORD			dwCurAp;
 
 	BYTE			byLevel;
 	DWORD			dwCurExp;

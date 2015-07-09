@@ -467,7 +467,9 @@ int Connections::CompleteRecv(DWORD TransferedBytes)
 
 		_recvBuffer.IncreaseWorkPos(packet.GetUsedSize());
 
-		if (_PacketEncoder)
+		LPPACKETDATA pData = (LPPACKETDATA)packet.GetPacketData();
+
+		if (_PacketEncoder && pData->wOpCode != 4)
 		{
 			rc = _PacketEncoder->RxDecrypt(packet);
 			if (0 != rc)
@@ -475,13 +477,6 @@ int Connections::CompleteRecv(DWORD TransferedBytes)
 				Logger::Log("Session[%X] RxDecrypt Error[%d]\n", this, rc);
 				return rc;
 			}
-		}
-
-		BYTE ValidSequence = (BYTE)(_PacketRecvCount & PACKET_MAX_SEQUENCE);
-		if (false == HasValidSequence(packet.GetPacketHeader(), ValidSequence))
-		{
-			Logger::Log("Session[%X] Sequence Error[%d] PacketSEQ[%u] CurrentSEQ[%u]\n", this, rc, GetSequence(_recvBuffer.GetQueueWorkPtr()), ValidSequence);
-			return 3; //ERR_NET_PACKET_SEQUENCE_FAIL
 		}
 
 		IncreasePacketRecv();
@@ -523,9 +518,6 @@ int Connections::CompleteSend(DWORD TransferedBytes)
 			{
 				break;
 			}
-
-			BYTE Sequence = (BYTE)(_PacketSendCount & PACKET_MAX_SEQUENCE);
-			SetSequence(SendPacket->GetPacketHeader(), Sequence);
 
 			if (_PacketEncoder)
 			{
@@ -698,13 +690,6 @@ bool Connections::IsValidPacket(void* PacketHeader, WORD PacketLength)
 	return packet.IsValidPacket();
 }
 
-BYTE Connections::GetSequence(void* PacketHeader)
-{
-	PACKETHEADER* pPacketHeader = (PACKETHEADER*)PacketHeader;
-
-	return pPacketHeader->bySequence;
-}
-
 int Connections::PushPacket(void* pData, int nSize)
 {
 	Packet* packet = new Packet((unsigned char*)pData, nSize);
@@ -767,8 +752,6 @@ int Connections::PushPacket(Packet* pPacket)
 	memcpy(_sendBuffer.GetQueuePushPtr(), pPacket->GetPacketBuffer(), pPacket->GetUsedSize());
 
 	Packet sendPacket(_sendBuffer.GetQueuePushPtr());
-	BYTE Sequence = (BYTE)(_PacketSendCount & PACKET_MAX_SEQUENCE);
-	SetSequence(sendPacket.GetPacketHeader(), Sequence);
 
 	int rc = 0;
 
@@ -850,24 +833,4 @@ int Connections::GetPacketLen(BYTE* HeaderPointer)
 {
 	PACKETHEADER* Header = (PACKETHEADER*)HeaderPointer;
 	return Header->wPacketLen;
-}
-
-void Connections::SetSequence(void* PacketHeader, BYTE Sequence)
-{
-	PACKETHEADER* pPacketHeader = (PACKETHEADER*)PacketHeader;
-	pPacketHeader->bySequence = Sequence;
-}
-
-bool Connections::HasValidSequence(void* PacketHeader, BYTE Sequence)
-{
-	PACKETHEADER* pPacketHeader = (PACKETHEADER*)PacketHeader;
-
-	if (Sequence == pPacketHeader->bySequence)
-	{
-		return true;
-	}
-	else
-	{
-		return false;
-	}
 }

@@ -36,7 +36,7 @@ void Session::Release()
 {
 	if (0 == InterlockedDecrement((LONG*)&_ReferenceCount))
 	{
-		delete this;
+		//if(this) delete this;
 	}
 }
 

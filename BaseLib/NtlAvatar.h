@@ -135,23 +135,25 @@ enum eATTRIBUTE_TO_UPDATE
 
 struct sAVATAR_ATTRIBUTE
 {
-	BYTE byBaseStr;
-	BYTE byLastStr;
-	BYTE byBaseCon;
-	BYTE byLastCon;
-	BYTE byBaseFoc;
-	BYTE byLastFoc;
-	BYTE byBaseDex;
-	BYTE byLastDex;
-	BYTE byBaseSol;
-	BYTE byLastSol;
-	BYTE byBaseEng;
-	BYTE byLastEng;
+	WORD wBaseStr;
+	WORD wLastStr;
+	WORD wBaseCon;
+	WORD wLastCon;
+	WORD wBaseFoc;
+	WORD wLastFoc;
+	WORD wBaseDex;
+	WORD wLastDex;
+	WORD wBaseSol;
+	WORD wLastSol;
+	WORD wBaseEng;
+	WORD wLastEng;
 
-	WORD wBaseMaxLP;
-	WORD wLastMaxLP;
+	DWORD dwBaseMaxLP;
+	DWORD dwLastMaxLP;
 	WORD wBaseMaxEP;
 	WORD wLastMaxEP;
+	DWORD dwBaseMaxAp;
+	DWORD dwLastMaxAp;
 	WORD wBaseMaxRP;
 	WORD wLastMaxRP;
 
@@ -168,6 +170,18 @@ struct sAVATAR_ATTRIBUTE
 	WORD wLastEpSitdownRegen;
 	WORD wBaseEpBattleRegen;
 	WORD wLastEpBattleRegen;
+
+	WORD wBaseApRegen;
+	WORD wLastApRegen;
+	WORD wBaseApSitdownRegen;
+	WORD wLastApSitdownRegen;
+	WORD wBaseApBattleRegen;
+	WORD wLastApBattleRegen;
+
+	WORD wUnknow_1;
+	WORD wUnknow_2;
+	WORD wUnknow_3;
+	WORD wUnknow_4;
 
 	WORD wBaseRpRegen;
 	WORD wLastRpRegen;
@@ -195,12 +209,28 @@ struct sAVATAR_ATTRIBUTE
 	WORD wBaseCurseToleranceRate;
 	WORD wLastCurseToleranceRate;
 
+	WORD wUnknow_5;
+	WORD wUnknow_6;
+
 	WORD wBasePhysicalCriticalRate;
 	WORD wLastPhysicalCriticalRate;
 	WORD wBaseEnergyCriticalRate;
 	WORD wLastEnergyCriticalRate;
 
+	float fUnknown_1;
+	float fUnknown_2;
+	float fUnknown_3;
+	float fUnknown_4;
+
+	float fBaseRunSpeed;
 	float fLastRunSpeed;
+
+	float fBaseAirSpeed;
+	float fLastAirSpeed;
+	float fBaseAirDashSpeed;
+	float fLastAirDashSpeed;
+	float fBaseAirDash2Speed;
+	float fLastAirDash2Speed;
 
 	WORD wBaseAttackSpeedRate;
 	WORD wLastAttackSpeedRate;
@@ -225,6 +255,8 @@ struct sAVATAR_ATTRIBUTE
 	float fFunnyOffence;
 	float fFunnyDefence;
 
+	float fUnknown_5;
+
 	WORD wParalyzeToleranceRate;
 	WORD wTerrorToleranceRate;
 	WORD wConfuseToleranceRate;
@@ -243,6 +275,7 @@ struct sAVATAR_ATTRIBUTE
 	float fCriticalBlockSuccessRate;
 
 	WORD wGuardRate;
+	WORD wUnknow_7;
 
 	float fSkillDamageBlockModeSuccessRate;
 	float fCurseBlockModeSuccessRate;
@@ -257,6 +290,10 @@ struct sAVATAR_ATTRIBUTE
 
 	float fItemUpgradeBonusRate;
 	float fItemUpgradeBreakBonusRate;
+
+	float fUnknown_6[14];
+	WORD wUnknow_8[7];
+	float fUnknown_7[6];
 };
 
 struct sAVATAR_ATTRIBUTE_LINK

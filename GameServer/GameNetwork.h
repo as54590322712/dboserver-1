@@ -76,7 +76,6 @@ public:
 	void SendAuthkeyCommSrvRes();
 	void SendGameLeaveRes();
 	void SendCharDestMove(sUG_CHAR_DEST_MOVE* pData);
-	void SendCharMoveSync(sUG_CHAR_MOVE_SYNC* pData);
 	void SpawnTesteMob(unsigned int id);
 	void SendCharJump(sUG_CHAR_JUMP* pData);
 	void SendCharJumpEnd();
@@ -106,6 +105,8 @@ public:
 	void SendGiveExp(DWORD dwExp);
 	void SendCharSkillRes(sUG_CHAR_SKILL_REQ* pData);
 	void DamagetoTarget(HOBJECT hTarget, WORD wDamage);
+	void SendNtlMemberNfy();
+	void SendServerContents();
 
 	//CASH/EVENT SHOPS
 	void SendEventItemStartRes();

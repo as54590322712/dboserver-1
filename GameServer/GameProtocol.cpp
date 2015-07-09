@@ -4,6 +4,7 @@
 bool GameClient::PacketControl(Packet* pPacket)
 {
 	LPPACKETDATA data = (LPPACKETDATA)pPacket->GetPacketData();
+	Logger::SavePacket(pPacket->GetPacketBuffer());
 
 	switch (data->wOpCode)
 	{
@@ -11,29 +12,30 @@ bool GameClient::PacketControl(Packet* pPacket)
 	case UG_GAME_ENTER_REQ: {
 		SendGameEnterRes((sUG_GAME_ENTER_REQ*)data);
 		SendCharInfo();
-		SendCharItemInfo();
-		SendCharSkillInfo();
-		SendCharBuffsInfo();
+		//SendCharItemInfo();
+		//SendCharSkillInfo();
+		//SendCharBuffsInfo();
 		// HTB Info
 		// Quest List
-		SendCharQuickSlotInfo();
+		//SendCharQuickSlotInfo();
+		//SendAvatarWarFogInfo();
 		SendCharInfoEnd();
-		SendAvatarWarFogInfo();
 	} break;
 	case UG_GAME_LEAVE_REQ: SendGameLeaveRes(); break;
 	case UG_AUTH_KEY_FOR_COMMUNITY_SERVER_REQ: SendAuthkeyCommSrvRes(); break;
 	case UG_ENTER_WORLD: {
+		SendNtlMemberNfy();
+		SendServerContents();
 		SendCharWorldInfo();
 		SendCharWorldInfoEnd();
 	} break;
-	case UG_SERVER_COMMAND: CheckCommand((sUG_SERVER_COMMAND*)data); break;
+	/*case UG_SERVER_COMMAND: CheckCommand((sUG_SERVER_COMMAND*)data); break;
 	case UG_CHAR_READY_FOR_COMMUNITY_SERVER_NFY: break;
 	case UG_CHAR_READY_TO_SPAWN: SendCharReadySpawnReq(); break;
 	case UG_CHAR_READY: SendCharReadyRes((sUG_CHAR_READY*)data); break;
 	case UG_CHAR_MOVE: SendCharMove((sUG_CHAR_MOVE*)data); break;
 	case UG_CHAR_DEST_MOVE: SendCharDestMove((sUG_CHAR_DEST_MOVE*)data); break;
 	case UG_CHAR_CHANGE_HEADING: SendCharChangeHeading((sUG_CHAR_CHANGE_HEADING*)data); break;
-	case UG_CHAR_MOVE_SYNC: SendCharMoveSync((sUG_CHAR_MOVE_SYNC*)data); break;
 	case UG_CHAR_JUMP: SendCharJump((sUG_CHAR_JUMP*)data); break;
 	case UG_CHAR_JUMP_END: SendCharJumpEnd(); break;
 	case UG_CHAR_TOGG_FIGHTING: SendToggleFightMode((sUG_CHAR_TOGG_FIGHTING*)data); break;
@@ -54,20 +56,45 @@ bool GameClient::PacketControl(Packet* pPacket)
 	case UG_SHOP_EVENTITEM_START_REQ: SendEventItemStartRes(); break;
 	case UG_SHOP_EVENTITEM_END_REQ: SendEventItemEndRes(); break;
 	case UG_SHOP_NETPYITEM_START_REQ: SendNetpyItemStartRes(); break;
-	case UG_SHOP_NETPYITEM_END_REQ: SendNetpyItemEndRes(); break;
+	case UG_SHOP_NETPYITEM_END_REQ: SendNetpyItemEndRes(); break;*/
 
-	// SYS PACKETS
-	case SYS_ALIVE: { ResetAliveTime(); } break;
-	case SYS_PING:	{
-		// use the ping response to check
-		//pServer->GetObjectManager()->SpawnToClient(this);
-	} break;
 	default:
-		Logger::Log("Received Opcode: %s\n", NtlGetPacketName_UG(data->wOpCode));
+		Logger::Log("Recv Opcode(%d): %s\n", data->wOpCode, NtlGetPacketName_UG(data->wOpCode));
 		return false;
 		break;
 	}
 	return true;
+}
+
+void GameClient::SendServerContents()
+{
+	BYTE contents_onoff[] = {
+		0xe4, 0x15, 0x00, 0x00, 0x40, 0xb1, 0xff, 0x12, 0x00, 0xf8, 0x01, 0x00, 0x00, 0x90, 0x00, 0x06, 0xda,
+		0x08, 0x00, 0x00, 0xd7, 0x08, 0x00, 0x00, 0xdb, 0x08, 0x00, 0x00, 0xd8, 0x08, 0x00, 0x00, 0xdc, 0x08,
+		0x00, 0x00, 0xd9, 0x08, 0x00, 0x00, 0xff, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x96, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00
+	};
+	Send(contents_onoff, sizeof(contents_onoff));
+}
+
+void GameClient::SendNtlMemberNfy()
+{
+	sGU_NETMARBLEMEMBERIP_NFY sPkt;
+	memset(&sPkt, 0, sizeof(sPkt));
+	sPkt.wOpCode = GU_NETMARBLEMEMBERIP_NFY;
+	Send(&sPkt, sizeof(sPkt));
 }
 
 void GameClient::SendCharSkillRes(sUG_CHAR_SKILL_REQ* pData)
@@ -193,11 +220,11 @@ void GameClient::DamagetoTarget(HOBJECT hTarget, WORD wDamage)
 	{
 		pPcProfile = pServer->GetObjectManager()->pcList.find(pProfile->GetTarget())->second;
 
-		pPcProfile->sPcProfile.wCurLP -= wDamage;
-		if ((pPcProfile->sPcProfile.wCurLP - wDamage) < 0)
-			pPcProfile->sPcProfile.wCurLP = 0;
+		pPcProfile->sPcProfile.dwCurLP -= wDamage;
+		if ((pPcProfile->sPcProfile.dwCurLP - wDamage) < 0)
+			pPcProfile->sPcProfile.dwCurLP = 0;
 
-		Logger::Log(" PC Attack [%u] LP: %u\n", pPcProfile->GetSerialID(), pPcProfile->sPcProfile.wCurLP);
+		Logger::Log(" PC Attack [%u] LP: %u\n", pPcProfile->GetSerialID(), pPcProfile->sPcProfile.dwCurLP);
 	}
 	else if (pServer->GetObjectManager()->FindObject(hTarget, eOBJTYPE::OBJTYPE_MOB))
 	{
@@ -484,17 +511,17 @@ void GameClient::SendIemMoveRes(sUG_ITEM_MOVE_REQ* pData)
 			}
 			else if (sSrcTbldat->byNeed_Level > pProfile->sPcProfile.byLevel)
 				wResult = eRESULTCODE::GAME_ITEM_NEED_MORE_LEVEL;
-			else if (sSrcTbldat->byNeed_Con > pProfile->sPcProfile.avatarAttribute.byBaseCon && sSrcTbldat->byNeed_Con != INVALID_BYTE)
+			else if (sSrcTbldat->byNeed_Con > pProfile->sPcProfile.avatarAttribute.wBaseCon && sSrcTbldat->byNeed_Con != INVALID_BYTE)
 				wResult = eRESULTCODE::GAME_ITEM_NEED_MORE_PARAMETER;
-			else if (sSrcTbldat->byNeed_Dex > pProfile->sPcProfile.avatarAttribute.byBaseDex && sSrcTbldat->byNeed_Dex != INVALID_BYTE)
+			else if (sSrcTbldat->byNeed_Dex > pProfile->sPcProfile.avatarAttribute.wBaseDex && sSrcTbldat->byNeed_Dex != INVALID_BYTE)
 				wResult = eRESULTCODE::GAME_ITEM_NEED_MORE_PARAMETER;
-			else if (sSrcTbldat->byNeed_Eng > pProfile->sPcProfile.avatarAttribute.byBaseEng && sSrcTbldat->byNeed_Eng != INVALID_BYTE)
+			else if (sSrcTbldat->byNeed_Eng > pProfile->sPcProfile.avatarAttribute.wBaseEng && sSrcTbldat->byNeed_Eng != INVALID_BYTE)
 				wResult = eRESULTCODE::GAME_ITEM_NEED_MORE_PARAMETER;
-			else if (sSrcTbldat->byNeed_Foc > pProfile->sPcProfile.avatarAttribute.byBaseFoc && sSrcTbldat->byNeed_Foc != INVALID_BYTE)
+			else if (sSrcTbldat->byNeed_Foc > pProfile->sPcProfile.avatarAttribute.wBaseFoc && sSrcTbldat->byNeed_Foc != INVALID_BYTE)
 				wResult = eRESULTCODE::GAME_ITEM_NEED_MORE_PARAMETER;
-			else if (sSrcTbldat->byNeed_Sol > pProfile->sPcProfile.avatarAttribute.byBaseSol && sSrcTbldat->byNeed_Sol != INVALID_BYTE)
+			else if (sSrcTbldat->byNeed_Sol > pProfile->sPcProfile.avatarAttribute.wBaseSol && sSrcTbldat->byNeed_Sol != INVALID_BYTE)
 				wResult = eRESULTCODE::GAME_ITEM_NEED_MORE_PARAMETER;
-			else if (sSrcTbldat->byNeed_Str > pProfile->sPcProfile.avatarAttribute.byBaseStr && sSrcTbldat->byNeed_Str != INVALID_BYTE)
+			else if (sSrcTbldat->byNeed_Str > pProfile->sPcProfile.avatarAttribute.wBaseStr && sSrcTbldat->byNeed_Str != INVALID_BYTE)
 				wResult = eRESULTCODE::GAME_ITEM_NEED_MORE_PARAMETER;
 		}
 	}
@@ -784,14 +811,14 @@ void GameClient::SendCharInfoEnd()
 void GameClient::SendCharInfo()
 {
 	sGU_AVATAR_CHAR_INFO charInfo;
-	memset(&charInfo, 0, sizeof(charInfo));
+	memset(&charInfo, 255, sizeof(charInfo));
 	charInfo.wOpCode = GU_AVATAR_CHAR_INFO;
 
 	pProfile->LoadCharacterData();
 	pProfile->CalculateAtributes();
 
 	// Current LP/EP (TODO: Load from DB)
-	pProfile->sPcProfile.wCurLP = pProfile->sPcProfile.avatarAttribute.wBaseMaxLP;
+	pProfile->sPcProfile.dwCurLP = pProfile->sPcProfile.avatarAttribute.dwBaseMaxLP;
 	pProfile->sPcProfile.wCurEP = pProfile->sPcProfile.avatarAttribute.wBaseMaxEP;
 
 	charInfo.handle = pProfile->GetSerialID();
@@ -808,6 +835,13 @@ void GameClient::SendCharWorldInfo()
 	wInfo.wOpCode = GU_AVATAR_WORLD_INFO;
 	pProfile->LoadWorldInfoData();
 	memcpy(&wInfo.worldInfo, &pProfile->sWorldInfo, sizeof(pProfile->sWorldInfo));
+
+	wInfo.byDojoCount = 0;
+	for (int n = 0; n < DBO_MAX_COUNT_DOJO_IN_WORLD; n++)
+	{
+		wInfo.sDojoData[n].guildId = 0xffffffff;
+		wInfo.sDojoData[n].dojoTblidx = 0xffffffff;
+	}
 
 	// TO DO: TUTOTIAL MODE
 	/*if (TutorialMode)
@@ -894,23 +928,6 @@ void GameClient::SendCharDestMove(sUG_CHAR_DEST_MOVE* pData)
 		dMove.byMoveFlag = 0; // to do run or not
 	}
 	pServer->GetClientManager()->SendOthers(&dMove, sizeof(dMove), this);
-}
-
-void GameClient::SendCharMoveSync(sUG_CHAR_MOVE_SYNC* pData)
-{
-	pProfile->UpdatePositions(pData->vCurDir, pData->vCurLoc);
-	pServer->GetObjectManager()->UpdateCharState(pProfile->GetSerialID(), pProfile->sCharState);
-	sGU_CHAR_MOVE_SYNC cmSync;
-	memset(&cmSync, 0, sizeof(cmSync));
-	cmSync.wOpCode = GU_CHAR_MOVE_SYNC;
-	if (pData->byAvatarType == pProfile->GetAvatartype())
-	{
-		cmSync.handle = pProfile->GetSerialID();
-		cmSync.vCurDir = pData->vCurDir;
-		cmSync.vCurLoc = pData->vCurLoc;
-		cmSync.dwTimeStamp = pData->dwTimeStamp;
-	}
-	pServer->GetClientManager()->SendOthers(&cmSync, sizeof(cmSync), this);
 }
 
 void GameClient::SendCharChangeHeading(sUG_CHAR_CHANGE_HEADING* pData)

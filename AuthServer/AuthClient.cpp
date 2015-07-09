@@ -14,7 +14,8 @@ AuthClient::AuthClient(bool IsAliveCheck, bool IsOpcodeCheck)
 		SetControlFlag(CONTROL_FLAG_CHECK_OPCODE);
 	}
 
-	SetPacketEncoder(&_packetEncoder);
+	// Desable Encoding
+	//SetPacketEncoder(&_packetEncoder);
 	pServer = (AuthServer*)_GetApp();
 }
 
@@ -113,33 +114,13 @@ eRESULTCODE AuthClient::LoginVerifyAccount()
 				}
 				else
 				{
-					if (pServer->ServerDB->ExecuteSelect("SELECT `ID` FROM `account` WHERE `userName`='%S' AND `passWord`='%S' AND `State`='0'", userName, passWord))
+					if (pServer->ServerDB->ExecuteQuery("UPDATE `account` SET `State` = '1' WHERE `ID` = '%d';", AccountID))
 					{
-						pServer->ServerDB->Fetch();
-						if (pServer->ServerDB->rowsCount() == 0)
-						{
-							bool reconnect = true;
-							if (reconnect)
-							{
-								if (pServer->ServerDB->ExecuteQuery("UPDATE `account` SET `State` = '1' WHERE `ID` = '%d';", AccountID))
-								{
-									Logger::Log("Client[%d] Logged In with Account '%S' (%d)\n", this, userName, AccountID);
-									return AUTH_SUCCESS;
-								}
-								else
-									return AUTH_DB_FAIL;
-							}
-							else
-								return AUTH_USER_EXIST;
-						}
-						else
-						{
-							if (pServer->ServerDB->ExecuteQuery("UPDATE `account` SET `State` = '1' WHERE `ID` = '%d';", AccountID))
-								return AUTH_SUCCESS;
-							else
-								return AUTH_DB_FAIL;
-						}
+						Logger::Log("Client[%d] Logged In with Account '%S' (%d)\n", this, userName, AccountID);
+						return AUTH_SUCCESS;
 					}
+					else
+						return AUTH_DB_FAIL;
 				}
 			}
 			else

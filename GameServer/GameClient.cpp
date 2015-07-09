@@ -14,7 +14,8 @@ GameClient::GameClient(bool IsAliveCheck, bool IsOpcodeCheck)
 		SetControlFlag(CONTROL_FLAG_CHECK_OPCODE);
 	}
 
-	SetPacketEncoder(&_packetEncoder);
+	// disable Encoding
+	//SetPacketEncoder(&_packetEncoder);
 	pServer = (GameServer*)_GetApp();
 	pProfile = new CharacterProfile(this);
 	bIsClosed = false;
@@ -68,6 +69,8 @@ void GameClient::Send(void* pData, int nSize)
 void GameClient::Send(void* pData, int nSize, int nHandle)
 {
 	Packet* packet = new Packet((unsigned char*)pData, nSize);
+	Logger::SavePacket(packet->GetPacketBuffer());
+
 	int rc = pServer->Send(nHandle, packet);
 	if (0 != rc)
 	{

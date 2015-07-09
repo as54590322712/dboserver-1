@@ -103,6 +103,7 @@ const char * NtlGetGameRuleTypeString(BYTE byRuleType);
 struct sGAME_RULE_INFO
 {
 	BYTE			byRuleType;	// eGAMERULE_TYPE
+	BYTE			abyUnknown[11];
 	union
 	{
 		sTIMEQUEST_RULE_INFO	sTimeQuestRuleInfo;

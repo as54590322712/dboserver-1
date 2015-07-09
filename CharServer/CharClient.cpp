@@ -13,8 +13,9 @@ CharClient::CharClient(bool IsAliveCheck, bool IsOpcodeCheck)
 	{
 		SetControlFlag(CONTROL_FLAG_CHECK_OPCODE);
 	}
-
-	SetPacketEncoder(&_packetEncoder);
+	
+	// Disable Encoding
+	//SetPacketEncoder(&_packetEncoder);
 	pServer = (CharServer*)_GetApp();
 	bIsGM = false;
 }
@@ -44,6 +45,7 @@ int CharClient::OnDispatch(Packet* pPacket)
 void CharClient::Send(void* pData, int nSize)
 {
 	Packet* packet = new Packet((unsigned char*)pData, nSize);
+	Logger::SavePacket(packet->GetPacketBuffer());
 	int rc = pServer->Send(this->GetHandle(), packet);
 	if (0 != rc)
 	{
@@ -172,53 +174,60 @@ int CharClient::DBInsertCharData(sPC_SUMMARY data, sNEWBIE_TBLDAT nbdata)
 	return charid;
 }
 
-int CharClient::GetDBAccCharListData(sCU_CHARACTER_INFO* outdata)
+void CharClient::GetDBAccCharListData(sCU_CHARACTER_INFO& outdata)
 {
 	try
 	{
+		// Clear Structs
+		memset(outdata.asDelData, 0xFF, sizeof(outdata.asDelData));
+		memset(outdata.sPcData, 0xFF, sizeof(outdata.sPcData));
+
 		int c = 0;
 		if (pServer->ServerDB->ExecuteSelect("SELECT * FROM `character` WHERE `AccID`='%d' AND `ServerID`='%d' LIMIT 8;", AccountID, CurrServerID))
 		{
 			while (pServer->ServerDB->Fetch())
 			{
-				outdata->sPcData[c].charId = pServer->ServerDB->getInt("ID");
-				memcpy(outdata->sPcData[c].awchName, charToWChar(pServer->ServerDB->getString("Name")), NTL_MAX_SIZE_CHAR_NAME_UNICODE);
-				outdata->sPcData[c].byClass = pServer->ServerDB->getInt("Class");
-				outdata->sPcData[c].byFace = pServer->ServerDB->getInt("Face");
-				outdata->sPcData[c].byGender = pServer->ServerDB->getInt("Gender");
-				outdata->sPcData[c].byHair = pServer->ServerDB->getInt("Hair");
-				outdata->sPcData[c].byHairColor = pServer->ServerDB->getInt("HairColor");
-				outdata->sPcData[c].bIsAdult = pServer->ServerDB->getBoolean("Adult");
-				outdata->sPcData[c].byLevel = pServer->ServerDB->getInt("Level");
-				outdata->sPcData[c].bNeedNameChange = pServer->ServerDB->getBoolean("NeedNameChange");
-				outdata->sPcData[c].byRace = pServer->ServerDB->getInt("Race");
-				outdata->sPcData[c].bySkinColor = pServer->ServerDB->getInt("SkinColor");
-				outdata->sPcData[c].worldTblidx = pServer->ServerDB->getInt("worldTblidx");
-				outdata->sPcData[c].worldId = pServer->ServerDB->getInt("worldId");
-				outdata->sPcData[c].fPositionX = pServer->ServerDB->getFloat("PositionX");
-				outdata->sPcData[c].fPositionY = pServer->ServerDB->getFloat("PositionY");
-				outdata->sPcData[c].fPositionZ = pServer->ServerDB->getFloat("PositionZ");
-				outdata->sPcData[c].dwMoney = pServer->ServerDB->getInt("Money");
-				outdata->sPcData[c].dwMoneyBank = pServer->ServerDB->getInt("MoneyBank");
-				outdata->sPcData[c].dwMapInfoIndex = pServer->ServerDB->getInt("MapInfoId");
-				outdata->sPcData[c].bTutorialFlag = pServer->ServerDB->getBoolean("TutorialFlag");
-				//MARKING
+				outdata.sPcData[c].charId = pServer->ServerDB->getInt("ID");
+				memcpy(outdata.sPcData[c].awchName, charToWChar(pServer->ServerDB->getString("Name")), NTL_MAX_SIZE_CHAR_NAME_UNICODE);
+				outdata.sPcData[c].byClass = pServer->ServerDB->getInt("Class");
+				outdata.sPcData[c].byFace = pServer->ServerDB->getInt("Face");
+				outdata.sPcData[c].byGender = pServer->ServerDB->getInt("Gender");
+				outdata.sPcData[c].byHair = pServer->ServerDB->getInt("Hair");
+				outdata.sPcData[c].byHairColor = pServer->ServerDB->getInt("HairColor");
+				outdata.sPcData[c].bIsAdult = pServer->ServerDB->getBoolean("Adult");
+				outdata.sPcData[c].byLevel = pServer->ServerDB->getInt("Level");
+				outdata.sPcData[c].bNeedNameChange = pServer->ServerDB->getBoolean("NeedNameChange");
+				outdata.sPcData[c].byRace = pServer->ServerDB->getInt("Race");
+				outdata.sPcData[c].bySkinColor = pServer->ServerDB->getInt("SkinColor");
+				outdata.sPcData[c].worldTblidx = pServer->ServerDB->getInt("worldTblidx");
+				outdata.sPcData[c].worldId = pServer->ServerDB->getInt("worldId");
+				outdata.sPcData[c].fPositionX = pServer->ServerDB->getFloat("PositionX");
+				outdata.sPcData[c].fPositionY = pServer->ServerDB->getFloat("PositionY");
+				outdata.sPcData[c].fPositionZ = pServer->ServerDB->getFloat("PositionZ");
+				outdata.sPcData[c].dwMoney = pServer->ServerDB->getInt("Money");
+				outdata.sPcData[c].dwMoneyBank = pServer->ServerDB->getInt("MoneyBank");
+				outdata.sPcData[c].dwMapInfoIndex = pServer->ServerDB->getInt("MapInfoId");
+				outdata.sPcData[c].bTutorialFlag = pServer->ServerDB->getBoolean("TutorialFlag");
+				outdata.sPcData[c].sMarking.dwCode = pServer->ServerDB->getInt("Marking");
+				outdata.sPcData[c].wUnknow1 = 0;
 
 				// Check to delete char flag
 				if (pServer->ServerDB->getBoolean("ToDelete"))
 				{
-					outdata->asDelData[c].charId = pServer->ServerDB->getInt("ID");
+					outdata.asDelData[c].charId = pServer->ServerDB->getInt("ID");
+					outdata.asDelData[c].dwPastTick = GetTickCount();
+				}
+				else
+				{
+					outdata.asDelData[c].charId = INVALID_DWORD;
+					outdata.asDelData[c].dwPastTick = INVALID_DWORD;
 				}
 				c++;
 			}
 		}
 		for (int i = 0; i < c; i++)
 		{
-			for (int x = 0; x < EQUIP_SLOT_TYPE_COUNT; x++)
-			{
-				outdata->sPcData[i].sItem[x].tblidx = INVALID_ITEMID;
-			}
-			if (pServer->ServerDB->ExecuteSelect("SELECT * FROM `inventory` WHERE `CharID`='%u';", outdata->sPcData[i].charId))
+			if (pServer->ServerDB->ExecuteSelect("SELECT * FROM `inventory` WHERE `CharID`='%u';", outdata.sPcData[i].charId))
 			{
 				while (pServer->ServerDB->Fetch())
 				{
@@ -226,22 +235,19 @@ int CharClient::GetDBAccCharListData(sCU_CHARACTER_INFO* outdata)
 					int place = pServer->ServerDB->getInt("Place");
 					if (((slot >= EQUIP_SLOT_TYPE_FIRST) && (slot <= EQUIP_SLOT_TYPE_LAST)) && place == CONTAINER_TYPE_EQUIP)
 					{
-						outdata->sPcData[i].sItem[slot].tblidx = pServer->ServerDB->getInt("ItemID");
-						outdata->sPcData[i].sItem[slot].byRank = pServer->ServerDB->getInt("Rank");
-						outdata->sPcData[i].sItem[slot].byGrade = pServer->ServerDB->getInt("Grade");
-						outdata->sPcData[i].sItem[slot].byBattleAttribute = pServer->ServerDB->getInt("BattleAttribute");
-						outdata->sPcData[i].sItem[slot].aOptionTblidx[0] = pServer->ServerDB->getInt("Opt1");
-						outdata->sPcData[i].sItem[slot].aOptionTblidx[1] = pServer->ServerDB->getInt("Opt2");
+						outdata.sPcData[i].sItem[slot].tblidx = pServer->ServerDB->getInt("ItemID");
+						outdata.sPcData[i].sItem[slot].byRank = pServer->ServerDB->getInt("Rank");
+						outdata.sPcData[i].sItem[slot].byGrade = pServer->ServerDB->getInt("Grade");
+						outdata.sPcData[i].sItem[slot].byBattleAttribute = pServer->ServerDB->getInt("BattleAttribute");
 					}
 				}
 			}
 		}
-		return c;
+		outdata.byCount = c;
 	}
 	catch (SQLException &e) {
 		Logger::Log("# ERROR #\n");
 		std::cout << "\t\tSQLException in " << __FILE__ << " (" << __FUNCTION__ << ") on line " << __LINE__ << std::endl;
 		std::cout << "\t\t" << e.what() << " (MySQL error code: " << e.getErrorCode() << " SQLState: " << e.getSQLState() << std::endl;
 	}
-	return 0;
 }

@@ -74,7 +74,6 @@ public:
 	int PushPacket(Packet* pPacket);
 	bool PopPacket(Packet* pPacket);
 	virtual bool IsValidPacket(void* PacketHeader, WORD PacketLength);
-	virtual BYTE GetSequence(void* PacketHeader);
 	void Lock() { _mutex.Lock(); }
 	void Unlock() { _mutex.Unlock(); }
 	Mutex* GetMutex() { return &_mutex; }
@@ -122,8 +121,6 @@ public:
 	DWORD GetSendQueueMaxUseSize() { return _sendQueue.GetMaxUsedSize(); }
 	virtual int GetHeaderSize() { return HEADER_SIZE; }
 	virtual int GetPacketLen(BYTE* HeaderPointer);
-	virtual void SetSequence(void* PacketHeader, BYTE Sequence);
-	virtual bool HasValidSequence(void* PacketHeader, BYTE Sequence);
 
 private:
 	void Init();
@@ -257,15 +254,6 @@ inline int Connections::MakeSureCompletedPacket(NetBuffer* pBuffer, WORD* Packet
 	if (nLinearSize < GetHeaderSize())
 	{
 		::CopyMemory(pBuffer->InGetQueueExtraPtr(), pBuffer->InGetQueueBufferPtr(), GetHeaderSize() - nLinearSize);
-	}
-
-	if (pPacketEncoder)
-	{
-		int rc = pPacketEncoder->RxDecrypt(pBuffer->GetQueueWorkPtr());
-		if (0 != rc)
-		{
-			return rc;
-		}
 	}
 
 	int wPacketLen = GetPacketLen(pBuffer->GetQueueWorkPtr());

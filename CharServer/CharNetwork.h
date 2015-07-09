@@ -45,7 +45,7 @@ public:
 	bool PacketControl(Packet* pPacket);
 
 	// DATA FUNCTIONS
-	int GetDBAccCharListData(sCU_CHARACTER_INFO* outdata);
+	void GetDBAccCharListData(sCU_CHARACTER_INFO& outdata);
 	int DBInsertCharData(sPC_SUMMARY data, sNEWBIE_TBLDAT nbdata);
 	eRESULTCODE CheckUsedName(WCHAR* Name);
 	eRESULTCODE DBChangeCharName(WCHAR* Name, int charId);

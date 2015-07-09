@@ -163,12 +163,6 @@ int PacketEncoder::RxDecrypt(Packet& rPacket)
 		Logger::Log("RxDecrypt Error: [%u != %u]\n", pSize, dSize);
 		return 1;
 	}
-	// Checksum
-	//Logger::Log("Rx PacketLen[%u] Sequence[%u] Checksum[%u]\n", rPacket.GetPacketHeader()->wPacketLen, rPacket.GetPacketHeader()->bySequence, rPacket.GetPacketHeader()->byChecksum);
-	if (byCheckSum != rPacket.GetPacketHeader()->byChecksum)
-	{
-		return 2;
-	}
 	return 0;
 }
 
@@ -183,9 +177,6 @@ int PacketEncoder::TxEncrypt(Packet& rPacket)
 		Logger::Log("TxEncrypt Error: [%u != %u]\n", pSize, dSize);
 		return 1;
 	}
-	// Checksum
-	rPacket.GetPacketHeader()->byChecksum = byCheckSum;
-	//Logger::Log("TxEncryptPacketLen[%u] Sequence[%u] Checksum[%u]\n", rPacket.GetPacketHeader()->wPacketLen, rPacket.GetPacketHeader()->bySequence, rPacket.GetPacketHeader()->byChecksum);
 	// Encrypt Header
 	TxEncrypt(rPacket.GetPacketHeader());
 	return 0;

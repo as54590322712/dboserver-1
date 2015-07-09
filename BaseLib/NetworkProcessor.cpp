@@ -89,6 +89,9 @@ void NetworkProcessor::Run()
 		{
 		case NETEVENT_ACCEPT:
 		{
+			BYTE rawData[8] = { 0x06, 0x00, 0x03, 0x00, 0x30, 0x2C, 0x67, 0x4C };
+			pSession->GetSocket().SendStream(rawData, sizeof(rawData), false);
+
 			int rc = pSession->OnAccept();
 			if (0 != rc)
 			{
@@ -123,7 +126,23 @@ void NetworkProcessor::Run()
 			Packet packet;
 			if (pSession->PopPacket(&packet))
 			{
-				rc = pSession->OnDispatch(&packet);
+				LPPACKETDATA pData = (LPPACKETDATA)packet.GetPacketData();
+
+				switch (pData->wOpCode)
+				{
+					case SYS_ALIVE: { pSession->ResetAliveTime(); } break;
+					case SYS_PING: break;
+					case SYS_HANDSHAKE_RES: {
+						BYTE rawData[36] =
+						{
+							0x22, 0x00, 0x10, 0x00, 0x49, 0xD1, 0xF1, 0x1C, 0x6D, 0x58, 0xF9, 0xC5, 0x30, 0x26, 0xA4, 0x7B,
+							0xB2, 0xD8, 0x2C, 0x86, 0x58, 0x60, 0x7B, 0xDD, 0xF0, 0x77, 0xCF, 0x25, 0x48, 0xB3, 0x65, 0x45,
+							0x38, 0x80, 0x14, 0x72
+						};
+						pSession->GetSocket().SendStream(rawData, sizeof(rawData), false);
+					} break;
+					default: { rc = pSession->OnDispatch(&packet); } break;
+				}
 
 				int PacketLen = pSession->GetPacketLen((BYTE*)(packet.GetPacketHeader()));
 				pSession->GetRecvBuffer()->IncreasePopPos(pSession->GetHeaderSize() + PacketLen);

@@ -16,7 +16,8 @@ ChatClient::ChatClient(bool IsAliveCheck, bool IsOpcodeCheck)
 		SetControlFlag(CONTROL_FLAG_CHECK_OPCODE);
 	}
 
-	SetPacketEncoder(&_packetEncoder);
+	// Disable Encoding
+	//SetPacketEncoder(&_packetEncoder);
 	pServer = (ChatServer*)_GetApp();
 }
 

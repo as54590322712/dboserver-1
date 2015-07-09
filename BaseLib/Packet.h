@@ -10,6 +10,10 @@ enum OPCODE_SYS
 	SYS_OPCODE_BEG = 0,
 	SYS_ALIVE,
 	SYS_PING,
+	SYS_HANDSHAKE_REQ = 3,
+	SYS_HANDSHAKE_RES,
+	SYS_HANSAHAKE_NFY = 16,
+
 
 	SYS_OPCODE_END_DUMMY,
 	SYS_OPCODE_END = SYS_OPCODE_END_DUMMY - 1
@@ -17,11 +21,8 @@ enum OPCODE_SYS
 
 typedef struct PACKETHEADER
 {
-	WORD		bEncrypt : 1;
 	WORD		wPacketLen : 15;
-	BYTE		bySequence;
-	BYTE		byChecksum;
-
+	WORD		bEncrypt : 1;
 } PACKETHEADER, *LPPACKETHEADER;
 
 typedef struct PACKETDATA

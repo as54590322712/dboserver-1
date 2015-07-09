@@ -4,26 +4,27 @@
 bool CharClient::PacketControl(Packet* pPacket)
 {
 	LPPACKETDATA data = (LPPACKETDATA)pPacket->GetPacketData();
+	Logger::SavePacket(pPacket->GetPacketBuffer());
+
 	switch (data->wOpCode)
 	{
 	case UC_LOGIN_REQ: SendLoginResult((sUC_LOGIN_REQ*)data); break;
 	case UC_CHARACTER_SERVERLIST_REQ: SendServerlist(false); break;
-	case UC_CHARACTER_SERVERLIST_ONE_REQ: SendServerlist(true); break;
-	case UC_CHARACTER_ADD_REQ: SendCharCreateRes((sUC_CHARACTER_ADD_REQ*)data); break;
-	case UC_CHARACTER_DEL_REQ: SendCharDelRes((sUC_CHARACTER_DEL_REQ*)data); break;
+	//case UC_CHARACTER_SERVERLIST_ONE_REQ: SendServerlist(true); break;
+	//case UC_CHARACTER_ADD_REQ: SendCharCreateRes((sUC_CHARACTER_ADD_REQ*)data); break;
+	//case UC_CHARACTER_DEL_REQ: SendCharDelRes((sUC_CHARACTER_DEL_REQ*)data); break;
 	case UC_CHARACTER_SELECT_REQ: SendCharSelectRes((sUC_CHARACTER_SELECT_REQ*)data); break;
 	case UC_CHARACTER_EXIT_REQ: SendCharExitRes((sUC_CHARACTER_EXIT_REQ*)data); break;
 	case UC_CHARACTER_LOAD_REQ: SendCharLoadResult((sUC_CHARACTER_LOAD_REQ*)data); break;
-	case UC_CHARACTER_DEL_CANCEL_REQ: SendCharDelCancelRes((sUC_CHARACTER_DEL_CANCEL_REQ*)data); break;
+	//case UC_CHARACTER_DEL_CANCEL_REQ: SendCharDelCancelRes((sUC_CHARACTER_DEL_CANCEL_REQ*)data); break;
 	case UC_CONNECT_WAIT_CHECK_REQ: SendCharConnWaitCheckRes((sUC_CONNECT_WAIT_CHECK_REQ*)data); break;
 	case UC_CONNECT_WAIT_CANCEL_REQ: SendCancelWaitReq((sUC_CONNECT_WAIT_CANCEL_REQ*)data); break;
-	case UC_CHARACTER_RENAME_REQ: SendCharRenameRes((sUC_CHARACTER_RENAME_REQ*)data); break;
+	//case UC_CHARACTER_RENAME_REQ: SendCharRenameRes((sUC_CHARACTER_RENAME_REQ*)data); break;
+	case UC_CHAR_SERVERLIST_REQ: SendServerlist(false); break;
+	case UC_CASHITEM_HLSHOP_REFRESH_REQ: break;
 
-	// SYS PACKETS
-	case SYS_ALIVE: { ResetAliveTime(); } break;
-	case SYS_PING: break;
 	default:
-		Logger::Log("Received Opcode: %s\n", NtlGetPacketName_UC(data->wOpCode));
+		Logger::Log("Recv Opcode[%d]: %s\n", data->wOpCode, NtlGetPacketName_UC(data->wOpCode));
 		return false;
 		break;
 	}
@@ -45,6 +46,7 @@ void CharClient::SendLoginResult(sUC_LOGIN_REQ* data)
 	lRes.wOpCode = CU_LOGIN_RES;
 	lRes.wResultCode = CHARACTER_SUCCESS;
 	lRes.dwRaceAllowedFlag = GetDBAllowedRaces();
+	lRes.dwUnknow = 0;
 	Send((unsigned char*)&lRes, sizeof(lRes));
 }
 
@@ -57,10 +59,10 @@ void CharClient::SendServerlist(bool one)
 		sCU_SERVER_FARM_INFO sinfo;
 		memset(&sinfo, 0, sizeof(sCU_SERVER_FARM_INFO));
 		sinfo.wOpCode = CU_SERVER_FARM_INFO;
-		sinfo.serverFarmInfo.serverFarmId = i;
+		sinfo.serverFarmInfo.serverFarmId = i + 1;
 		memcpy(sinfo.serverFarmInfo.wszGameServerFarmName, charToWChar(pServer->ServerCfg->GetStr(snode, "Name")), NTL_MAX_SIZE_SERVER_FARM_NAME_UNICODE);
 		sinfo.serverFarmInfo.byServerStatus = DBO_SERVER_STATUS_UP;
-		sinfo.serverFarmInfo.dwLoad = 0;
+		sinfo.serverFarmInfo.dwLoad = 1;
 		sinfo.serverFarmInfo.dwMaxLoad = pServer->ServerCfg->GetInt(snode, "MaxLoad");
 		Send((unsigned char*)&sinfo, sizeof(sinfo));
 	}
@@ -93,26 +95,27 @@ void CharClient::SendCharLoadResult(sUC_CHARACTER_LOAD_REQ* data)
 	memset(&cninfo, 0, sizeof(sCU_SERVER_CHANNEL_INFO));
 	cninfo.wOpCode = CU_SERVER_CHANNEL_INFO;
 	char snode[20];
-	sprintf_s(snode, "Server%d", CurrServerID + 1);
+	sprintf_s(snode, "Server%d", CurrServerID);
 	cninfo.byCount = pServer->ServerCfg->GetInt(snode, "Count");
 	for (int x = 0; x < cninfo.byCount; x++)
 	{
 		char cnode[20];
 		sprintf_s(cnode, "Channel%d", x + 1);
-		cninfo.serverChannelInfo[x].byServerChannelIndex = x;
+		cninfo.serverChannelInfo[x].byServerChannelIndex = x + 1;
 		cninfo.serverChannelInfo[x].serverFarmId = CurrServerID;
 		cninfo.serverChannelInfo[x].bIsVisible = true;
 		cninfo.serverChannelInfo[x].dwLoad = 0;
-		cninfo.serverChannelInfo[x].dwMaxLoad = pServer->ServerCfg->GetChildInt(snode, cnode, "MaxLoad");
+		cninfo.serverChannelInfo[x].dwMaxLoad = 0;// pServer->ServerCfg->GetChildInt(snode, cnode, "MaxLoad");
 		cninfo.serverChannelInfo[x].byServerStatus = DBO_SERVER_STATUS_UP;
+		cninfo.serverChannelInfo[x].bIsScramble = false;
 	}
 	Send((unsigned char*)&cninfo, sizeof(cninfo));
 
 	sCU_CHARACTER_INFO cinfo;
 	memset(&cinfo, 0, sizeof(sCU_CHARACTER_INFO));
-	cinfo.byCount = GetDBAccCharListData(&cinfo);
+	GetDBAccCharListData(cinfo);
 	cinfo.wOpCode = CU_CHARACTER_INFO;
-	Send((unsigned char*)&cinfo, sizeof(cinfo));
+	Send(&cinfo, sizeof(cinfo));
 
 	Logger::Log("Loaded %d characters from client[%d] (%d)\n", cinfo.byCount, this, AccountID);
 
@@ -120,6 +123,9 @@ void CharClient::SendCharLoadResult(sUC_CHARACTER_LOAD_REQ* data)
 	memset(&clres, 0, sizeof(sCU_CHARACTER_LOAD_RES));
 	clres.wOpCode = CU_CHARACTER_LOAD_RES;
 	clres.wResultCode = CHARACTER_SUCCESS;
+	clres.ServerFarmId = CurrServerID;
+	clres.byOpenCharSlots = 8;
+	clres.byVIPCharSlots = 0;
 	Send((unsigned char*)&clres, sizeof(clres));
 }
 
@@ -231,8 +237,8 @@ void CharClient::SendCharSelectRes(sUC_CHARACTER_SELECT_REQ* data)
 	memcpy(selRes.abyAuthKey, AuthKey, NTL_MAX_SIZE_AUTH_KEY);
 	selRes.charId = CurrCharID;
 	char snode[20], cnode[20];
-	sprintf_s(snode, "Server%d", CurrServerID + 1);
-	sprintf_s(cnode, "Channel%d", CurrChannelID + 1);
+	sprintf_s(snode, "Server%d", CurrServerID);
+	sprintf_s(cnode, "Channel%d", CurrChannelID);
 	memcpy(selRes.szGameServerIP, pServer->ServerCfg->GetChildStr(snode, cnode, "IP"), NTL_MAX_LENGTH_OF_IP);
 	selRes.wGameServerPortForClient = pServer->ServerCfg->GetChildInt(snode, cnode, "Port");
 	selRes.wResultCode = CHARACTER_SUCCESS;

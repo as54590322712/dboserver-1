@@ -9,7 +9,7 @@ enum eOPCODE_CU
 {
 	CU_OPCODE_BEGIN = 3000,
 
-	CU_HEARTBEAT = CU_OPCODE_BEGIN,
+	CU_HEARTBEAT,
 
 	CU_SERVER_FARM_INFO,
 	CU_SERVER_CHANNEL_INFO,
@@ -39,6 +39,12 @@ enum eOPCODE_CU
 
 	CU_CHARACTER_DEL_NFY,
 	CU_CHARACTER_RENAME_RES,
+
+	CU_CASHITEM_HLSHOP_REFRESH_RES,
+	CU_CASHITEM_BUY_RES,
+	CU_PREMIUM_SLOT_COUNT_NFY,
+	CU_CHAR_SERVERLIST_RES,
+	CU_SERVER_FARM_INFO_NFY,
 
 	CU_OPCODE_DUMMY,
 	CU_OPCODE_END = CU_OPCODE_DUMMY - 1
@@ -70,10 +76,15 @@ BEGIN_PROTOCOL(CU_LOGIN_RES)
 	WORD			wResultCode;
 	SERVERFARMID	lastServerFarmId;
 	DWORD			dwRaceAllowedFlag;
+	DWORD			dwUnknow;
 END_PROTOCOL()
 //------------------------------------------------------------------
 BEGIN_PROTOCOL(CU_CHARACTER_SERVERLIST_RES)
 	WORD wResultCode;	
+END_PROTOCOL()
+
+BEGIN_PROTOCOL(CU_CHAR_SERVERLIST_RES)
+	WORD wResultCode;
 END_PROTOCOL()
 //------------------------------------------------------------------
 BEGIN_PROTOCOL(CU_CHARACTER_SERVERLIST_ONE_RES)
@@ -106,7 +117,10 @@ BEGIN_PROTOCOL(CU_CHARACTER_INFO)
 END_PROTOCOL()
 //------------------------------------------------------------------
 BEGIN_PROTOCOL(CU_CHARACTER_LOAD_RES)
-	WORD	wResultCode;
+	WORD			wResultCode;
+	SERVERFARMID	ServerFarmId;
+	BYTE			byOpenCharSlots;
+	BYTE			byVIPCharSlots;
 END_PROTOCOL()
 //------------------------------------------------------------------
 BEGIN_PROTOCOL(CU_CHARACTER_EXIT_RES)

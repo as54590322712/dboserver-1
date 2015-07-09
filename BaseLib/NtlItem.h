@@ -268,12 +268,17 @@ enum eEQUIP_SLOT_TYPE
 	EQUIP_SLOT_TYPE_EARRING_2,
 	EQUIP_SLOT_TYPE_RING_1,
 	EQUIP_SLOT_TYPE_RING_2,
+	EQUIP_SLOT_TYPE_DOGI,
+	EQUIP_SLOT_TYPE_HAIR,
+	EQUIP_SLOT_TYPE_ACCESSORY_1,
+	EQUIP_SLOT_TYPE_ACCESSORY_2,
+	EQUIP_SLOT_TYPE_ACCESSORY_3,
 
 	EQUIP_SLOT_TYPE_COUNT,
 	EQUIP_SLOT_TYPE_UNKNOWN	= 0xFF,
 
 	EQUIP_SLOT_TYPE_FIRST	= EQUIP_SLOT_TYPE_HAND,
-	EQUIP_SLOT_TYPE_LAST	= EQUIP_SLOT_TYPE_RING_2,
+	EQUIP_SLOT_TYPE_LAST	= EQUIP_SLOT_TYPE_COUNT - 1,
 };
 
 //-----------------------------------------------------------------------------------
@@ -853,7 +858,8 @@ struct sHOIPOIMIX_DATA
 	BYTE			bySpecialType;	// eRECIPE_TYPE
 
 	BYTE			byMixLevel;
-	DWORD			dwMixExp;
+	WORD			wMixExp;
+	WORD			wUnknow;
 	
 	//BYTE			byNormalLevel;	 
 	//DWORD			dwNormalExp;
@@ -981,7 +987,6 @@ struct sITEM_SUMMARY
 	BYTE			byRank;
 	BYTE			byGrade;
 	BYTE			byBattleAttribute;
-	TBLIDX			aOptionTblidx[NTL_MAX_OPTION_IN_ITEM];
 };
 
 // 아이템 상태

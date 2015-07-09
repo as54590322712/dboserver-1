@@ -47,8 +47,8 @@ void CharacterManager::UpdateClientData(GameClient* pClient, DWORD dwCurrTick)
 	if (false == pClient->IsClosed() && HasClients() && pClient->IsReadyToUpdate())
 	{
 		// Update LP/EP
-		pClient->SendLPEPUpdate(pClient->GetProfile()->sPcProfile.wCurLP,
-			pClient->GetProfile()->sPcProfile.avatarAttribute.wBaseMaxLP,
+		pClient->SendLPEPUpdate(pClient->GetProfile()->sPcProfile.dwCurLP,
+			pClient->GetProfile()->sPcProfile.avatarAttribute.dwBaseMaxLP,
 			pClient->GetProfile()->sPcProfile.wCurEP,
 			pClient->GetProfile()->sPcProfile.avatarAttribute.wBaseMaxEP,
 			pClient->GetProfile()->GetSerialID());

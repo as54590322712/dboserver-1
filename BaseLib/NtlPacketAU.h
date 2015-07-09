@@ -10,12 +10,13 @@
 //------------------------------------------------------------------
 enum eOPCODE_AU
 {
-	AU_OPCODE_BEGIN = 1000,
+	AU_OPCODE_BEGIN = 1001,
 
 	AU_HEARTBEAT = AU_OPCODE_BEGIN,
 	AU_LOGIN_RES,
 	AU_LOGIN_CREATEUSER_RES,
 	AU_LOGIN_DISCONNECT_RES,
+	AU_COMMERCIAL_SETTING_NFY,
 
 	AU_OPCODE_DUMMY,
 	AU_OPCODE_END = AU_OPCODE_DUMMY - 1
@@ -42,6 +43,7 @@ BEGIN_PROTOCOL(AU_LOGIN_RES)
 	BYTE		abyAuthKey[NTL_MAX_SIZE_AUTH_KEY];
 	ACCOUNTID	accountId;
 	SERVERFARMID		lastServerFarmId;
+	BYTE				lastChannelId;
 	DWORD				dwAllowedFunctionForDeveloper;
 	BYTE				byServerInfoCount;
 	sSERVER_INFO		aServerInfo[DBO_MAX_CHARACTER_SERVER_COUNT];
@@ -55,5 +57,7 @@ END_PROTOCOL()
 BEGIN_PROTOCOL(AU_LOGIN_DISCONNECT_RES)
 END_PROTOCOL()
 //------------------------------------------------------------------
+BEGIN_PROTOCOL(AU_COMMERCIAL_SETTING_NFY)
+END_PROTOCOL()
 
 #pragma pack()

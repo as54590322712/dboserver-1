@@ -9,6 +9,7 @@
 #include <iostream>
 #include <ctime>
 #include <string>
+#include <fstream>
 
 #define	BLACK 0
 #define BLUE 1
@@ -32,6 +33,7 @@
 namespace Logger
 {
 	void Log(char* szText, ...);
+	void SavePacket(BYTE* pData);
 };
 
 #endif

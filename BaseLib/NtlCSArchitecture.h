@@ -263,8 +263,10 @@ struct sDBO_GAME_SERVER_CHANNEL_INFO
 			bIsVisible(true),
 			byServerStatus(DBO_SERVER_STATUS_DOWN),
 			dwMaxLoad(0),
-			dwLoad(0)
+			dwLoad(0),
+			bIsScramble(false)
 	{
+		::ZeroMemory(abyDummy, sizeof(abyDummy));
 	};
 
 	SERVERFARMID serverFarmId;
@@ -272,13 +274,10 @@ struct sDBO_GAME_SERVER_CHANNEL_INFO
 	bool bIsVisible;
 
 	BYTE byServerStatus;		// eDBO_SERVER_STATUS
-	// Load value is stored in percents if it's for Client.
-	// 'dwMaxLoad' should be 100.
-	// 클라이언트에서 사용할 목적으로 값을 세팅할 때는 퍼센트 단위로 저장한다.
-	// 'dwMaxLoad'는 100이 된다.
-	// by YOSHIKI(2007-01-29)
 	DWORD dwMaxLoad;
 	DWORD dwLoad;
+	bool bIsScramble;
+	BYTE abyDummy[106];
 };
 
 struct sDBO_GAME_SERVER_FARM_INFO
@@ -287,7 +286,8 @@ struct sDBO_GAME_SERVER_FARM_INFO
 			serverFarmId(INVALID_SERVERFARMID),
 			byServerStatus(DBO_SERVER_STATUS_DOWN),
 			dwMaxLoad(0),
-			dwLoad(0)
+			dwLoad(0),
+			wUnknow(0)
 	{
 		::ZeroMemory(wszGameServerFarmName, sizeof(wszGameServerFarmName));
 	};
@@ -303,6 +303,7 @@ struct sDBO_GAME_SERVER_FARM_INFO
 	// by YOSHIKI(2007-01-29)
 	DWORD dwMaxLoad;
 	DWORD dwLoad;
+	WORD wUnknow;
 };
 
 struct sDBO_SERVER_LOCK_INFO

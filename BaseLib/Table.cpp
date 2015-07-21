@@ -582,7 +582,7 @@ void Table::CheckNegativeInvalid(const wchar_t* pwszFormatString, BSTR bstr)
 	if (CheckInvalidValue(bstr))
 	{
 		(void)pwszFormatString;
-		_ASSERTE(!"@를 넣을 수 없는 필드입니다.");
+		_ASSERTE(!"The field can not put a @.");
 	}
 }
 

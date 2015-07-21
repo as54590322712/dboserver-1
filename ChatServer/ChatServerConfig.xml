@@ -2,5 +2,5 @@
 <ChatServer>
   <!-- Server Configuration -->
   <Server IP="127.0.0.1" Port="50100" />
-  <MySQL Host="127.0.0.1" Port="3306" Database="dbosnaity" User="root" Password="vertrigo" />
+  <MySQL Host="127.0.0.1" Port="3306" Database="dbodb" User="dboserver" Password="dboserver" />
 </ChatServer>

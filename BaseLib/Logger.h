@@ -7,8 +7,12 @@
 #include <cstdlib>
 #include <cstdio>
 #include <iostream>
+#include <fstream>
 #include <ctime>
 #include <string>
+#include <Shlwapi.h>
+
+#pragma comment(lib, "Shlwapi.lib")
 
 #define	BLACK 0
 #define BLUE 1
@@ -28,10 +32,14 @@
 #define	WHITE 15
 
 #define CONSOLECOLOR(p) SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), p);
+#define MAKEDIR(p) CreateFolder(p);
+
+void CreateFolder(const char * path);
 
 namespace Logger
 {
 	void Log(char* szText, ...);
+	void StartLog();
 };
 
 #endif

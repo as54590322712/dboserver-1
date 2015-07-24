@@ -1842,7 +1842,7 @@ void GameClient::SendItemStackUpdate(HOBJECT hItem, BYTE byStackCount)
 void GameClient::SendDragonBallCheckRes(sUG_DRAGONBALL_CHECK_REQ* pData)
 {
 	int itemExist = 0;
-	DWORD gameResult = 0;
+	WORD gameResult = 0;
 	HOBJECT shenronIdx = INVALID_TBLIDX;
 	TBLIDX testValue = INVALID_TBLIDX;
 	int i = 0;
@@ -1876,7 +1876,7 @@ void GameClient::SendDragonBallCheckRes(sUG_DRAGONBALL_CHECK_REQ* pData)
 //By Luiz45 Dragon Ball Wish
 void GameClient::SendDragonBallReward(sUG_DRAGONBALL_REWARD_REQ* pData)
 {
-	DWORD gameResult = GAME_SUCCESS;
+	WORD gameResult = GAME_SUCCESS;
 
 	sDRAGONBALL_REWARD_TBLDAT* pDBtData = (sDRAGONBALL_REWARD_TBLDAT*)pServer->GetTableContainer()->GetDragonBallRewardTable()->FindData(pData->rewardTblidx);
 	sSKILL_TBLDAT* pSkillData = (sSKILL_TBLDAT*)pServer->GetTableContainer()->GetSkillTable()->FindData(pDBtData->rewardLinkTblidx);

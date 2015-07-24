@@ -4,7 +4,6 @@
 
 int main(int argc, char* argv[])
 {
-	Logger::Log("DBO - ChatServer\n");
 	ChatServer app;
 
 	int rc = app.Create(argc, argv);

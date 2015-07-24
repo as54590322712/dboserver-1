@@ -47,12 +47,10 @@ CREATE TABLE `blacklist` (
   `pkID` bigint(20) unsigned NOT NULL,
   `owner_id` bigint(20) unsigned NOT NULL,
   `target_id` bigint(20) unsigned NOT NULL,
-  PRIMARY KEY (`pkID`,`owner_id`,`target_id`),
+  PRIMARY KEY (`pkID`,`owner_id`),
   UNIQUE KEY `pkID_UNIQUE` (`pkID`),
   KEY `fk_block_owneridx` (`owner_id`),
-  KEY `fk_block_targetidx` (`target_id`),
-  CONSTRAINT `fk_block_ownerid` FOREIGN KEY (`owner_id`) REFERENCES `character` (`ID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `fk_block_targetid` FOREIGN KEY (`target_id`) REFERENCES `character` (`ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
+  CONSTRAINT `fk_block_ownerid` FOREIGN KEY (`owner_id`) REFERENCES `character` (`ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -122,11 +120,9 @@ CREATE TABLE `friendlist` (
   `owner_id` bigint(20) unsigned NOT NULL,
   `friend_id` bigint(20) unsigned NOT NULL,
   `toBlackList` tinyint(1) NOT NULL DEFAULT '0',
-  PRIMARY KEY (`pkID`,`owner_id`,`friend_id`),
+  PRIMARY KEY (`pkID`,`owner_id`),
   UNIQUE KEY `pkID_UNIQUE` (`pkID`),
   KEY `fk_friendlist_owneridx` (`owner_id`),
-  KEY `fk_friendlist_friendidx` (`friend_id`),
-  CONSTRAINT `fk_friendlist_friendid` FOREIGN KEY (`friend_id`) REFERENCES `character` (`ID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_friendlist_ownerid` FOREIGN KEY (`owner_id`) REFERENCES `character` (`ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -645,4 +641,4 @@ DELIMITER ;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2015-07-21 19:10:26
+-- Dump completed on 2015-07-23 23:07:21

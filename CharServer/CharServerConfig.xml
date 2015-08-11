@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <CharServer>
   <!-- Server Configuration -->
-  <Server IP="127.0.0.1" Port="50300" />
+  <Server IP="0.0.0.0" Port="50300" />
   <MySQL Host="127.0.0.1" Port="3306" Database="dbodb" User="dboserver" Password="dboserver" />
   <ServerCount value="1" />
 

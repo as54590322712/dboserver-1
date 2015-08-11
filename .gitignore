@@ -156,6 +156,6 @@ $RECYCLE.BIN/
 .DS_Store
 
 # DBOServer Excludes
-/Deps/*
+[Ll]ogs/
 *.rar
 *.zip

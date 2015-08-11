@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ChatServer>
   <!-- Server Configuration -->
-  <Server IP="127.0.0.1" Port="50100" />
+  <Server IP="0.0.0.0" Port="50700" />
   <MySQL Host="127.0.0.1" Port="3306" Database="dbodb" User="dboserver" Password="dboserver" />
 </ChatServer>

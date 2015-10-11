@@ -811,7 +811,7 @@ void GameClient::SendCharInfoEnd()
 void GameClient::SendCharInfo()
 {
 	sGU_AVATAR_CHAR_INFO charInfo;
-	memset(&charInfo, 255, sizeof(charInfo));
+	memset(&charInfo, 0xFF, sizeof(charInfo));
 	charInfo.wOpCode = GU_AVATAR_CHAR_INFO;
 
 	pProfile->LoadCharacterData();

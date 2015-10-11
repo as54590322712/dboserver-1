@@ -429,7 +429,7 @@ void CharacterProfile::LoadCharacterData()
 	{
 		while (pServer->ServerDB->Fetch())
 		{
-			memset(&sPcProfile, 0xFF, sizeof(sPcProfile));
+			memset(&sPcProfile, 255, sizeof(sPcProfile));
 			sPcProfile.charId = pServer->ServerDB->getInt("ID");
 			memcpy(sPcProfile.awchName, charToWChar(pServer->ServerDB->getString("Name")), NTL_MAX_SIZE_CHAR_NAME_UNICODE);
 			memcpy(wszCharName, charToWChar(pServer->ServerDB->getString("Name")), NTL_MAX_SIZE_CHAR_NAME_UNICODE);
@@ -456,7 +456,7 @@ void CharacterProfile::LoadCharacterData()
 			sPcProfile.sMarking.dwCode = pServer->ServerDB->getInt("Marking");
 			sPcProfile.guildId = pServer->ServerDB->getInt("GuildID");
 
-			memset(&sCharState, 0xFF, sizeof(sCharState));
+			memset(&sCharState, 255, sizeof(sCharState));
 			sCharState.sCharStateBase.vCurLoc.x = pServer->ServerDB->getFloat("PositionX");
 			sCharState.sCharStateBase.vCurLoc.y = pServer->ServerDB->getFloat("PositionY");
 			sCharState.sCharStateBase.vCurLoc.z = pServer->ServerDB->getFloat("PositionZ");

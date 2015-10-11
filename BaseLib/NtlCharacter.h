@@ -949,8 +949,8 @@ struct sPC_BRIEF
 
 	sPC_SHAPE		sPcShape; // pc 외양 ( 얼굴/머리/머리색 )
 
-	WORD			wCurLP;
-	WORD			wMaxLP;
+	DWORD			wCurLP;
+	DWORD			wMaxLP;
 	WORD			wCurEP;
 	WORD			wMaxEP;
 	BYTE			byLevel;

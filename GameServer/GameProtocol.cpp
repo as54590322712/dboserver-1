@@ -4,7 +4,7 @@
 bool GameClient::PacketControl(Packet* pPacket)
 {
 	LPPACKETDATA data = (LPPACKETDATA)pPacket->GetPacketData();
-	Logger::SavePacket(pPacket->GetPacketBuffer());
+	Logger::SavePacket(pPacket->GetPacketBuffer(), NtlGetPacketName_UG(data->wOpCode));
 
 	switch (data->wOpCode)
 	{

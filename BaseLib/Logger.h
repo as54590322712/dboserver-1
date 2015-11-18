@@ -34,6 +34,7 @@ namespace Logger
 {
 	void Log(char* szText, ...);
 	void SavePacket(BYTE* pData);
+	void SavePacket(BYTE* pData, const char* packetName);
 };
 
 #endif

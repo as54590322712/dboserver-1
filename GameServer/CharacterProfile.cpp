@@ -505,9 +505,9 @@ void CharacterProfile::GetObjectCreate(sGU_OBJECT_CREATE& sPacket)
 	sPacket.sObjectInfo.pcBrief.byLevel = sPcProfile.byLevel;
 	sPacket.sObjectInfo.pcBrief.wAttackSpeedRate = sPcProfile.avatarAttribute.wLastAttackSpeedRate;
 	sPacket.sObjectInfo.pcBrief.wCurEP = sPcProfile.wCurEP;
-	sPacket.sObjectInfo.pcBrief.wCurLP = sPcProfile.dwCurLP;
+	sPacket.sObjectInfo.pcBrief.dwCurLP = sPcProfile.dwCurLP;
 	sPacket.sObjectInfo.pcBrief.wMaxEP = sPcProfile.avatarAttribute.wLastMaxEP;
-	sPacket.sObjectInfo.pcBrief.wMaxLP = sPcProfile.avatarAttribute.dwLastMaxLP;
+	sPacket.sObjectInfo.pcBrief.dwMaxLP = sPcProfile.avatarAttribute.dwLastMaxLP;
 	sPacket.sObjectInfo.pcBrief.fSpeed = sPcProfile.avatarAttribute.fLastRunSpeed;
 	memcpy(sPacket.sObjectInfo.pcBrief.awchName, sPcProfile.awchName, NTL_MAX_SIZE_CHAR_NAME_UNICODE);
 	sPacket.sObjectInfo.pcBrief.sMarking.dwCode = sPcProfile.sMarking.dwCode;

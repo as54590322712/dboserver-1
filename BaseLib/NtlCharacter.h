@@ -949,12 +949,16 @@ struct sPC_BRIEF
 
 	sPC_SHAPE		sPcShape; // pc 외양 ( 얼굴/머리/머리색 )
 
-	DWORD			wCurLP;
-	DWORD			wMaxLP;
+	DWORD			dwCurLP;
+	DWORD			dwMaxLP;
 	WORD			wCurEP;
 	WORD			wMaxEP;
+	DWORD			dwCurAP;
+	DWORD			dwMaxAP;
 	BYTE			byLevel;
 	float			fSpeed;
+
+	WORD			wUnknow1;
 
 	sITEM_BRIEF		sItemBrief[EQUIP_SLOT_TYPE_COUNT]; // 장착 아이템 정보
 

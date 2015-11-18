@@ -1,4 +1,5 @@
 #include "GameNetwork.h"
+#include "GameProtocol.h"
 
 GameClient::GameClient(bool IsAliveCheck, bool IsOpcodeCheck)
 	:Session(SESSION_CLIENT)
@@ -69,7 +70,8 @@ void GameClient::Send(void* pData, int nSize)
 void GameClient::Send(void* pData, int nSize, int nHandle)
 {
 	Packet* packet = new Packet((unsigned char*)pData, nSize);
-	Logger::SavePacket(packet->GetPacketBuffer());
+	LPPACKETDATA data = (LPPACKETDATA)packet->GetPacketData();
+	Logger::SavePacket(packet->GetPacketBuffer(), NtlGetPacketName_GU(data->wOpCode));
 
 	int rc = pServer->Send(nHandle, packet);
 	if (0 != rc)

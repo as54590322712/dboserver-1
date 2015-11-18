@@ -347,11 +347,11 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <IncludePath>$(SolutionDir)Deps\include;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)Deps\lib;$(SolutionDir)Deps\lib\Debug;$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(SolutionDir)Deps\lib;$(SolutionDir)Deps\lib\mysql_debug;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <IncludePath>$(SolutionDir)Deps\include;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)Deps\lib;$(SolutionDir)Deps\lib\Release;$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(SolutionDir)Deps\lib;$(SolutionDir)Deps\lib\mysql_release;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -366,7 +366,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <PostBuildEvent>
-      <Command>copy "$(SolutionDir)Deps\bin\libmysql.dll" "$(OutDir)"</Command>
+      <Command>copy "$(SolutionDir)Deps\dlls\libmysql.dll" "$(OutDir)"</Command>
     </PostBuildEvent>
     <Lib />
   </ItemDefinitionGroup>
@@ -387,7 +387,7 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <PostBuildEvent>
-      <Command>copy "$(SolutionDir)Deps\bin\libmysql.dll" "$(OutDir)"</Command>
+      <Command>copy "$(SolutionDir)Deps\dlls\libmysql.dll" "$(OutDir)"</Command>
     </PostBuildEvent>
     <Lib />
   </ItemDefinitionGroup>

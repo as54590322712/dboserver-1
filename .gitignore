@@ -154,8 +154,16 @@ $RECYCLE.BIN/
 
 # Mac desktop service store files
 .DS_Store
+<<<<<<< HEAD
 /AuthServer/logs
 /CharServer/logs
 /CharServer/packets
 /GameServer/packets
 *.bak
+=======
+
+# DBOServer Excludes
+[Ll]ogs/
+*.rar
+*.zip
+>>>>>>> d23e846e5701bea5d1f3006f0d9cdca96f9308a4

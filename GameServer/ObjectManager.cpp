@@ -32,14 +32,25 @@ void ObjectManager::Run()
 	{
 		if (HasPcs())
 		{
-			for (OBJPCLISTIT it = pcList.begin(); it != pcList.end(); it++)
+			try
 			{
-				GameClient* pClient = it->second->GetClient();
-
-				if (pClient && pClient->IsSpawnReady())
+				if (pcList.size()>0)
 				{
-					SpawnToClient(pClient);
+					for (OBJPCLISTIT it = pcList.begin(); it != pcList.end(); it++)
+					{
+						GameClient* pClient = it->second->GetClient();
+
+						if (pClient && pClient->IsSpawnReady())
+						{
+							SpawnToClient(pClient);
+						}
+					}
 				}
+
+			}
+			catch (Exception e){
+				Logger::Log("Error on SpawnToClient: %s Removing from map...", e.GetWhat());
+				continue;
 			}
 		}
 		Sleep(1000);
@@ -52,6 +63,21 @@ void ObjectManager::CreateThread()
 	pThread->Start();
 }
 
+//By Luiz45 Insert the DB on our list
+bool ObjectManager::AddDragonBall(TBLIDX tblDragonBallItem, sDRAGONBALL_TBLDAT* pDb)
+{
+	if (false == dbList.insert(OBJDRAGONBALLLISTVAL(tblDragonBallItem, pDb)).second)
+		return false;
+	return true;
+}
+//By Luiz45 Find DB
+bool ObjectManager::FindDragonBall(TBLIDX idxDB)
+{
+	OBJDRAGONBALLIT it = dbList.find(idxDB);
+	if (it == dbList.end())
+		return false;
+	return true;
+}
 bool ObjectManager::AddObject(HOBJECT hObject, void* pObj, eOBJTYPE eType)
 {
 	if (eType == eOBJTYPE::OBJTYPE_PC)
@@ -69,6 +95,18 @@ bool ObjectManager::AddObject(HOBJECT hObject, void* pObj, eOBJTYPE eType)
 	if (eType == eOBJTYPE::OBJTYPE_MOB)
 	{
 		if (false == mobList.insert(OBJMOBLISTVAL(hObject, (MobProfile*)pObj)).second)
+			return false;
+		return true;
+	}
+	if (eType == eOBJTYPE::OBJTYPE_TOBJECT)
+	{
+		if (false == objMapList.insert(OBJMAPLISTVAL(hObject, (sOBJECT_TBLDAT*)pObj)).second)
+			return false;
+		return true;
+	}
+	if (eType == eOBJTYPE::OBJTYPE_DYNAMIC)
+	{
+		if (false == objDynamicList.insert(OBJDYNAMICLISTVAL(hObject, (sDYNAMIC_OBJECT_TBLDAT*)pObj)).second)
 			return false;
 		return true;
 	}
@@ -95,6 +133,18 @@ void ObjectManager::RemoveObject(HOBJECT hObject, eOBJTYPE eType)
 		if (it != mobList.end())
 			mobList.erase(it);
 	}
+	if (eType == eOBJTYPE::OBJTYPE_TOBJECT)
+	{
+		OBJMAPLISTIT it = objMapList.find(hObject);
+		if (it != objMapList.end())
+			objMapList.erase(it);
+	}
+	if (eType == eOBJTYPE::OBJTYPE_DYNAMIC)
+	{
+		OBJDYNAMICLISTIT it = objDynamicList.find(hObject);
+		if (it != objDynamicList.end())
+			objDynamicList.erase(it);
+	}
 }
 
 bool ObjectManager::FindObject(HOBJECT hObject, eOBJTYPE eType)
@@ -117,6 +167,20 @@ bool ObjectManager::FindObject(HOBJECT hObject, eOBJTYPE eType)
 	{
 		OBJMOBLISTIT it = mobList.find(hObject);
 		if (it == mobList.end())
+			return false;
+		return true;
+	}
+	if (eType == eOBJTYPE::OBJTYPE_TOBJECT)
+	{
+		OBJMAPLISTIT it = objMapList.find(hObject);
+		if (it == objMapList.end())
+			return false;
+		return true;
+	}
+	if (eType == eOBJTYPE::OBJTYPE_DYNAMIC)
+	{
+		OBJDYNAMICLISTIT it = objDynamicList.find(hObject);
+		if (it == objDynamicList.end())
 			return false;
 		return true;
 	}

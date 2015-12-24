@@ -52,7 +52,6 @@ public:
 	int GetDBAllowedRaces();
 	void DBUpdateLastServer();
 	void DBGetGMAccess();
-
 	// PROTOCOL FUNCTIONS
 	void SendLoginResult(sUC_LOGIN_REQ* data);
 	void SendServerlist(bool one);
@@ -113,6 +112,7 @@ public:
 	int	OnConfiguration(const char* ConfigFile);
 	int OnCommandArgument(int argc, _TCHAR* argv[]) { return 0; }
 	int	OnAppStart();
+	unsigned int AcquireSerialID();
 	void Run()
 	{
 		DWORD TickCur, TickOld = ::GetTickCount();
@@ -139,6 +139,7 @@ public:
 	Database* ServerDB;
 	int ServerID;
 	char* gameDataPath;
+	unsigned int m_uiSerialID;
 };
 
 #endif

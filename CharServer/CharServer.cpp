@@ -48,6 +48,7 @@ int CharServer::OnCreate()
 	else
 		return 3;//ERR_TABLE_LOAD
 
+	m_uiSerialID = INVALID_DWORD;
 	return 0;
 }
 
@@ -99,4 +100,15 @@ bool CharServer::LoadTableData()
 	m_pTableContainer = new TableContainer();
 
 	return m_pTableContainer->Create(flagManager, gameDataPath, &fileNameList, eLOADING_METHOD::LOADING_METHOD_SECURED_BINARY, GetACP(), NULL);
+}
+
+unsigned int CharServer::AcquireSerialID()
+{
+	if (m_uiSerialID++)
+	{
+		if (m_uiSerialID == INVALID_DWORD)
+			m_uiSerialID = 0;
+	}
+
+	return m_uiSerialID;
 }

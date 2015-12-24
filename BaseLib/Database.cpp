@@ -11,9 +11,7 @@ Database::Database()
 		driver = get_driver_instance();
 		driver->threadInit();
 	} catch (SQLException &e) {
-		Logger::Log("# ERROR #\n");
-		std::cout << "\t\tSQLException in "<< __FILE__ << " ("<< __FUNCTION__ <<") on line "<< __LINE__ << std::endl;
-		std::cout << "\t\t" << e.what() << " (MySQL error code: " << e.getErrorCode() << " SQLState: " << e.getSQLState() << std::endl;
+		Logger::Log("# ERROR # %s (MySQL error code: %d  SQLState: %s)\n", e.what(), e.getErrorCode(), e.getSQLState());
 	}
 }
 
@@ -24,9 +22,7 @@ Database::~Database()
 		driver->threadEnd();
 	}
 	catch (SQLException &e) {
-		Logger::Log("# ERROR #\n");
-		std::cout << "\t\tSQLException in " << __FILE__ << " (" << __FUNCTION__ << ") on line " << __LINE__ << std::endl;
-		std::cout << "\t\t" << e.what() << " (MySQL error code: " << e.getErrorCode() << " SQLState: " << e.getSQLState() << std::endl;
+		Logger::Log("# ERROR # %s (MySQL error code: %d  SQLState: %s)\n", e.what(), e.getErrorCode(), e.getSQLState());
 	}
 }
 
@@ -47,10 +43,7 @@ bool Database::Connect(char* host, char* database, char* user, char* password, i
 		return false;
 	}
 	catch (SQLException &e) {
-		Logger::Log("Cannot connect to MySQL Server\n");
-		Logger::Log("# ERROR #\n");
-		std::cout << "\t\tSQLException in " << __FILE__ << " (" << __FUNCTION__ << ") on line " << __LINE__ << std::endl;
-		std::cout << "\t\t" << e.what() << " (MySQL error code: " << e.getErrorCode() << " SQLState: " << e.getSQLState() << std::endl;
+		Logger::Log("# ERROR # %s (MySQL error code: %d  SQLState: %s)\n", e.what(), e.getErrorCode(), e.getSQLState());
 	}
 	return false;
 }
@@ -64,9 +57,7 @@ bool Database::ChangeDB(char* db)
 		return true;
 	}
 	catch (SQLException &e) {
-		Logger::Log("# ERROR #\n");
-		std::cout << "\t\tSQLException in " << __FILE__ << " (" << __FUNCTION__ << ") on line " << __LINE__ << std::endl;
-		std::cout << "\t\t" << e.what() << " (MySQL error code: " << e.getErrorCode() << " SQLState: " << e.getSQLState() << std::endl;
+		Logger::Log("# ERROR # %s (MySQL error code: %d  SQLState: %s)\n", e.what(), e.getErrorCode(), e.getSQLState());
 	}
 	return false;
 }
@@ -85,9 +76,7 @@ bool Database::ExecuteQuery(char* Format, ...)
 		return true;
 	}
 	catch (SQLException &e) {
-		Logger::Log("# ERROR #\n");
-		std::cout << "\t\tSQLException in " << __FILE__ << " (" << __FUNCTION__ << ") on line " << __LINE__ << std::endl;
-		std::cout << "\t\t" << e.what() << " (MySQL error code: " << e.getErrorCode() << " SQLState: " << e.getSQLState() << std::endl;
+		Logger::Log("# ERROR # %s (MySQL error code: %d  SQLState: %s)\n", e.what(), e.getErrorCode(), e.getSQLState());
 	}
 	return false;
 }
@@ -106,9 +95,7 @@ bool Database::ExecuteSelect(char* Format, ...)
 		return true;
 	}
 	catch (SQLException &e) {
-		Logger::Log("# ERROR #\n");
-		std::cout << "\t\tSQLException in " << __FILE__ << " (" << __FUNCTION__ << ") on line " << __LINE__ << std::endl;
-		std::cout << "\t\t" << e.what() << " (MySQL error code: " << e.getErrorCode() << " SQLState: " << e.getSQLState() << std::endl;
+		Logger::Log("# ERROR # %s (MySQL error code: %d  SQLState: %s)\n", e.what(), e.getErrorCode(), e.getSQLState());
 	}
 	return false;
 }
@@ -127,9 +114,7 @@ bool Database::ExecuteSp(char* Format, ...)
 		return true;
 	}
 	catch (SQLException &e) {
-		Logger::Log("# ERROR #\n");
-		std::cout << "\t\tSQLException in " << __FILE__ << " (" << __FUNCTION__ << ") on line " << __LINE__ << std::endl;
-		std::cout << "\t\t" << e.what() << " (MySQL error code: " << e.getErrorCode() << " SQLState: " << e.getSQLState() << std::endl;
+		Logger::Log("# ERROR # %s (MySQL error code: %d  SQLState: %s)\n", e.what(), e.getErrorCode(), e.getSQLState());
 	}
 	return false;
 }

@@ -10,6 +10,9 @@
 #include <map>
 
 #include "GameProtocol.h"
+#include "ObjectTable.h"
+#include "DynamicObjectTable.h"
+#include "DragonBallTable.h"
 
 class GameServer;
 class GameClient;
@@ -29,7 +32,9 @@ public:
 	void CreateThread();
 	void Run();
 
-	bool AddObject(HOBJECT hObject, void* pObj, eOBJTYPE eType);
+	bool AddDragonBall(HOBJECT hObject, sDRAGONBALL_TBLDAT* tblDat);
+	bool FindDragonBall(TBLIDX tblDragonBall);
+	bool AddObject(TBLIDX tblDragonBallItem, void* pObj, eOBJTYPE eType);
 	void RemoveObject(HOBJECT hObject, eOBJTYPE eType);
 	bool FindObject(HOBJECT hObject, eOBJTYPE eType);
 
@@ -52,6 +57,21 @@ public:
 	typedef OBJPCLIST::iterator OBJPCLISTIT;
 	typedef OBJPCLIST::value_type OBJPCLISTVAL;
 	OBJPCLIST pcList;
+
+	typedef std::map<HOBJECT, sOBJECT_TBLDAT*> OBJMAPLIST;
+	typedef OBJMAPLIST::iterator OBJMAPLISTIT;
+	typedef OBJMAPLIST::value_type OBJMAPLISTVAL;
+	OBJMAPLIST objMapList;
+
+	typedef std::map<HOBJECT, sDYNAMIC_OBJECT_TBLDAT*> OBJDYNAMICLIST;
+	typedef OBJDYNAMICLIST::iterator OBJDYNAMICLISTIT;
+	typedef OBJDYNAMICLIST::value_type OBJDYNAMICLISTVAL;
+	OBJDYNAMICLIST objDynamicList;
+
+	typedef std::map<TBLIDX, sDRAGONBALL_TBLDAT*> OBJDRAGONBALLLIST;
+	typedef OBJDRAGONBALLLIST::iterator OBJDRAGONBALLIT;
+	typedef OBJDRAGONBALLLIST::value_type OBJDRAGONBALLLISTVAL;
+	OBJDRAGONBALLLIST dbList;
 
 private:
 	Thread* pThread;

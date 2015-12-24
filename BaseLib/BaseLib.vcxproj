@@ -59,6 +59,7 @@
     <ClCompile Include="LandMarkTable.cpp" />
     <ClCompile Include="LegendaryDropTable.cpp" />
     <ClCompile Include="Logger.cpp" />
+    <ClCompile Include="Logic.cpp" />
     <ClCompile Include="MerchantTable.cpp" />
     <ClCompile Include="MobMovePatternTable.cpp" />
     <ClCompile Include="MobTable.cpp" />
@@ -68,6 +69,7 @@
     <ClCompile Include="NormalDropTable.cpp" />
     <ClCompile Include="NpcSpeechTable.cpp" />
     <ClCompile Include="NPCTable.cpp" />
+    <ClCompile Include="NtlAvatar.cpp" />
     <ClCompile Include="NtlBattle.cpp" />
     <ClCompile Include="NtlBBox.cpp" />
     <ClCompile Include="NtlBitFlagManager.cpp" />
@@ -196,6 +198,7 @@
     <ClInclude Include="LinkArray.h" />
     <ClInclude Include="LinkList.h" />
     <ClInclude Include="Logger.h" />
+    <ClInclude Include="Logic.h" />
     <ClInclude Include="MerchantTable.h" />
     <ClInclude Include="MobMovePatternTable.h" />
     <ClInclude Include="MobTable.h" />

@@ -125,7 +125,7 @@ enum eATTRIBUTE_TO_UPDATE
 	ATTRIBUTE_TO_UPDATE_ITEM_BREAK_RATE_DOWN,
 
 	ATTRIBUTE_TO_UPDATE_COUNT,
-	ATTRIBUTE_TO_UPDATE_UNKNOWN	= 0xFF,
+	ATTRIBUTE_TO_UPDATE_UNKNOWN = 0xFF,
 
 	ATTRIBUTE_TO_UPDATE_FIRST = ATTRIBUTE_TO_UPDATE_STR_BASE,
 	ATTRIBUTE_TO_UPDATE_LAST = ATTRIBUTE_TO_UPDATE_COUNT - 1,
@@ -423,3 +423,62 @@ struct sAVATAR_ATTRIBUTE_LINK
 };
 
 #pragma pack(pop)
+
+class CNtlBitFlagManager;
+
+class CNtlAvatar
+{
+public:
+	struct sATTRIBUTE_LOGIC
+	{
+		DWORD dwFieldOffset;
+		DWORD(*pCopyAttributeFunction)(void* pvBuffer, void* pvValue);
+	};
+
+protected:
+	CNtlAvatar(void);
+public:
+	virtual ~CNtlAvatar(void);
+
+protected:
+	void Init();
+
+	virtual void InitializeAttributeLink();
+
+public:
+	static CNtlAvatar* GetInstance();
+
+public:
+	// 패킷의 raw 데이타로부터 sAVATAR_ATTRIBUTE 구조체를 업데이트한다.(주로 클라이언트에서 사용하게 된다.)
+	// Updates sAVATAR_ATTRIBUTE structure with using raw data in a packet.(This function will be used mainly on client-side.)
+	//
+	// (패킷 -> 메타 데이타 + sAVATAR_ATTRIBUTE)
+	// (Packet -> Meta data + sAVATAR_ATTRIBUTE)
+	//
+	static bool UpdateAvatarAttribute(BYTE byAttributeTotalCount, void* pvRawData, sAVATAR_ATTRIBUTE* pAttributeData);
+
+	// 속성 데이타를 패킷의 raw 데이타로 저장한다.(주로 서버에서 사용하게 된다.)
+	// Generates raw data in a packet with using attribute data.(This function will be used mainly on server-side.)
+	//
+	// (메타 데이타 + 속성 데이타 -> 패킷)
+	// (Meta data + Attribute data -> Packet)
+	//
+	static bool SaveAvatarAttribute(CNtlBitFlagManager* pChangedFlag, sAVATAR_ATTRIBUTE_LINK* pAttributeDataLink, void* pvBuffer, DWORD* pwdDataSize);
+
+	// 속성 데이타를 sAVATAR_ATTRIBUTE 구조체로 복사한다.(주로 서버에서 사용하게 된다.)
+	// Copies attribute data into sAVATAR_ATTRIBUTE structure.(This function will be used mainly on server-side.)
+	//
+	// (속성 데이타 -> sAVATAR_ATTRIBUTE)
+	// (Attribute data -> sAVATAR_ATTRIBUTE)
+	//
+	static bool FillAvatarAttribute(sAVATAR_ATTRIBUTE_LINK* pAttributeDataLink, sAVATAR_ATTRIBUTE* pAttributeData);
+	//Convert Attributes - Luiz45
+	static sAVATAR_ATTRIBUTE_LINK ConvertAttributeToAttributeLink(sAVATAR_ATTRIBUTE* pAttribute);
+
+protected:
+	static sATTRIBUTE_LOGIC m_attributeLogic[ATTRIBUTE_TO_UPDATE_COUNT];
+
+	static DWORD CopyValueByType_BYTE(void* pvValue, void* pvBuffer);
+	static DWORD CopyValueByType_WORD(void* pvValue, void* pvBuffer);
+	static DWORD CopyValueByType_float(void* pvValue, void* pvBuffer);
+};

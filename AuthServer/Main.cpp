@@ -2,7 +2,6 @@
 
 int main(int argc, char* argv[])
 {
-	Logger::Log("DBO - AuthServer\n");
 	AuthServer app;
 
 	int rc = app.Create(argc, argv);

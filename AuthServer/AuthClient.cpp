@@ -25,6 +25,9 @@ AuthClient::~AuthClient()
 
 int	AuthClient::OnAccept()
 {
+	#ifdef USE_DBO_TW
+	//Some Code here?
+	#endif
 	return 0;
 }
 

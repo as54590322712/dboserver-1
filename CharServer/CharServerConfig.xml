@@ -2,7 +2,7 @@
 <CharServer>
   <!-- Server Configuration -->
   <Server IP="0.0.0.0" Port="50300" />
-  <MySQL Host="127.0.0.1" Port="3306" Database="DBO" User="dboserver" Password="dboserver" />
+  <MySQL Host="127.0.0.1" Port="3306" Database="dbodb" User="dboserver" Password="dboserver" />
   <ServerCount value="1" />
 
   <!-- Game Data Tables Folder Location -->

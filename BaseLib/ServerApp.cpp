@@ -18,6 +18,7 @@ void ServerApp::Init()
 {
 	_SessionFactory = NULL;
 	_MaxSessionCount = 0;
+	Logger::StartLog();
 }
 
 void ServerApp::Destroy()

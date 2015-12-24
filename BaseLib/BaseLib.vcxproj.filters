@@ -127,6 +127,12 @@
     <Filter Include="Header Files\Table\Rule">
       <UniqueIdentifier>{d379065c-dcf6-4086-bef5-ad57372d97c9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Logic">
+      <UniqueIdentifier>{8049b7da-2352-49d8-9a15-e8f1c65214a1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Logic">
+      <UniqueIdentifier>{b27dcb4d-0441-4bf0-b3b1-d7ada3eda732}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Packet.cpp">
@@ -512,6 +518,12 @@
     </ClCompile>
     <ClCompile Include="NtlStringHandler.cpp">
       <Filter>Source Files\GameLib</Filter>
+    </ClCompile>
+    <ClCompile Include="NtlAvatar.cpp">
+      <Filter>Source Files\GameLib</Filter>
+    </ClCompile>
+    <ClCompile Include="Logic.cpp">
+      <Filter>Source Files\Logic</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1036,6 +1048,9 @@
     </ClInclude>
     <ClInclude Include="TableAll.h">
       <Filter>Header Files\Table</Filter>
+    </ClInclude>
+    <ClInclude Include="Logic.h">
+      <Filter>Header Files\Logic</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

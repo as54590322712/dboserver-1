@@ -2,7 +2,7 @@
 <AuthServer>
   <!-- Server Configuration -->
   <Server IP="0.0.0.0" Port="50200" />
-  <MySQL Host="127.0.0.1" Port="3306" Database="DBO" User="dboserver" Password="dboserver" />
+  <MySQL Host="127.0.0.1" Port="3306" Database="dbodb" User="dboserver" Password="dboserver" />
   
   <!-- Char Server List Configuration -->
   <CharServerList Count="1">

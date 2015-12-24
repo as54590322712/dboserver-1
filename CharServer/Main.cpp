@@ -2,7 +2,6 @@
 
 int main(int argc, char* argv[])
 {
-	Logger::Log("DBO - CharServer\n");
 	CharServer app;
 
 	int rc = app.Create(argc, argv);

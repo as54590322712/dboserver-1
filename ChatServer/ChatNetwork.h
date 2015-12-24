@@ -38,18 +38,41 @@ public:
 	ChatClient(bool IsAliveCheck = false, bool IsOpcodeCheck = false);
 	~ChatClient();
 
+	sFRIEND_FULL_INFO asInfo[NTL_MAX_COUNT_FRIEND + NTL_MAX_COUNT_FRIEND];
+
 	int	OnAccept();
 	void OnClose();
 	int	OnDispatch(Packet* pPacket);
 	void Send(void* pData, int nSize);
 	unsigned int GetCharSerialID() { return CharSerialID; };
 	void GetCharInfo();
-
+	// DB Function
+	void AddFriend(CHARACTERID charID);
+	bool SearchFriendDB(CHARACTERID charID);
+	void DeleteFriend(CHARACTERID charID);
+	void MoveFriend(CHARACTERID charID);
+	void AddToBlackList(CHARACTERID charID);
+	void DeleteFromBlackList(CHARACTERID charID);
+	//Avatar Loader
+	int LoadFriendList();
+	WCHAR* GetCharName() { return charName; };
 	// Opcode Control
 	bool PacketControl(Packet* pPacket);
 
+	//Chat Functions
 	void SendChatEnterRes(sUT_ENTER_CHAT* pData);
+	void SendFriendList();
+	void SendGuildInfo();
 	void SendChatSay(sUT_CHAT_MESSAGE_SAY* pData);
+	void SendChatShout(sUT_CHAT_MESSAGE_SHOUT* pData);
+	void SendChatWhisper(sUT_CHAT_MESSAGE_WHISPER* pData);
+	void SendChatPrivateShop(sUT_CHAT_MESSAGE_PRIVATESHOP_BUSINESS* pData);
+	//Friend List Functions
+	void SendFriendAdd(sUT_FRIEND_ADD_REQ* pData);
+	void SendFriendDel(sUT_FRIEND_DEL_REQ* pData);
+	void SendFriendMove(sUT_FRIEND_MOVE_REQ* pData);
+	void SendBlackListAdd(sUT_FRIEND_BLACK_ADD_REQ* pData);
+	void SendBlackListDel(sUT_FRIEND_BLACK_DEL_REQ* pData);
 
 private:
 	PacketEncoder _packetEncoder;

@@ -95,9 +95,6 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <Text Include="ReadMe.txt" />
-  </ItemGroup>
-  <ItemGroup>
     <ClInclude Include="AuthNetwork.h" />
     <ClInclude Include="AuthProtocol.h" />
   </ItemGroup>

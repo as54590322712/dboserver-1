@@ -101,7 +101,15 @@ bool CharacterManager::FindClient(GameClient* pClient)
 	return false;
 }
 
-void CharacterManager::SendAll2(void* pData, int nSize, GameClient* pClient)
+void CharacterManager::SendAll(void* pData, int nSize)
+{
+	for (cliIt it = cList.begin(); it != cList.end(); ++it)
+	{
+		it->second->PushPacket(pData, nSize);
+	}
+}
+
+void CharacterManager::SendAll(void* pData, int nSize, GameClient* pClient)
 {
 	for (cliIt it = cList.begin(); it != cList.end(); ++it)
 	{
@@ -109,14 +117,6 @@ void CharacterManager::SendAll2(void* pData, int nSize, GameClient* pClient)
 			it->second->PushPacket(pData, nSize);
 		else if (pClient->FindSpawn(it->second->GetHandle(), 0))
 			it->second->PushPacket(pData, nSize);
-	}
-}
-
-void CharacterManager::SendAll(void* pData, int nSize)
-{
-	for (cliIt it = cList.begin(); it != cList.end(); ++it)
-	{
-		it->second->PushPacket(pData, nSize);
 	}
 }
 

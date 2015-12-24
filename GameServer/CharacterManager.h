@@ -31,7 +31,7 @@ public:
 	void RemoveClient(GameClient* pClient);
 	bool FindClient(GameClient* pClient);
 	void SendAll(void* pData, int nSize);
-	void SendAll2(void* pData, int nSize, GameClient* pClient);
+	void SendAll(void* pData, int nSize, GameClient* pClient);
 	void SendOthers(void* pData, int nSize, GameClient* pClient, bool distCheck = false);
 	void RecvOthers(eOPCODE_GU Opcode, GameClient* pClient, bool distCheck = false);
 

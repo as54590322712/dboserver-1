@@ -156,7 +156,7 @@ void GameClient::SendCharSkillRes(sUG_CHAR_SKILL_REQ* pData)
 				DamagetoTarget(sSkill.aSkillResult[i].hTarget, wDamage);
 			}
 
-			pServer->GetClientManager()->SendAll2(&sSkill, sizeof(sSkill), this);
+			pServer->GetClientManager()->SendAll(&sSkill, sizeof(sSkill), this);
 		}
 	}
 	else
@@ -223,7 +223,7 @@ void GameClient::SendToggleFightMode(sUG_CHAR_TOGG_FIGHTING* pData)
 		sPkt.bFightMode = pProfile->sCharState.sCharStateBase.bFightMode;
 		sPkt.handle = pProfile->GetSerialID();
 		sPkt.wOpCode = GU_CHAR_FIGHTMODE;
-		pServer->GetClientManager()->SendAll2(&sPkt, sizeof(sPkt), this);
+		pServer->GetClientManager()->SendAll(&sPkt, sizeof(sPkt), this);
 	}
 }
 
@@ -267,7 +267,7 @@ void GameClient::DamagetoTarget(HOBJECT hTarget, WORD wDamage)
 			sPkt.bFightMode = pProfile->sCharState.sCharStateBase.bFightMode = false;
 			sPkt.handle = pProfile->GetSerialID();
 			sPkt.wOpCode = GU_CHAR_FIGHTMODE;
-			pServer->GetClientManager()->SendAll2(&sPkt, sizeof(sPkt), this);
+			pServer->GetClientManager()->SendAll(&sPkt, sizeof(sPkt), this);
 
 			SendMobGiveExp(pMobProfile->GetMobID());
 		}
@@ -294,7 +294,7 @@ void GameClient::SendCharAttack(DWORD dwCurrTick)
 			sPkt.bChainAttack = false;
 			sPkt.byAttackSequence = 1;
 			sPkt.vShift = pProfile->sCharState.sCharStateBase.vCurLoc;
-			pServer->GetClientManager()->SendAll2(&sPkt, sizeof(sPkt), this);
+			pServer->GetClientManager()->SendAll(&sPkt, sizeof(sPkt), this);
 			pProfile->dwLastAttack = dwCurrTick;
 
 			DamagetoTarget(pProfile->GetTarget(), wDamage);
@@ -329,7 +329,7 @@ void GameClient::SendLPEPUpdate(WORD wCurLp, WORD wMaxLp, WORD wCurEp, WORD wMax
 	sPkt.wCurEP = wCurEp;
 	sPkt.wMaxEP = wMaxEp;
 	sPkt.dwLpEpEventId = 255;
-	pServer->GetClientManager()->SendAll2(&sPkt, sizeof(sPkt), this);
+	pServer->GetClientManager()->SendAll(&sPkt, sizeof(sPkt), this);
 }
 
 void GameClient::SendEPUpdate(WORD wCurEp, WORD wMaxEp, HOBJECT hTarget)
@@ -341,7 +341,7 @@ void GameClient::SendEPUpdate(WORD wCurEp, WORD wMaxEp, HOBJECT hTarget)
 	sPkt.wCurEP = wCurEp;
 	sPkt.wMaxEP = wMaxEp;
 	sPkt.dwLpEpEventId = 255;
-	pServer->GetClientManager()->SendAll2(&sPkt, sizeof(sPkt), this);
+	pServer->GetClientManager()->SendAll(&sPkt, sizeof(sPkt), this);
 }
 
 void GameClient::SendLPUpdate(WORD wCurLp, WORD wMaxLp, HOBJECT hTarget)
@@ -353,7 +353,7 @@ void GameClient::SendLPUpdate(WORD wCurLp, WORD wMaxLp, HOBJECT hTarget)
 	sPkt.wCurLP = wCurLp;
 	sPkt.wMaxLP = wMaxLp;
 	sPkt.dwLpEpEventId = 255;
-	pServer->GetClientManager()->SendAll2(&sPkt, sizeof(sPkt), this);
+	pServer->GetClientManager()->SendAll(&sPkt, sizeof(sPkt), this);
 }
 
 void GameClient::SendCharStateUpdate(HOBJECT hObject, sCHARSTATE sCharState)
@@ -363,7 +363,7 @@ void GameClient::SendCharStateUpdate(HOBJECT hObject, sCHARSTATE sCharState)
 	sPkt.handle = hObject;
 	sPkt.wOpCode = GU_UPDATE_CHAR_STATE;
 	sPkt.sCharState = sCharState;
-	pServer->GetClientManager()->SendAll2(&sPkt, sizeof(sPkt), this);
+	pServer->GetClientManager()->SendAll(&sPkt, sizeof(sPkt), this);
 }
 
 void GameClient::SendCharLevelUp(BYTE byToUp)
@@ -380,7 +380,7 @@ void GameClient::SendCharLevelUp(BYTE byToUp)
 		sPkt.byPrevLevel = pProfile->sPcProfile.byLevel - byToUp;
 		sPkt.dwMaxExpInThisLevel = pExpTbl->dwNeed_Exp;
 		sPkt.handle = pProfile->GetSerialID();
-		pServer->GetClientManager()->SendAll2(&sPkt, sizeof(sPkt), this);
+		pServer->GetClientManager()->SendAll(&sPkt, sizeof(sPkt), this);
 		pProfile->UpdateCharLevel();
 	}
 }
@@ -883,7 +883,7 @@ void GameClient::CheckCommand(sUG_SERVER_COMMAND* pData)
 				sPkt.wOpCode = GU_UPDATE_CHAR_SPEED;
 				sPkt.handle = pProfile->GetSerialID();
 				sPkt.fLastRunningSpeed = sPkt.fLastWalkingSpeed = speed;
-				pServer->GetClientManager()->SendAll2(&sPkt, sizeof(sPkt), this);
+				pServer->GetClientManager()->SendAll(&sPkt, sizeof(sPkt), this);
 			}
 		}
 		if (strcmp(tok[0].c_str(), "@spawnmob") == 0)
@@ -1186,7 +1186,7 @@ void GameClient::SendSystemText(GameString msg, eSERVER_TEXT_TYPE type)
 	sPkt.byDisplayType = type;
 	sPkt.wMessageLengthInUnicode = NTL_MAX_LENGTH_OF_CHAT_MESSAGE_UNICODE;
 	memcpy(sPkt.awchMessage, msg.wc_str(), sPkt.wMessageLengthInUnicode);
-	pServer->GetClientManager()->SendAll2(&sPkt, sizeof(sPkt), this);
+	pServer->GetClientManager()->SendAll(&sPkt, sizeof(sPkt), this);
 }
 //By Luiz45 sitDown
 void GameClient::SendToggleSitDown()
@@ -1250,7 +1250,7 @@ void GameClient::SendPrivateShopCreate(sUG_PRIVATESHOP_CREATE_REQ* pData)
 	sPktReplyNFY.sSummaryPrivateShopData.byShopState = ePRIVATESHOP_STATE::PRIVATESHOP_STATE_CLOSE;
 	sPktReplyNFY.hOwner = pProfile->GetSerialID();
 	sPktReplyNFY.wOpCode = GU_PRIVATESHOP_CREATE_NFY;
-	pServer->GetClientManager()->SendAll2(&sPktReplyNFY, sizeof(sPktReplyNFY), this);
+	pServer->GetClientManager()->SendAll(&sPktReplyNFY, sizeof(sPktReplyNFY), this);
 }
 //By Luiz45 - Char Follow Move
 void GameClient::SendCharFollowMove(sUG_CHAR_FOLLOW_MOVE* pData)
@@ -1938,7 +1938,7 @@ void GameClient::SendChangeZoneInfo(bool bNight)
 	res.zoneInfo.bIsDark = bNight;
 	res.wOpCode = GU_AVATAR_ZONE_INFO;
 	//Send(&res, sizeof(res));
-	pServer->GetClientManager()->SendAll2(&res, sizeof(res), this);
+	pServer->GetClientManager()->SendAll(&res, sizeof(res), this);
 }
 //By luiz45 Create a Object
 void GameClient::SpawnShenron(TBLIDX shenronIDX, sOBJECT_TBLDAT* object)
@@ -1959,7 +1959,7 @@ void GameClient::SpawnShenron(TBLIDX shenronIDX, sOBJECT_TBLDAT* object)
 	res.sObjectInfo.npcBrief.wMaxEP = 100;
 	res.sObjectInfo.npcBrief.wMaxLP = 100;
 	res.wOpCode = GU_OBJECT_CREATE;
-	pServer->GetClientManager()->SendAll2(&res, sizeof(res), this);
+	pServer->GetClientManager()->SendAll(&res, sizeof(res), this);
 	pProfile->SetSpawnedShenron(res.handle);
 	
 }
@@ -1970,5 +1970,5 @@ void GameClient::SendObjectDestroy(HOBJECT hObject)
 	memset(&res, 0, sizeof(res));
 	res.handle = hObject;
 	res.wOpCode = GU_OBJECT_DESTROY;
-	pServer->GetClientManager()->SendAll2(&res, sizeof(res), this);
+	pServer->GetClientManager()->SendAll(&res, sizeof(res), this);
 }
